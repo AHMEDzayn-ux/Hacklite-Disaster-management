@@ -9,6 +9,7 @@ This document shows exactly what kind of data gets generated.
 ## 📋 Missing Person Examples
 
 ### Example 1: Active Case
+
 ```json
 {
   "id": "uuid-1",
@@ -32,6 +33,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 2: Resolved Case
+
 ```json
 {
   "id": "uuid-2",
@@ -59,6 +61,7 @@ This document shows exactly what kind of data gets generated.
 ## ⚠️ Disaster Examples
 
 ### Example 1: Critical Flood
+
 ```json
 {
   "id": "uuid-3",
@@ -90,6 +93,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 2: Moderate Landslide (Resolved)
+
 ```json
 {
   "id": "uuid-4",
@@ -121,6 +125,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 3: High Severity Fire
+
 ```json
 {
   "id": "uuid-5",
@@ -156,6 +161,7 @@ This document shows exactly what kind of data gets generated.
 ## 🐕 Animal Rescue Examples
 
 ### Example 1: Injured Dog
+
 ```json
 {
   "id": "uuid-6",
@@ -178,6 +184,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 2: Trapped Cat (Rescued)
+
 ```json
 {
   "id": "uuid-7",
@@ -188,7 +195,7 @@ This document shows exactly what kind of data gets generated.
   "is_dangerous": false,
   "location": {
     "lat": 7.1644,
-    "lng": 80.5770,
+    "lng": 80.577,
     "address": "Gampola, Kandy, Sri Lanka"
   },
   "reporter_name": "Nuwan Amarasinghe",
@@ -200,6 +207,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 3: Wild Elephant (Dangerous)
+
 ```json
 {
   "id": "uuid-8",
@@ -222,6 +230,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 4: Lost Buffalo
+
 ```json
 {
   "id": "uuid-9",
@@ -231,8 +240,8 @@ This document shows exactly what kind of data gets generated.
   "condition": "lost",
   "is_dangerous": false,
   "location": {
-    "lat": 6.0270,
-    "lng": 80.2170,
+    "lat": 6.027,
+    "lng": 80.217,
     "address": "Fort Area, Galle, Sri Lanka"
   },
   "reporter_name": "Thilini Gamage",
@@ -248,6 +257,7 @@ This document shows exactly what kind of data gets generated.
 ## ⛺ Relief Camp Examples
 
 ### Example 1: Active Emergency Camp
+
 ```json
 {
   "id": "uuid-10",
@@ -262,13 +272,7 @@ This document shows exactly what kind of data gets generated.
   },
   "contact_person": "Janith Samarasinghe",
   "contact_number": "0770123456",
-  "facilities": [
-    "Water",
-    "Electricity",
-    "Medical",
-    "Food",
-    "Shelter"
-  ],
+  "facilities": ["Water", "Electricity", "Medical", "Food", "Shelter"],
   "status": "Active",
   "photo": "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800",
   "created_at": "2026-01-28T10:18:00.000Z"
@@ -276,6 +280,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 2: Full Capacity Camp
+
 ```json
 {
   "id": "uuid-11",
@@ -290,13 +295,7 @@ This document shows exactly what kind of data gets generated.
   },
   "contact_person": "Madhavi Liyanage",
   "contact_number": "0751234567",
-  "facilities": [
-    "Water",
-    "Medical",
-    "Food",
-    "Shelter",
-    "Sanitation"
-  ],
+  "facilities": ["Water", "Medical", "Food", "Shelter", "Sanitation"],
   "status": "Full",
   "photo": "https://images.unsplash.com/photo-1578645510447-e20b4311e3ce?w=800",
   "created_at": "2026-01-28T10:20:00.000Z"
@@ -304,6 +303,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 3: Permanent Camp
+
 ```json
 {
   "id": "uuid-12",
@@ -337,6 +337,7 @@ This document shows exactly what kind of data gets generated.
 ## 💰 Donation Examples
 
 ### Example 1: Named LKR Donation with Message
+
 ```json
 {
   "id": "uuid-13",
@@ -353,6 +354,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 2: Anonymous USD Donation
+
 ```json
 {
   "id": "uuid-14",
@@ -369,6 +371,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 3: Large Named Donation
+
 ```json
 {
   "id": "uuid-15",
@@ -385,6 +388,7 @@ This document shows exactly what kind of data gets generated.
 ```
 
 ### Example 4: Small Anonymous Donation
+
 ```json
 {
   "id": "uuid-16",
@@ -405,6 +409,7 @@ This document shows exactly what kind of data gets generated.
 ## 📊 Dataset Statistics
 
 ### Names Distribution
+
 ```
 Most Common First Names:
 - Nimal (appears ~4-5 times)
@@ -419,6 +424,7 @@ Most Common Last Names:
 ```
 
 ### Location Distribution
+
 ```
 Colombo:        ~8% of records
 Gampaha:        ~8% of records
@@ -428,6 +434,7 @@ Other Districts: ~68% of records
 ```
 
 ### Timestamp Distribution
+
 ```
 Last 7 days:    ~25% of records
 8-14 days ago:  ~25% of records
@@ -440,6 +447,7 @@ Last 7 days:    ~25% of records
 ## 🗺️ Coordinate Examples
 
 ### Colombo Locations
+
 ```
 Pettah:       6.9353, 79.8519
 Fort:         6.9344, 79.8428
@@ -449,6 +457,7 @@ Dehiwala:     6.8520, 79.8630
 ```
 
 ### Kandy Locations
+
 ```
 Peradeniya:   7.2599, 80.5977
 Katugastota:  7.3215, 80.6347
@@ -457,6 +466,7 @@ Temple Area:  7.2936, 80.6400
 ```
 
 ### Coastal Locations
+
 ```
 Negombo:      7.2094, 79.8358
 Galle Fort:   6.0270, 80.2170
@@ -470,6 +480,7 @@ Mirissa:      5.9467, 80.4592
 ## 📱 Contact Examples
 
 ### Phone Numbers
+
 ```
 Valid Formats:
 0771234567  (070-series)
@@ -480,6 +491,7 @@ Valid Formats:
 ```
 
 ### Email Addresses
+
 ```
 Pattern: firstname.lastname@email.com
 
@@ -495,6 +507,7 @@ dilrukshi.jayawardena@email.com
 ## 🎨 Photo URL Examples
 
 ### Person Photos
+
 ```
 https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400
 https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400
@@ -502,6 +515,7 @@ https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400
 ```
 
 ### Disaster Photos (Flood)
+
 ```
 https://images.unsplash.com/photo-1547683905-f686c993aae5?w=800
 https://images.unsplash.com/photo-1624024242180-3f86c56c768a?w=800
@@ -509,6 +523,7 @@ https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=800
 ```
 
 ### Animal Photos (Dog)
+
 ```
 https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800
 https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800
@@ -520,6 +535,7 @@ https://images.unsplash.com/photo-1552053831-71594a27632d?w=800
 ## 🔍 Search Test Cases
 
 ### By Name
+
 ```
 Search: "Nimal"
 Expected: 4-5 missing persons
@@ -529,6 +545,7 @@ Expected: 8-10 records (various types)
 ```
 
 ### By Location
+
 ```
 Search: "Colombo"
 Expected: ~15 records
@@ -538,6 +555,7 @@ Expected: 4-6 records
 ```
 
 ### By District
+
 ```
 Filter: Colombo
 Expected: ~15 records
@@ -547,6 +565,7 @@ Expected: ~15 records
 ```
 
 ### By Status
+
 ```
 Filter: Active
 Expected: ~120 records (80% of missing/disasters)
@@ -560,6 +579,7 @@ Expected: ~30 records (20% of missing/disasters)
 ## ✅ Quality Validation
 
 ### Data Completeness
+
 ```
 ✓ All required fields populated
 ✓ No null values in required fields
@@ -569,6 +589,7 @@ Expected: ~30 records (20% of missing/disasters)
 ```
 
 ### Data Validity
+
 ```
 ✓ Phone numbers: 10 digits, valid prefixes
 ✓ Email format: valid structure
@@ -578,6 +599,7 @@ Expected: ~30 records (20% of missing/disasters)
 ```
 
 ### Data Variety
+
 ```
 ✓ Multiple first names used
 ✓ Multiple last names used
@@ -593,6 +615,7 @@ Expected: ~30 records (20% of missing/disasters)
 After generating all 190 records:
 
 ### List Views Should Show
+
 - 50 missing persons with photos
 - 30 disasters with type-specific images
 - 40 animal rescues with animal photos
@@ -600,12 +623,14 @@ After generating all 190 records:
 - 50 donations with various amounts
 
 ### Maps Should Display
+
 - ~150 markers (all except donations)
 - Distributed across Sri Lanka
 - Clustered in major cities
 - Clickable for details
 
 ### Filters Should Work
+
 - District filter: 25 options
 - Status filter: various per type
 - Date range: last 30 days

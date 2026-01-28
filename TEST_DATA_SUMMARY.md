@@ -9,35 +9,39 @@
 
 ## 📊 What Gets Generated
 
-| Category | Count | Features |
-|----------|-------|----------|
-| Missing Persons | 50 | Photos, GPS, Sri Lankan names, medical info |
-| Disaster Reports | 30 | Disaster-specific photos, severities, needs |
-| Animal Rescues | 40 | Animal photos, breeds, conditions |
-| Relief Camps | 20 | Camp photos, capacities, facilities |
-| Donations | 50 | Multiple currencies, payment methods |
-| **TOTAL** | **190** | **Complete test dataset** |
+| Category         | Count   | Features                                    |
+| ---------------- | ------- | ------------------------------------------- |
+| Missing Persons  | 50      | Photos, GPS, Sri Lankan names, medical info |
+| Disaster Reports | 30      | Disaster-specific photos, severities, needs |
+| Animal Rescues   | 40      | Animal photos, breeds, conditions           |
+| Relief Camps     | 20      | Camp photos, capacities, facilities         |
+| Donations        | 50      | Multiple currencies, payment methods        |
+| **TOTAL**        | **190** | **Complete test dataset**                   |
 
 ## ✨ Key Features
 
 ✅ **Real GPS Coordinates**
+
 - All 25 Sri Lankan districts
 - Major cities and towns
 - Accurate lat/lng with minor randomization
 
 ✅ **Professional Photos**
+
 - Sourced from Unsplash
 - High quality (800px width)
 - Category-appropriate images
 - Royalty-free
 
 ✅ **Authentic Data**
+
 - Sri Lankan names (Sinhala conventions)
 - Valid phone format (070-078 prefixes)
 - Recent dates (last 30 days)
 - Realistic descriptions
 
 ✅ **Complete Information**
+
 - Contact details
 - Status tracking
 - Detailed descriptions
@@ -46,6 +50,7 @@
 ## 📍 Districts Covered
 
 **High Detail Areas** (with specific locations):
+
 - Colombo (Pettah, Fort, Kollupitiya, Nugegoda, Dehiwala)
 - Gampaha (Negombo, Ja-Ela, Kadawatha, Wattala)
 - Kandy (Peradeniya, Katugastota, Gampola)
@@ -62,50 +67,55 @@ All other 15 districts with base coordinates
 
 ## 📸 Photo Categories
 
-| Type | Photo Content |
-|------|---------------|
+| Type            | Photo Content                          |
+| --------------- | -------------------------------------- |
 | Missing Persons | Professional portraits (10 variations) |
-| Floods | Water disasters (3 variations) |
-| Landslides | Hill collapses (2 variations) |
-| Fires | Fire incidents (3 variations) |
-| Cyclones | Storm damage (2 variations) |
-| Droughts | Dry landscapes (2 variations) |
-| Earthquakes | Structural damage (2 variations) |
-| Dogs | Dog photos (3 variations) |
-| Cats | Cat photos (3 variations) |
-| Cattle | Cattle photos (2 variations) |
-| Buffalo | Buffalo photos (2 variations) |
-| Goats | Goat photos (2 variations) |
-| Wild Animals | Wildlife photos (2 variations) |
-| Camps | Relief camps/tents (4 variations) |
+| Floods          | Water disasters (3 variations)         |
+| Landslides      | Hill collapses (2 variations)          |
+| Fires           | Fire incidents (3 variations)          |
+| Cyclones        | Storm damage (2 variations)            |
+| Droughts        | Dry landscapes (2 variations)          |
+| Earthquakes     | Structural damage (2 variations)       |
+| Dogs            | Dog photos (3 variations)              |
+| Cats            | Cat photos (3 variations)              |
+| Cattle          | Cattle photos (2 variations)           |
+| Buffalo         | Buffalo photos (2 variations)          |
+| Goats           | Goat photos (2 variations)             |
+| Wild Animals    | Wildlife photos (2 variations)         |
+| Camps           | Relief camps/tents (4 variations)      |
 
 ## 🎯 Data Distribution
 
 ### Missing Persons
+
 - Ages: 10-80 years
 - Gender: 50/50 split
 - Status: 80% Active, 20% Resolved
 - Medical conditions: ~50% have details
 
 ### Disasters
+
 - 6 types: flood, landslide, fire, cyclone, drought, earthquake
 - 4 severities: low, moderate, high, critical
 - Status: 70% Active, 30% Resolved
 - People affected: 10-500+
 
 ### Animal Rescues
+
 - 6 animal types
 - 4 conditions: injured, trapped, lost, healthy
 - Status: 70% Pending, 30% Rescued
 - Dangerous flag: ~15% marked
 
 ### Relief Camps
+
 - 3 types: Emergency, Temporary, Permanent
 - Capacity: 50-1000 people
 - 5-6 facilities per camp
 - Status: 90% Active, 10% Full/Closed
 
 ### Donations
+
 - Amounts: 100-50,000
 - Currency: 80% LKR, 20% USD
 - Donor: 70% named, 30% anonymous
@@ -114,6 +124,7 @@ All other 15 districts with base coordinates
 ## ⚡ Usage Tips
 
 ### Individual Generation
+
 ```
 ✓ Generate 50 Missing Persons (5 seconds)
 ✓ Generate 30 Disasters (3 seconds)
@@ -123,11 +134,13 @@ All other 15 districts with base coordinates
 ```
 
 ### Monitoring
+
 - Watch console (F12) for detailed logs
 - Each record shows: ✓ success or ✗ failure
 - Progress counter displayed
 
 ### Best Time to Generate
+
 - ✅ Fresh database setup
 - ✅ Demo preparation
 - ✅ Testing new features
@@ -167,6 +180,7 @@ After generation, test:
 ## 🔧 Quick Fixes
 
 ### Photos Not Loading
+
 ```
 Check: Internet connection
 Check: Browser console for errors
@@ -174,6 +188,7 @@ Try: Clear cache and reload
 ```
 
 ### Generation Fails
+
 ```
 Check: Supabase connection
 Check: Database permissions (RLS)
@@ -182,6 +197,7 @@ Try: Generate smaller batches
 ```
 
 ### Slow Performance
+
 ```
 Normal: 100ms delay between records
 Solution: Generate in smaller batches
@@ -191,12 +207,14 @@ Check: Network latency
 ## 📋 Checklist
 
 Before generating:
+
 - [ ] Supabase connection active
 - [ ] Database tables exist
 - [ ] RLS policies configured
 - [ ] Browser console open (F12)
 
 After generating:
+
 - [ ] Check console for completion
 - [ ] Verify record counts
 - [ ] Test list pages
@@ -207,6 +225,7 @@ After generating:
 ## 🗑️ Cleanup
 
 To remove test data:
+
 ```sql
 -- In Supabase SQL Editor
 DELETE FROM missing_persons WHERE created_at > '2026-01-01';
@@ -219,6 +238,7 @@ DELETE FROM donations WHERE created_at > '2026-01-01';
 ## 📞 Contact Data Format
 
 **Phone Numbers:**
+
 ```
 070XXXXXXX (70-series)
 071XXXXXXX (71-series)
@@ -230,11 +250,13 @@ DELETE FROM donations WHERE created_at > '2026-01-01';
 ```
 
 **Emails:**
+
 ```
 firstname.lastname@email.com
 ```
 
 **Addresses:**
+
 ```
 [Area Name], [District], Sri Lanka
 Example: Pettah, Colombo, Sri Lanka
@@ -248,13 +270,13 @@ Example: Pettah, Colombo, Sri Lanka
 
 ## 💾 Database Tables Used
 
-| Table | Field for Photo | Field for Location |
-|-------|----------------|-------------------|
-| missing_persons | photo | last_seen_location |
-| disasters | photo | location |
-| animal_rescues | photo | location |
-| camps | photo | location |
-| donations | N/A | N/A |
+| Table           | Field for Photo | Field for Location |
+| --------------- | --------------- | ------------------ |
+| missing_persons | photo           | last_seen_location |
+| disasters       | photo           | location           |
+| animal_rescues  | photo           | location           |
+| camps           | photo           | location           |
+| donations       | N/A             | N/A                |
 
 ## 🎨 Photo URLs Format
 
@@ -263,6 +285,7 @@ https://images.unsplash.com/photo-[ID]?w=800
 ```
 
 All photos optimized for:
+
 - Width: 800px
 - Quality: High
 - Format: JPEG

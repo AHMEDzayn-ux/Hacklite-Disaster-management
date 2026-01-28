@@ -87,12 +87,14 @@ All coordinates include minor randomization (±0.01 degrees) for variety while m
 ### 📸 Photo Sources
 
 All photos are sourced from **Unsplash**, ensuring:
+
 - High-quality professional images
 - Royalty-free usage
 - Appropriate content for each category
 - Consistent 800px width for optimal display
 
 **Photo Categories:**
+
 - **Missing Persons**: Professional portrait photos
 - **Disasters**: Disaster-specific images (floods, fires, etc.)
 - **Animals**: Species-specific photos
@@ -103,7 +105,6 @@ All photos are sourced from **Unsplash**, ensuring:
 - **Phone Numbers**: Valid Sri Lankan mobile format
   - Prefixes: 070, 071, 072, 075, 076, 077, 078
   - Format: `07XXXXXXXX` (10 digits)
-  
 - **Email Addresses**: Generated from names
   - Format: `firstname.lastname@email.com`
 
@@ -142,12 +143,15 @@ All photos are sourced from **Unsplash**, ensuring:
 ### Generation Options
 
 #### Option 1: Generate All Data
+
 ```
 Click "Generate All (190 records)" button
 ```
+
 This creates:
+
 - 50 Missing Persons
-- 30 Disaster Reports  
+- 30 Disaster Reports
 - 40 Animal Rescues
 - 20 Relief Camps
 - 50 Donations
@@ -155,7 +159,9 @@ This creates:
 **Time Required**: 1-3 minutes
 
 #### Option 2: Generate Individual Categories
+
 Use individual buttons for each category:
+
 - Generate 50 Missing Persons
 - Generate 30 Disasters
 - Generate 40 Animal Rescues
@@ -165,7 +171,7 @@ Use individual buttons for each category:
 ### Monitoring Progress
 
 1. **UI Progress Indicator**: Shows current generation status
-2. **Browser Console** (Press F12): 
+2. **Browser Console** (Press F12):
    - Detailed logs for each record
    - Success/failure indicators
    - Record counts and details
@@ -193,21 +199,22 @@ src/
 
 ```javascript
 // Generate individual categories
-generateMissingPersons(count)
-generateDisasters(count)
-generateAnimalRescues(count)
-generateCamps(count)
-generateDonations(count)
+generateMissingPersons(count);
+generateDisasters(count);
+generateAnimalRescues(count);
+generateCamps(count);
+generateDonations(count);
 
 // Generate all at once
-generateAllTestData()
+generateAllTestData();
 ```
 
 ### Database Integration
 
 Uses Supabase service layer:
+
 ```javascript
-import { createDocument, TABLES } from '../services/supabaseService';
+import { createDocument, TABLES } from "../services/supabaseService";
 ```
 
 Records are inserted with proper delay (50-100ms) to avoid rate limiting.
@@ -215,7 +222,9 @@ Records are inserted with proper delay (50-100ms) to avoid rate limiting.
 ## Testing Scenarios
 
 ### Complete System Test
+
 Generate all data to test:
+
 - ✅ List views with pagination
 - ✅ Detail pages
 - ✅ Map displays with markers
@@ -227,18 +236,21 @@ Generate all data to test:
 - ✅ Location accuracy
 
 ### Performance Test
+
 - Generate large datasets
 - Test load times
 - Verify pagination
 - Check memory usage
 
 ### Map Testing
+
 - Verify all markers appear
 - Check clustering functionality
 - Test marker click events
 - Validate coordinate accuracy
 
 ### Filter Testing
+
 - Filter by district
 - Filter by status
 - Filter by date range
@@ -273,6 +285,7 @@ Generate all data to test:
 ### Issue: Generation Fails
 
 **Solutions:**
+
 - Check internet connection (needed for Supabase)
 - Verify Supabase credentials in `.env`
 - Check browser console for specific errors
@@ -282,6 +295,7 @@ Generate all data to test:
 ### Issue: Photos Not Showing
 
 **Solutions:**
+
 - Check internet connection (Unsplash CDN)
 - Verify photo URLs are valid
 - Check browser console for CORS errors
@@ -290,11 +304,13 @@ Generate all data to test:
 ### Issue: Slow Generation
 
 **Causes:**
+
 - Network latency to Supabase
 - Large number of records
 - Rate limiting
 
 **Solutions:**
+
 - Generate in smaller batches
 - Check network speed
 - Increase delay between insertions
@@ -302,6 +318,7 @@ Generate all data to test:
 ### Issue: Duplicate Data
 
 **Solution:**
+
 - Each generation creates new records
 - Manually delete old test data from database
 - Or add unique constraints to prevent duplicates
@@ -314,15 +331,16 @@ Edit in `bulkTestData.js`:
 
 ```javascript
 export const generateAllTestData = async () => {
-    await generateMissingPersons(50);  // Change count here
-    await generateDisasters(30);        // Change count here
-    // ... etc
+  await generateMissingPersons(50); // Change count here
+  await generateDisasters(30); // Change count here
+  // ... etc
 };
 ```
 
 ### Customizing Data
 
 **Add More Names:**
+
 ```javascript
 const FIRST_NAMES = [
     'Nimal', 'Kamal', 'YourName', ...
@@ -330,27 +348,28 @@ const FIRST_NAMES = [
 ```
 
 **Add More Districts:**
+
 ```javascript
 const DISTRICT_LOCATIONS = {
-    'YourDistrict': [
-        { area: 'Area1', lat: X.XXXX, lng: Y.YYYY }
-    ]
+  YourDistrict: [{ area: "Area1", lat: X.XXXX, lng: Y.YYYY }],
 };
 ```
 
 **Change Photo Sources:**
+
 ```javascript
 const PERSON_PHOTOS = [
-    'https://your-image-url.com/photo.jpg',
-    // ... more photos
+  "https://your-image-url.com/photo.jpg",
+  // ... more photos
 ];
 ```
 
 ### Modifying Delays
 
 Adjust rate limiting:
+
 ```javascript
-await new Promise(resolve => setTimeout(resolve, 100)); // Change 100ms
+await new Promise((resolve) => setTimeout(resolve, 100)); // Change 100ms
 ```
 
 ## Data Cleanup
@@ -358,6 +377,7 @@ await new Promise(resolve => setTimeout(resolve, 100)); // Change 100ms
 ### Delete Test Data
 
 **Option 1: SQL Commands**
+
 ```sql
 -- Delete all test data
 DELETE FROM missing_persons WHERE created_at > '2026-01-01';
@@ -368,72 +388,87 @@ DELETE FROM donations WHERE created_at > '2026-01-01';
 ```
 
 **Option 2: Supabase Dashboard**
+
 - Go to Table Editor
 - Use filters to identify test data
 - Select and delete records
 
 **Option 3: Create Cleanup Script**
+
 ```javascript
 // Add to bulkTestData.js
 export const cleanupTestData = async () => {
-    // Implementation for cleanup
+  // Implementation for cleanup
 };
 ```
 
 ## API Reference
 
 ### generateMissingPersons(count)
+
 Generates missing person reports.
 
 **Parameters:**
+
 - `count` (number): Number of records to generate
 
 **Returns:** Promise<Array> - Array of created records
 
 **Example:**
+
 ```javascript
 const persons = await generateMissingPersons(50);
 console.log(`Created ${persons.length} missing person reports`);
 ```
 
 ### generateDisasters(count)
+
 Generates disaster reports with photos.
 
 **Parameters:**
+
 - `count` (number): Number of records to generate
 
 **Returns:** Promise<Array> - Array of created records
 
 ### generateAnimalRescues(count)
+
 Generates animal rescue requests.
 
 **Parameters:**
+
 - `count` (number): Number of records to generate
 
 **Returns:** Promise<Array> - Array of created records
 
 ### generateCamps(count)
+
 Generates relief camp entries.
 
 **Parameters:**
+
 - `count` (number): Number of records to generate
 
 **Returns:** Promise<Array> - Array of created records
 
 ### generateDonations(count)
+
 Generates donation records.
 
 **Parameters:**
+
 - `count` (number): Number of records to generate
 
 **Returns:** Promise<Array> - Array of created records
 
 ### generateAllTestData()
+
 Generates all test data categories.
 
 **Parameters:** None
 
-**Returns:** 
+**Returns:**
+
 ```javascript
 Promise<{
     success: boolean,
@@ -451,6 +486,7 @@ Promise<{
 ## Version History
 
 ### v1.0 (Current)
+
 - Initial implementation
 - 5 data categories
 - Real GPS coordinates
@@ -492,6 +528,7 @@ Promise<{
 ## Support
 
 For issues or questions:
+
 1. Check browser console for errors
 2. Review Supabase logs
 3. Verify database permissions
