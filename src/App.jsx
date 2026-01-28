@@ -24,6 +24,7 @@ const Volunteers = lazy(() => import('./pages/Volunteers'));
 const Donations = lazy(() => import('./pages/Donations'));
 const BulkTestData = lazy(() => import('./pages/BulkTestData'));
 const Camps = lazy(() => import('./pages/Camps'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Admin pages (lazy loaded)
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -93,6 +94,9 @@ function App() {
 
             {/* Bulk Test Data Generator */}
             <Route path="/bulk-test-data" element={<BulkTestData />} />
+
+            {/* 404 - Catch all unmatched routes */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </div>
