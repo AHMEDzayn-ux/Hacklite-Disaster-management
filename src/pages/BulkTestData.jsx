@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generateAllTestData, generateMissingPersons, generateDisasters, generateAnimalRescues, generateCamps } from '../utils/bulkTestData';
+import { generateAllTestData, generateMissingPersons, generateDisasters, generateAnimalRescues, generateCamps, generateDonations } from '../utils/bulkTestData';
 
 function BulkTestData() {
     const navigate = useNavigate();
@@ -81,7 +81,7 @@ function BulkTestData() {
                 {result && (
                     <div className="card bg-green-50 border-l-4 border-green-500 mb-6">
                         <h3 className="font-bold text-green-800 mb-2">✅ Generation Complete!</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
                             <div className="bg-white rounded p-3 text-center">
                                 <p className="text-2xl font-bold text-primary-600">{result.counts.missingPersons}</p>
                                 <p className="text-xs text-gray-600">Missing Persons</p>
@@ -98,6 +98,10 @@ function BulkTestData() {
                                 <p className="text-2xl font-bold text-success-600">{result.counts.camps}</p>
                                 <p className="text-xs text-gray-600">Camps</p>
                             </div>
+                            <div className="bg-white rounded p-3 text-center">
+                                <p className="text-2xl font-bold text-blue-600">{result.counts.donations}</p>
+                                <p className="text-xs text-gray-600">Donations</p>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -108,7 +112,8 @@ function BulkTestData() {
                     <ul className="text-yellow-700 text-sm space-y-1">
                         <li>• This creates test records in your Supabase database</li>
                         <li>• Data is realistic but randomly generated</li>
-                        <li>• Photos are not included (photo field will be null)</li>
+                        <li>• ✨ Photos are included from Unsplash (professional stock images)</li>
+                        <li>• ✨ Real GPS coordinates for all Sri Lankan districts</li>
                         <li>• Generation may take 1-3 minutes depending on count</li>
                         <li>• Check browser console (F12) for detailed progress</li>
                     </ul>
@@ -118,14 +123,14 @@ function BulkTestData() {
                 <div className="card mb-6 bg-gradient-to-r from-primary-500 to-primary-700 text-white">
                     <h3 className="font-bold text-xl mb-2">🚀 Generate All Test Data</h3>
                     <p className="text-primary-100 mb-4">
-                        Creates 140 records: 50 Missing Persons + 30 Disasters + 40 Animal Rescues + 20 Camps
+                        Creates 190 records: 50 Missing Persons + 30 Disasters + 40 Animal Rescues + 20 Camps + 50 Donations
                     </p>
                     <button
                         onClick={handleGenerateAll}
                         disabled={loading}
                         className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? 'Generating...' : '🎯 Generate All (140 records)'}
+                        {loading ? 'Generating...' : '🎯 Generate All (190 records)'}
                     </button>
                 </div>
 
@@ -202,6 +207,24 @@ function BulkTestData() {
                             Generate 20 Camps
                         </button>
                     </div>
+
+                    {/* Donations */}
+                    <div className="card">
+                        <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                            <span className="text-2xl">💰</span>
+                            Donations
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-4">
+                            Donation records with various amounts, currencies, and donor information
+                        </p>
+                        <button
+                            onClick={() => handleGenerateType('Donations', 50, generateDonations)}
+                            disabled={loading}
+                            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Generate 50 Donations
+                        </button>
+                    </div>
                 </div>
 
                 {/* Features List */}
@@ -212,18 +235,20 @@ function BulkTestData() {
                             <p className="font-semibold mb-2">✓ Realistic Data:</p>
                             <ul className="space-y-1 ml-4">
                                 <li>• Sri Lankan names</li>
-                                <li>• Valid phone numbers</li>
-                                <li>• All 25 districts</li>
+                                <li>• Valid phone numbers (070-078)</li>
+                                <li>• All 25 districts with real areas</li>
                                 <li>• Recent dates (last 30 days)</li>
+                                <li>• Professional photos from Unsplash</li>
                             </ul>
                         </div>
                         <div>
                             <p className="font-semibold mb-2">✓ Features:</p>
                             <ul className="space-y-1 ml-4">
                                 <li>• Mixed statuses (Active/Resolved)</li>
-                                <li>• Various severities</li>
-                                <li>• Real GPS coordinates</li>
-                                <li>• Detailed descriptions</li>
+                                <li>• Various severities & conditions</li>
+                                <li>• Real GPS coordinates (accurate)</li>
+                                <li>• Detailed contextual descriptions</li>
+                                <li>• Donation amounts (LKR & USD)</li>
                             </ul>
                         </div>
                     </div>

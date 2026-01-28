@@ -24,12 +24,12 @@
 
 ### Prerequisites
 
-| Requirement | Version | Purpose |
-|-------------|---------|---------|
-| Node.js | 18.x+ | JavaScript runtime |
-| npm | 9.x+ | Package manager |
-| Git | 2.x+ | Version control |
-| VS Code | Latest | Recommended IDE |
+| Requirement | Version | Purpose            |
+| ----------- | ------- | ------------------ |
+| Node.js     | 18.x+   | JavaScript runtime |
+| npm         | 9.x+    | Package manager    |
+| Git         | 2.x+    | Version control    |
+| VS Code     | Latest  | Recommended IDE    |
 
 ### Initial Setup
 
@@ -151,13 +151,13 @@ Disaster-management/
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/App.jsx` | Route definitions and app structure |
-| `src/config/supabase.js` | Supabase client initialization |
-| `src/services/supabaseService.js` | Database CRUD operations |
-| `src/store/supabaseStore.js` | Zustand state stores |
-| `src/contexts/AuthContext.jsx` | Authentication provider |
+| File                              | Purpose                             |
+| --------------------------------- | ----------------------------------- |
+| `src/App.jsx`                     | Route definitions and app structure |
+| `src/config/supabase.js`          | Supabase client initialization      |
+| `src/services/supabaseService.js` | Database CRUD operations            |
+| `src/store/supabaseStore.js`      | Zustand state stores                |
+| `src/contexts/AuthContext.jsx`    | Authentication provider             |
 
 ---
 
@@ -218,11 +218,11 @@ User Action → Component → Store Action → Service → Supabase
 // ✅ Use functional components with hooks
 function MyComponent({ prop1, prop2 }) {
     const [state, setState] = useState(null);
-    
+
     useEffect(() => {
         // Side effects here
     }, []);
-    
+
     return <div>...</div>;
 }
 
@@ -249,66 +249,64 @@ const value = data ?? defaultValue;
 
 ### File Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
+| Type       | Convention | Example                 |
+| ---------- | ---------- | ----------------------- |
 | Components | PascalCase | `MissingPersonForm.jsx` |
-| Pages | PascalCase | `Dashboard.jsx` |
-| Services | camelCase | `supabaseService.js` |
-| Stores | camelCase | `supabaseStore.js` |
-| Utils | camelCase | `cacheManager.js` |
-| Styles | kebab-case | `index.css` |
+| Pages      | PascalCase | `Dashboard.jsx`         |
+| Services   | camelCase  | `supabaseService.js`    |
+| Stores     | camelCase  | `supabaseStore.js`      |
+| Utils      | camelCase  | `cacheManager.js`       |
+| Styles     | kebab-case | `index.css`             |
 
 ### Component Structure
 
 ```jsx
 // Standard component structure
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { useSomeStore } from '../store';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useSomeStore } from "../store";
 
 // Constants at top
-const STATUS_OPTIONS = ['Active', 'Pending', 'Closed'];
+const STATUS_OPTIONS = ["Active", "Pending", "Closed"];
 
 /**
  * Component description
  * @param {Object} props - Component props
  */
 function MyComponent({ prop1, prop2 }) {
-    // Hooks first
-    const [loading, setLoading] = useState(false);
-    const { data, fetchData } = useSomeStore();
-    const { register, handleSubmit } = useForm();
-    
-    // Effects
-    useEffect(() => {
-        fetchData();
-    }, []);
-    
-    // Event handlers
-    const handleAction = async (formData) => {
-        setLoading(true);
-        try {
-            await doSomething(formData);
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    // Render helpers (if needed)
-    const renderList = () => (
-        <ul>
-            {data.map(item => <li key={item.id}>{item.name}</li>)}
-        </ul>
-    );
-    
-    // Main render
-    if (loading) return <LoadingSpinner />;
-    
-    return (
-        <div className="container mx-auto p-4">
-            {renderList()}
-        </div>
-    );
+  // Hooks first
+  const [loading, setLoading] = useState(false);
+  const { data, fetchData } = useSomeStore();
+  const { register, handleSubmit } = useForm();
+
+  // Effects
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Event handlers
+  const handleAction = async (formData) => {
+    setLoading(true);
+    try {
+      await doSomething(formData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Render helpers (if needed)
+  const renderList = () => (
+    <ul>
+      {data.map((item) => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  );
+
+  // Main render
+  if (loading) return <LoadingSpinner />;
+
+  return <div className="container mx-auto p-4">{renderList()}</div>;
 }
 
 export default MyComponent;
@@ -349,38 +347,41 @@ export default MyComponent;
 
 ```jsx
 // src/components/NewFeatureForm.jsx
-import { useForm } from 'react-hook-form';
-import LocationPicker from './LocationPicker';
+import { useForm } from "react-hook-form";
+import LocationPicker from "./LocationPicker";
 
 function NewFeatureForm({ onSubmit }) {
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm();
-    
-    const handleFormSubmit = async (data) => {
-        await onSubmit(data);
-    };
-    
-    return (
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-            <div>
-                <label className="block text-sm font-medium mb-1">
-                    Field Name *
-                </label>
-                <input
-                    {...register('fieldName', { required: 'Field is required' })}
-                    className="w-full px-4 py-2 border rounded-lg"
-                />
-                {errors.fieldName && (
-                    <span className="text-red-500 text-sm">
-                        {errors.fieldName.message}
-                    </span>
-                )}
-            </div>
-            
-            <button type="submit" className="btn-primary">
-                Submit
-            </button>
-        </form>
-    );
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const handleFormSubmit = async (data) => {
+    await onSubmit(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Field Name *</label>
+        <input
+          {...register("fieldName", { required: "Field is required" })}
+          className="w-full px-4 py-2 border rounded-lg"
+        />
+        {errors.fieldName && (
+          <span className="text-red-500 text-sm">
+            {errors.fieldName.message}
+          </span>
+        )}
+      </div>
+
+      <button type="submit" className="btn-primary">
+        Submit
+      </button>
+    </form>
+  );
 }
 
 export default NewFeatureForm;
@@ -391,28 +392,24 @@ export default NewFeatureForm;
 ```jsx
 // src/components/NewFeatureList.jsx
 function NewFeatureList({ items, onItemClick }) {
-    if (!items || items.length === 0) {
-        return (
-            <div className="text-center text-gray-500 py-8">
-                No items found
-            </div>
-        );
-    }
-    
-    return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {items.map(item => (
-                <div 
-                    key={item.id}
-                    onClick={() => onItemClick(item)}
-                    className="p-4 bg-white rounded-lg shadow hover:shadow-md cursor-pointer"
-                >
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <p className="text-gray-600">{item.description}</p>
-                </div>
-            ))}
+  if (!items || items.length === 0) {
+    return <div className="text-center text-gray-500 py-8">No items found</div>;
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => (
+        <div
+          key={item.id}
+          onClick={() => onItemClick(item)}
+          className="p-4 bg-white rounded-lg shadow hover:shadow-md cursor-pointer"
+        >
+          <h3 className="font-semibold">{item.title}</h3>
+          <p className="text-gray-600">{item.description}</p>
         </div>
-    );
+      ))}
+    </div>
+  );
 }
 
 export default NewFeatureList;
@@ -422,50 +419,41 @@ export default NewFeatureList;
 
 ```jsx
 // src/pages/NewFeature.jsx
-import { useEffect } from 'react';
-import { useNewFeatureStore } from '../store';
-import NewFeatureForm from '../components/NewFeatureForm';
-import NewFeatureList from '../components/NewFeatureList';
+import { useEffect } from "react";
+import { useNewFeatureStore } from "../store";
+import NewFeatureForm from "../components/NewFeatureForm";
+import NewFeatureList from "../components/NewFeatureList";
 
 function NewFeature() {
-    const { 
-        items, 
-        loading, 
-        subscribeToItems,
-        unsubscribeFromItems,
-        addItem 
-    } = useNewFeatureStore();
-    
-    useEffect(() => {
-        subscribeToItems();
-        return () => unsubscribeFromItems();
-    }, []);
-    
-    const handleSubmit = async (data) => {
-        await addItem(data);
-    };
-    
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-6">New Feature</h1>
-            
-            <div className="grid gap-8 lg:grid-cols-2">
-                <div>
-                    <h2 className="text-xl font-semibold mb-4">Submit</h2>
-                    <NewFeatureForm onSubmit={handleSubmit} />
-                </div>
-                
-                <div>
-                    <h2 className="text-xl font-semibold mb-4">All Items</h2>
-                    {loading ? (
-                        <div>Loading...</div>
-                    ) : (
-                        <NewFeatureList items={items} />
-                    )}
-                </div>
-            </div>
+  const { items, loading, subscribeToItems, unsubscribeFromItems, addItem } =
+    useNewFeatureStore();
+
+  useEffect(() => {
+    subscribeToItems();
+    return () => unsubscribeFromItems();
+  }, []);
+
+  const handleSubmit = async (data) => {
+    await addItem(data);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">New Feature</h1>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Submit</h2>
+          <NewFeatureForm onSubmit={handleSubmit} />
         </div>
-    );
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4">All Items</h2>
+          {loading ? <div>Loading...</div> : <NewFeatureList items={items} />}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default NewFeature;
@@ -476,35 +464,34 @@ export default NewFeature;
 ```javascript
 // Add to src/store/supabaseStore.js
 export const useNewFeatureStore = create((set, get) => ({
-    items: [],
-    loading: false,
-    error: null,
-    unsubscribe: null,
-    
-    subscribeToItems: async () => {
-        set({ loading: true });
-        const unsubscribeFn = await subscribeToTable(
-            'new_feature_table',
-            (items) => set({ items, loading: false })
-        );
-        set({ unsubscribe: unsubscribeFn });
-    },
-    
-    unsubscribeFromItems: () => {
-        const { unsubscribe } = get();
-        if (unsubscribe) unsubscribe();
-        set({ unsubscribe: null });
-    },
-    
-    addItem: async (item) => {
-        set({ loading: true });
-        const newItem = await createDocument('new_feature_table', item);
-        set(state => ({
-            items: [newItem, ...state.items],
-            loading: false
-        }));
-        return newItem;
-    }
+  items: [],
+  loading: false,
+  error: null,
+  unsubscribe: null,
+
+  subscribeToItems: async () => {
+    set({ loading: true });
+    const unsubscribeFn = await subscribeToTable("new_feature_table", (items) =>
+      set({ items, loading: false })
+    );
+    set({ unsubscribe: unsubscribeFn });
+  },
+
+  unsubscribeFromItems: () => {
+    const { unsubscribe } = get();
+    if (unsubscribe) unsubscribe();
+    set({ unsubscribe: null });
+  },
+
+  addItem: async (item) => {
+    set({ loading: true });
+    const newItem = await createDocument("new_feature_table", item);
+    set((state) => ({
+      items: [newItem, ...state.items],
+      loading: false,
+    }));
+    return newItem;
+  },
 }));
 ```
 
@@ -512,12 +499,18 @@ export const useNewFeatureStore = create((set, get) => ({
 
 ```jsx
 // In src/App.jsx
-const NewFeature = lazy(() => import('./pages/NewFeature'));
+const NewFeature = lazy(() => import("./pages/NewFeature"));
 
 // Add route
-<Route path="/new-feature" element={
-    <><Navbar /><NewFeature /></>
-} />
+<Route
+  path="/new-feature"
+  element={
+    <>
+      <Navbar />
+      <NewFeature />
+    </>
+  }
+/>;
 ```
 
 ---
@@ -527,100 +520,104 @@ const NewFeature = lazy(() => import('./pages/NewFeature'));
 ### Zustand Store Pattern
 
 ```javascript
-import { create } from 'zustand';
-import { subscribeToTable, createDocument, updateDocument } from '../services/supabaseService';
+import { create } from "zustand";
+import {
+  subscribeToTable,
+  createDocument,
+  updateDocument,
+} from "../services/supabaseService";
 
 export const useExampleStore = create((set, get) => ({
-    // State
-    items: [],
-    loading: false,
-    error: null,
-    unsubscribe: null,
-    isInitialized: false,
-    
-    // Subscribe to real-time updates
-    subscribe: async () => {
-        const { isInitialized, unsubscribe } = get();
-        if (isInitialized && unsubscribe) return;
-        
-        set({ loading: true });
-        const unsubscribeFn = await subscribeToTable(
-            'table_name',
-            (data, appendMode) => {
-                if (appendMode) {
-                    set(state => ({ items: [...state.items, ...data] }));
-                } else {
-                    set({ items: data, loading: false, isInitialized: true });
-                }
-            }
-        );
-        set({ unsubscribe: unsubscribeFn });
-    },
-    
-    // Unsubscribe
-    unsubscribe: () => {
-        const { unsubscribe } = get();
-        if (unsubscribe) {
-            unsubscribe();
-            set({ unsubscribe: null });
+  // State
+  items: [],
+  loading: false,
+  error: null,
+  unsubscribe: null,
+  isInitialized: false,
+
+  // Subscribe to real-time updates
+  subscribe: async () => {
+    const { isInitialized, unsubscribe } = get();
+    if (isInitialized && unsubscribe) return;
+
+    set({ loading: true });
+    const unsubscribeFn = await subscribeToTable(
+      "table_name",
+      (data, appendMode) => {
+        if (appendMode) {
+          set((state) => ({ items: [...state.items, ...data] }));
+        } else {
+          set({ items: data, loading: false, isInitialized: true });
         }
-    },
-    
-    // Add item
-    addItem: async (item) => {
-        try {
-            set({ loading: true, error: null });
-            const newItem = await createDocument('table_name', item);
-            set(state => ({
-                items: [newItem, ...state.items],
-                loading: false
-            }));
-            return newItem;
-        } catch (error) {
-            set({ error: error.message, loading: false });
-            throw error;
-        }
-    },
-    
-    // Update item
-    updateItem: async (id, updates) => {
-        try {
-            set({ loading: true, error: null });
-            await updateDocument('table_name', id, updates);
-            set(state => ({
-                items: state.items.map(item =>
-                    item.id === id ? { ...item, ...updates } : item
-                ),
-                loading: false
-            }));
-        } catch (error) {
-            set({ error: error.message, loading: false });
-            throw error;
-        }
+      }
+    );
+    set({ unsubscribe: unsubscribeFn });
+  },
+
+  // Unsubscribe
+  unsubscribe: () => {
+    const { unsubscribe } = get();
+    if (unsubscribe) {
+      unsubscribe();
+      set({ unsubscribe: null });
     }
+  },
+
+  // Add item
+  addItem: async (item) => {
+    try {
+      set({ loading: true, error: null });
+      const newItem = await createDocument("table_name", item);
+      set((state) => ({
+        items: [newItem, ...state.items],
+        loading: false,
+      }));
+      return newItem;
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  // Update item
+  updateItem: async (id, updates) => {
+    try {
+      set({ loading: true, error: null });
+      await updateDocument("table_name", id, updates);
+      set((state) => ({
+        items: state.items.map((item) =>
+          item.id === id ? { ...item, ...updates } : item
+        ),
+        loading: false,
+      }));
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
 }));
 ```
 
 ### Using Stores in Components
 
 ```jsx
-import { useEffect } from 'react';
-import { useExampleStore } from '../store';
+import { useEffect } from "react";
+import { useExampleStore } from "../store";
 
 function MyComponent() {
-    // Select only what you need
-    const items = useExampleStore(state => state.items);
-    const loading = useExampleStore(state => state.loading);
-    const { subscribe, unsubscribe, addItem } = useExampleStore();
-    
-    // Subscribe on mount
-    useEffect(() => {
-        subscribe();
-        return () => unsubscribe();
-    }, []);
-    
-    // Use the data
-    return loading ? <Spinner /> : <List items={items} />;
+  // Select only what you need
+  const items = useExampleStore((state) => state.items);
+  const loading = useExampleStore((state) => state.loading);
+  const { subscribe, unsubscribe, addItem } = useExampleStore();
+
+  // Subscribe on mount
+  useEffect(() => {
+    subscribe();
+    return () => unsubscribe();
+  }, []);
+
+  // Use the data
+  return loading ? <Spinner /> : <List items={items} />;
 }
 ```
 
@@ -646,13 +643,13 @@ CREATE TABLE new_feature (
 ALTER TABLE new_feature ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
-CREATE POLICY "Anyone can view" ON new_feature 
+CREATE POLICY "Anyone can view" ON new_feature
     FOR SELECT USING (true);
 
-CREATE POLICY "Anyone can insert" ON new_feature 
+CREATE POLICY "Anyone can insert" ON new_feature
     FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Authenticated can update" ON new_feature 
+CREATE POLICY "Authenticated can update" ON new_feature
     FOR UPDATE USING (auth.role() = 'authenticated');
 
 -- Enable realtime
@@ -666,50 +663,45 @@ ALTER PUBLICATION supabase_realtime ADD TABLE new_feature;
 
 // Query with filters
 export const getFilteredDocuments = async (table, filters) => {
-    let query = supabase.from(table).select('*');
-    
-    // Apply filters
-    if (filters.status) {
-        query = query.eq('status', filters.status);
-    }
-    if (filters.district) {
-        query = query.eq('district', filters.district);
-    }
-    if (filters.search) {
-        query = query.ilike('name', `%${filters.search}%`);
-    }
-    
-    // Order and limit
-    query = query
-        .order('created_at', { ascending: false })
-        .limit(100);
-    
-    const { data, error } = await query;
-    if (error) throw error;
-    return data;
+  let query = supabase.from(table).select("*");
+
+  // Apply filters
+  if (filters.status) {
+    query = query.eq("status", filters.status);
+  }
+  if (filters.district) {
+    query = query.eq("district", filters.district);
+  }
+  if (filters.search) {
+    query = query.ilike("name", `%${filters.search}%`);
+  }
+
+  // Order and limit
+  query = query.order("created_at", { ascending: false }).limit(100);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
 };
 
 // Upsert (insert or update)
-export const upsertDocument = async (table, data, conflictColumn = 'id') => {
-    const { data: result, error } = await supabase
-        .from(table)
-        .upsert(data, { onConflict: conflictColumn })
-        .select()
-        .single();
-    
-    if (error) throw error;
-    return result;
+export const upsertDocument = async (table, data, conflictColumn = "id") => {
+  const { data: result, error } = await supabase
+    .from(table)
+    .upsert(data, { onConflict: conflictColumn })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return result;
 };
 
 // Batch insert
 export const batchInsert = async (table, items) => {
-    const { data, error } = await supabase
-        .from(table)
-        .insert(items)
-        .select();
-    
-    if (error) throw error;
-    return data;
+  const { data, error } = await supabase.from(table).insert(items).select();
+
+  if (error) throw error;
+  return data;
 };
 ```
 
@@ -727,41 +719,41 @@ npm install -D vitest @testing-library/react @testing-library/jest-dom
 ```javascript
 // vite.config.js
 export default defineConfig({
-    plugins: [react()],
-    test: {
-        globals: true,
-        environment: 'jsdom',
-        setupFiles: './src/test/setup.js'
-    }
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.js",
+  },
 });
 ```
 
 ```javascript
 // src/test/setup.js
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 ```
 
 ### Component Test Example
 
 ```javascript
 // src/components/__tests__/MyComponent.test.jsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import MyComponent from '../MyComponent';
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import MyComponent from "../MyComponent";
 
-describe('MyComponent', () => {
-    it('renders correctly', () => {
-        render(<MyComponent title="Test" />);
-        expect(screen.getByText('Test')).toBeInTheDocument();
-    });
-    
-    it('calls onClick when clicked', () => {
-        const handleClick = vi.fn();
-        render(<MyComponent onClick={handleClick} />);
-        
-        fireEvent.click(screen.getByRole('button'));
-        expect(handleClick).toHaveBeenCalledTimes(1);
-    });
+describe("MyComponent", () => {
+  it("renders correctly", () => {
+    render(<MyComponent title="Test" />);
+    expect(screen.getByText("Test")).toBeInTheDocument();
+  });
+
+  it("calls onClick when clicked", () => {
+    const handleClick = vi.fn();
+    render(<MyComponent onClick={handleClick} />);
+
+    fireEvent.click(screen.getByRole("button"));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
 });
 ```
 
@@ -785,6 +777,7 @@ npm run test -- --watch
 ### AWS Amplify Deployment
 
 1. **Prepare for Deployment**
+
 ```bash
 # Build locally first to check for errors
 npm run build
@@ -796,6 +789,7 @@ git push origin main
 ```
 
 2. **Amplify Configuration** (`amplify.yml`)
+
 ```yaml
 version: 1
 frontend:
@@ -809,14 +803,15 @@ frontend:
   artifacts:
     baseDirectory: dist
     files:
-      - '**/*'
+      - "**/*"
   cache:
     paths:
       - node_modules/**/*
 ```
 
 3. **Environment Variables**
-Set in Amplify Console:
+   Set in Amplify Console:
+
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_STRIPE_PUBLISHABLE_KEY`
@@ -864,6 +859,7 @@ type(scope): description
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -873,6 +869,7 @@ type(scope): description
 - `chore`: Maintenance
 
 **Examples:**
+
 ```
 feat(camps): add filtering by district
 fix(forms): resolve validation error on empty fields
@@ -908,23 +905,29 @@ docs(readme): update installation instructions
 ### Common Issues
 
 **Supabase Connection Error**
+
 ```
 Error: Supabase configuration is missing
 ```
+
 Solution: Check `.env` file has correct `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
 
 **Build Errors**
+
 ```
 Module not found: Can't resolve '...'
 ```
+
 Solution: Run `npm install` and check import paths
 
 **Real-time Not Working**
+
 - Verify RLS policies allow SELECT
 - Check table is added to realtime publication
 - Verify WebSocket connection in browser DevTools
 
 **Tailwind Classes Not Working**
+
 - Restart dev server
 - Check `tailwind.config.js` content paths
 - Verify class names are correct
@@ -933,16 +936,16 @@ Solution: Run `npm install` and check import paths
 
 ```javascript
 // Enable Supabase logging
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 const supabase = createClient(url, key, {
-    db: { schema: 'public' },
-    auth: { persistSession: true },
-    global: { headers: {} }
+  db: { schema: "public" },
+  auth: { persistSession: true },
+  global: { headers: {} },
 });
 
 // Log all Supabase queries (dev only)
 if (import.meta.env.DEV) {
-    supabase.channel('*').subscribe(console.log);
+  supabase.channel("*").subscribe(console.log);
 }
 ```
 
@@ -951,6 +954,7 @@ if (import.meta.env.DEV) {
 ## Resources
 
 ### Documentation
+
 - [React Docs](https://react.dev)
 - [Supabase Docs](https://supabase.com/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
@@ -959,6 +963,7 @@ if (import.meta.env.DEV) {
 - [Vite](https://vitejs.dev)
 
 ### Community
+
 - GitHub Issues for bug reports
 - Discussions for questions
 - Pull Requests for contributions

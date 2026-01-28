@@ -38,10 +38,10 @@ Welcome to the Sri Lanka Disaster Management Platform! This guide will help you 
 
 On the landing page, you'll see two options:
 
-| Role | Best For | Actions |
-|------|----------|---------|
-| 📣 **I Need Help (Report)** | Victims, witnesses, anyone needing assistance | Report emergencies, find camps, get help |
-| 🤝 **I Want to Help (Respond)** | Volunteers, NGOs, donors | View reports, volunteer, donate |
+| Role                            | Best For                                      | Actions                                  |
+| ------------------------------- | --------------------------------------------- | ---------------------------------------- |
+| 📣 **I Need Help (Report)**     | Victims, witnesses, anyone needing assistance | Report emergencies, find camps, get help |
+| 🤝 **I Want to Help (Respond)** | Volunteers, NGOs, donors                      | View reports, volunteer, donate          |
 
 > 💡 **Tip:** You can switch between roles anytime by clicking the home button or navigating to the main page.
 
@@ -56,23 +56,24 @@ As a reporter, you can submit emergency reports to alert responders and authorit
 **Purpose:** Report someone who is missing during or after a disaster.
 
 **Steps:**
+
 1. Click **"I Need Help"** from the landing page
 2. Select **"Missing Persons"** from the menu
 3. Click **"Report Missing Person"**
 4. Fill in the form:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Full Name | ✅ Yes | Complete name of missing person |
-| Age | ✅ Yes | Age in years |
-| Gender | ✅ Yes | Select from dropdown |
-| Description | ✅ Yes | Physical appearance, clothing |
-| Last Seen Location | ✅ Yes | Click on map or enter address |
-| Last Seen Date | ✅ Yes | When they were last seen |
-| Your Name | ✅ Yes | Reporter's name |
-| Contact Number | ✅ Yes | Phone for updates |
-| Photo | ❌ Optional | Upload a clear photo |
-| Additional Info | ❌ Optional | Any other relevant details |
+| Field              | Required    | Description                     |
+| ------------------ | ----------- | ------------------------------- |
+| Full Name          | ✅ Yes      | Complete name of missing person |
+| Age                | ✅ Yes      | Age in years                    |
+| Gender             | ✅ Yes      | Select from dropdown            |
+| Description        | ✅ Yes      | Physical appearance, clothing   |
+| Last Seen Location | ✅ Yes      | Click on map or enter address   |
+| Last Seen Date     | ✅ Yes      | When they were last seen        |
+| Your Name          | ✅ Yes      | Reporter's name                 |
+| Contact Number     | ✅ Yes      | Phone for updates               |
+| Photo              | ❌ Optional | Upload a clear photo            |
+| Additional Info    | ❌ Optional | Any other relevant details      |
 
 5. Click **"Submit Report"**
 6. You'll receive a confirmation with a reference number
@@ -84,30 +85,31 @@ As a reporter, you can submit emergency reports to alert responders and authorit
 **Purpose:** Report a disaster incident (flood, landslide, fire, etc.)
 
 **Steps:**
+
 1. Navigate to **"Disaster Reports"**
 2. Click **"Report Disaster"**
 3. Fill in the form:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Disaster Type | ✅ Yes | Flood, Landslide, Fire, etc. |
-| Severity | ✅ Yes | Low, Medium, High, Critical |
-| Description | ✅ Yes | What happened, current situation |
-| Location | ✅ Yes | Click on map or enter address |
-| People Affected | ❌ Optional | Estimated number |
-| Casualties | ❌ Optional | If known |
-| Immediate Needs | ❌ Optional | Food, Water, Medical, etc. |
-| Photo | ❌ Optional | Photo of the situation |
+| Field           | Required    | Description                      |
+| --------------- | ----------- | -------------------------------- |
+| Disaster Type   | ✅ Yes      | Flood, Landslide, Fire, etc.     |
+| Severity        | ✅ Yes      | Low, Medium, High, Critical      |
+| Description     | ✅ Yes      | What happened, current situation |
+| Location        | ✅ Yes      | Click on map or enter address    |
+| People Affected | ❌ Optional | Estimated number                 |
+| Casualties      | ❌ Optional | If known                         |
+| Immediate Needs | ❌ Optional | Food, Water, Medical, etc.       |
+| Photo           | ❌ Optional | Photo of the situation           |
 
 4. Click **"Submit Report"**
 
 **Severity Guide:**
 
-| Level | When to Use |
-|-------|-------------|
-| 🟢 Low | Minor incident, no immediate danger |
-| 🟡 Medium | Significant impact, help needed |
-| 🟠 High | Serious situation, urgent response needed |
+| Level       | When to Use                                   |
+| ----------- | --------------------------------------------- |
+| 🟢 Low      | Minor incident, no immediate danger           |
+| 🟡 Medium   | Significant impact, help needed               |
+| 🟠 High     | Serious situation, urgent response needed     |
 | 🔴 Critical | Life-threatening, emergency response required |
 
 ### 3. Report Animal Rescue Need
@@ -115,19 +117,20 @@ As a reporter, you can submit emergency reports to alert responders and authorit
 **Purpose:** Report an animal that needs rescue.
 
 **Steps:**
+
 1. Navigate to **"Animal Rescue"**
 2. Click **"Report Animal"**
 3. Fill in the form:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Animal Type | ✅ Yes | Dog, Cat, Bird, Livestock, etc. |
-| Breed | ❌ Optional | If known |
-| Condition | ✅ Yes | Injured, Trapped, Stranded, etc. |
-| Is Dangerous? | ✅ Yes | Check if animal may be aggressive |
-| Description | ✅ Yes | Animal's condition, situation |
-| Location | ✅ Yes | Where the animal is |
-| Photo | ❌ Optional | Photo of the animal |
+| Field         | Required    | Description                       |
+| ------------- | ----------- | --------------------------------- |
+| Animal Type   | ✅ Yes      | Dog, Cat, Bird, Livestock, etc.   |
+| Breed         | ❌ Optional | If known                          |
+| Condition     | ✅ Yes      | Injured, Trapped, Stranded, etc.  |
+| Is Dangerous? | ✅ Yes      | Check if animal may be aggressive |
+| Description   | ✅ Yes      | Animal's condition, situation     |
+| Location      | ✅ Yes      | Where the animal is               |
+| Photo         | ❌ Optional | Photo of the animal               |
 
 4. Click **"Submit Report"**
 
@@ -138,9 +141,11 @@ As a reporter, you can submit emergency reports to alert responders and authorit
 **Purpose:** Request registration of a new relief camp location.
 
 **Steps:**
+
 1. Navigate to **"Camps"** from the responder interface
 2. Click **"Request New Camp"**
 3. Fill in camp details:
+
    - Camp Name
    - Type (Temporary Shelter, Medical Facility, etc.)
    - Location
@@ -161,6 +166,7 @@ When selecting a location:
 3. **Use Current Location** - Click the GPS button to use your device location
 
 The map shows:
+
 - 📍 Your selected location
 - 🏕️ Nearby relief camps
 - 📊 Disaster incident markers
@@ -174,6 +180,7 @@ As a responder, you can view reports, offer assistance, and contribute to relief
 ### 1. View and Respond to Reports
 
 **Finding Reports:**
+
 1. Click **"I Want to Help"** from the landing page
 2. Choose a category:
    - Missing Persons List
@@ -181,6 +188,7 @@ As a responder, you can view reports, offer assistance, and contribute to relief
    - Animal Rescue Needs
 
 **Viewing Details:**
+
 1. Click on any report card to see full details
 2. View location on the map
 3. See contact information
@@ -189,6 +197,7 @@ As a responder, you can view reports, offer assistance, and contribute to relief
 **Marking as Resolved:**
 
 For Missing Persons:
+
 1. Open the missing person detail
 2. Click **"Mark as Found"**
 3. Fill in:
@@ -197,6 +206,7 @@ For Missing Persons:
 4. Submit
 
 For Disasters:
+
 1. Open the disaster detail
 2. Click **"Mark as Resolved"**
 3. Provide resolution details
@@ -205,6 +215,7 @@ For Disasters:
 ### 2. Find Relief Camps
 
 **Steps:**
+
 1. Navigate to **"Camps"**
 2. View all active camps on the map
 3. Filter by:
@@ -213,6 +224,7 @@ For Disasters:
    - Available Capacity
 
 **Camp Information:**
+
 - 📍 Location and address
 - 👥 Capacity and current occupancy
 - 🏥 Available facilities
@@ -222,9 +234,11 @@ For Disasters:
 ### 3. Register as a Volunteer
 
 **Steps:**
+
 1. Navigate to **"Volunteers"**
 2. Click **"Register as Volunteer"**
 3. Fill in your details:
+
    - Name and contact
    - Skills and availability
    - Preferred activities
@@ -235,23 +249,25 @@ For Disasters:
 ### 4. Make a Donation
 
 **Steps:**
+
 1. Navigate to **"Donations"**
 2. View the current donation total and goal
 3. Click **"Donate Now"**
 4. Select amount or enter custom amount
 5. Fill in your details:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Amount | ✅ Yes | Donation amount |
-| Name | ❌ Optional | Your name (or anonymous) |
-| Email | ✅ Yes | For receipt |
-| Message | ❌ Optional | Supportive message |
+| Field   | Required    | Description              |
+| ------- | ----------- | ------------------------ |
+| Amount  | ✅ Yes      | Donation amount          |
+| Name    | ❌ Optional | Your name (or anonymous) |
+| Email   | ✅ Yes      | For receipt              |
+| Message | ❌ Optional | Supportive message       |
 
 6. Enter payment details (Stripe secure payment)
 7. Complete donation
 
 **Donation Features:**
+
 - 💰 **Live Counter** - See total donations in real-time
 - 📊 **Transparency** - View all donations in the public ledger
 - 🎯 **Goals** - Track progress toward relief goals
@@ -276,6 +292,7 @@ Administrators have full access to manage the platform.
 ### Admin Dashboard
 
 After login, you'll see the dashboard with:
+
 - 📊 Statistics overview
 - 📝 Pending requests
 - ⚡ Recent activity
@@ -284,6 +301,7 @@ After login, you'll see the dashboard with:
 ### 1. Review Camp Requests
 
 **Steps:**
+
 1. Click **"Review Requests"** in the admin menu
 2. View all pending camp requests
 3. For each request:
@@ -297,6 +315,7 @@ After login, you'll see the dashboard with:
 ### 2. Manage Camps
 
 **Steps:**
+
 1. Click **"Manage Camps"**
 2. View all registered camps
 3. Actions available:
@@ -306,6 +325,7 @@ After login, you'll see the dashboard with:
    - **Delete** - Remove camp record
 
 **Editing a Camp:**
+
 1. Click **"Edit"** on a camp card
 2. Update fields as needed
 3. Click **"Save Changes"**
@@ -322,6 +342,7 @@ Admins can register camps directly without approval:
 ### 4. View All Records
 
 **Steps:**
+
 1. Click **"All Records"**
 2. Select category:
    - Missing Persons
@@ -334,6 +355,7 @@ Admins can register camps directly without approval:
 ### 5. Analytics
 
 View platform statistics:
+
 - Total reports by category
 - Resolution rates
 - Active vs resolved cases
@@ -346,16 +368,16 @@ View platform statistics:
 
 **In case of emergency, contact these numbers immediately:**
 
-| Service | Number | When to Call |
-|---------|--------|--------------|
-| 🚔 **Police Emergency** | **119** | Crime, violence, immediate danger |
-| 🚑 **Ambulance** | **110** | Medical emergency |
-| 🚒 **Fire & Rescue** | **111** | Fire, rescue operations |
-| 🌊 **Disaster Management** | **117** | Disaster reporting, coordination |
-| ⛑️ **Red Cross** | **2691095** | Humanitarian assistance |
-| 🚤 **Coastguard** | **0112-463880** | Maritime emergencies |
-| 👶 **Child Helpline** | **1929** | Child protection |
-| 👩 **Women's Helpline** | **1938** | Women in distress |
+| Service                    | Number          | When to Call                      |
+| -------------------------- | --------------- | --------------------------------- |
+| 🚔 **Police Emergency**    | **119**         | Crime, violence, immediate danger |
+| 🚑 **Ambulance**           | **110**         | Medical emergency                 |
+| 🚒 **Fire & Rescue**       | **111**         | Fire, rescue operations           |
+| 🌊 **Disaster Management** | **117**         | Disaster reporting, coordination  |
+| ⛑️ **Red Cross**           | **2691095**     | Humanitarian assistance           |
+| 🚤 **Coastguard**          | **0112-463880** | Maritime emergencies              |
+| 👶 **Child Helpline**      | **1929**        | Child protection                  |
+| 👩 **Women's Helpline**    | **1938**        | Women in distress                 |
 
 > 📱 **Tip:** Save these numbers in your phone for quick access during emergencies.
 
@@ -412,6 +434,7 @@ A: They remain in the system with "Rejected" status. Users can submit new reques
 ## Tips for Effective Use
 
 ### For Reporters
+
 - ✅ Provide clear, accurate information
 - ✅ Include photos when possible
 - ✅ Use precise location markers
@@ -419,6 +442,7 @@ A: They remain in the system with "Rejected" status. Users can submit new reques
 - ✅ Check back for status updates
 
 ### For Responders
+
 - ✅ Check reports regularly
 - ✅ Prioritize by severity
 - ✅ Update status when taking action
@@ -426,6 +450,7 @@ A: They remain in the system with "Rejected" status. Users can submit new reques
 - ✅ Document your response activities
 
 ### For Admins
+
 - ✅ Review pending requests daily
 - ✅ Keep camp information current
 - ✅ Monitor platform activity
@@ -448,4 +473,4 @@ If you encounter issues:
 
 ---
 
-*This guide is part of the Sri Lanka Disaster Management Platform documentation.*
+_This guide is part of the Sri Lanka Disaster Management Platform documentation._

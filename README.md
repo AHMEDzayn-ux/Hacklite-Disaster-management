@@ -22,16 +22,16 @@ The **Disaster Management Platform** enables efficient coordination of emergency
 
 ### Key Features
 
-| Feature | Description |
-|---------|-------------|
-| 🔴 **Missing Persons** | Report and track missing individuals |
-| 🌊 **Disaster Reporting** | Submit incidents with location data |
-| 🐾 **Animal Rescue** | Coordinate animal rescue operations |
-| 🏕️ **Camp Management** | Manage relief camps and resources |
-| 🤝 **Volunteer Registration** | Register and coordinate volunteers |
-| 💰 **Donations** | Secure payment processing via Stripe |
-| 📞 **Emergency Contacts** | Quick access to emergency services |
-| 🛡️ **Admin Dashboard** | Comprehensive management panel |
+| Feature                       | Description                          |
+| ----------------------------- | ------------------------------------ |
+| 🔴 **Missing Persons**        | Report and track missing individuals |
+| 🌊 **Disaster Reporting**     | Submit incidents with location data  |
+| 🐾 **Animal Rescue**          | Coordinate animal rescue operations  |
+| 🏕️ **Camp Management**        | Manage relief camps and resources    |
+| 🤝 **Volunteer Registration** | Register and coordinate volunteers   |
+| 💰 **Donations**              | Secure payment processing via Stripe |
+| 📞 **Emergency Contacts**     | Quick access to emergency services   |
+| 🛡️ **Admin Dashboard**        | Comprehensive management panel       |
 
 ### Advanced Capabilities
 
@@ -46,22 +46,23 @@ The **Disaster Management Platform** enables efficient coordination of emergency
 
 ## 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
-| [📖 Full Documentation](docs/DOCUMENTATION.md) | Complete project overview and architecture |
-| [🔧 API Reference](docs/API_REFERENCE.md) | Service layer and database operations |
-| [📱 User Guide](docs/USER_GUIDE.md) | Guide for reporters, responders, and admins |
-| [👨‍💻 Developer Guide](docs/DEVELOPER_GUIDE.md) | Technical guide for contributors |
-| [🗄️ Supabase Setup](SUPABASE_SETUP.md) | Database configuration guide |
-| [💳 Stripe Setup](STRIPE_SETUP_GUIDE.md) | Payment integration guide |
-| [🚀 Deployment](DEPLOYMENT.md) | AWS Amplify deployment guide |
-| [🔒 Security Audit](SECURITY_AUDIT_REPORT.md) | Security implementation report |
+| Document                                       | Description                                 |
+| ---------------------------------------------- | ------------------------------------------- |
+| [📖 Full Documentation](docs/DOCUMENTATION.md) | Complete project overview and architecture  |
+| [🔧 API Reference](docs/API_REFERENCE.md)      | Service layer and database operations       |
+| [📱 User Guide](docs/USER_GUIDE.md)            | Guide for reporters, responders, and admins |
+| [👨‍💻 Developer Guide](docs/DEVELOPER_GUIDE.md)  | Technical guide for contributors            |
+| [🗄️ Supabase Setup](SUPABASE_SETUP.md)         | Database configuration guide                |
+| [💳 Stripe Setup](STRIPE_SETUP_GUIDE.md)       | Payment integration guide                   |
+| [🚀 Deployment](DEPLOYMENT.md)                 | AWS Amplify deployment guide                |
+| [🔒 Security Audit](SECURITY_AUDIT_REPORT.md)  | Security implementation report              |
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 19** - UI Framework
 - **React Router DOM 7** - Client-side routing
 - **Tailwind CSS 3** - Utility-first styling
@@ -72,6 +73,7 @@ The **Disaster Management Platform** enables efficient coordination of emergency
 - **Vite** - Build tool
 
 ### Backend & Services
+
 - **Supabase** - Backend as a Service
 - **PostgreSQL** - Database
 - **Stripe** - Payment processing
@@ -117,12 +119,12 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
 ```
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
+| Command           | Description              |
+| ----------------- | ------------------------ |
+| `npm run dev`     | Start development server |
+| `npm run build`   | Build for production     |
 | `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
+| `npm run lint`    | Run ESLint               |
 
 ---
 
@@ -157,18 +159,21 @@ Disaster-management/
 ## 👥 User Roles
 
 ### 📣 Reporter
+
 - Report missing persons
 - Submit disaster incidents
 - Report animal rescues
 - Request camp registration
 
 ### 🤝 Responder
+
 - View all reports
 - Mark incidents as resolved
 - Register as volunteer
 - Make donations
 
 ### 🛡️ Administrator
+
 - Review camp requests
 - Manage all camps
 - View analytics
@@ -201,14 +206,14 @@ Disaster-management/
 
 ## 🗄️ Database Tables
 
-| Table | Description |
-|-------|-------------|
-| `missing_persons` | Missing person reports |
-| `disasters` | Disaster incident reports |
-| `animal_rescues` | Animal rescue cases |
-| `camps` | Relief camp registry |
-| `camp_requests` | Camp registration requests |
-| `donations` | Donation records |
+| Table             | Description                |
+| ----------------- | -------------------------- |
+| `missing_persons` | Missing person reports     |
+| `disasters`       | Disaster incident reports  |
+| `animal_rescues`  | Animal rescue cases        |
+| `camps`           | Relief camp registry       |
+| `camp_requests`   | Camp registration requests |
+| `donations`       | Donation records           |
 
 See [API Reference](docs/API_REFERENCE.md) for full schema details.
 
@@ -228,11 +233,11 @@ See [Security Audit Report](SECURITY_AUDIT_REPORT.md) for details.
 
 ## 📞 Emergency Contacts (Sri Lanka)
 
-| Service | Number |
-|---------|--------|
-| 🚔 Police Emergency | **119** |
-| 🚑 Ambulance | **110** |
-| 🚒 Fire & Rescue | **111** |
+| Service                | Number  |
+| ---------------------- | ------- |
+| 🚔 Police Emergency    | **119** |
+| 🚑 Ambulance           | **110** |
+| 🚒 Fire & Rescue       | **111** |
 | 🌊 Disaster Management | **117** |
 
 ---
