@@ -14,7 +14,7 @@ export default defineConfig({
           'form-vendor': ['react-hook-form'],
           'state-vendor': ['zustand'],
           // Map libraries are heavy, load separately
-          'map-vendor': ['leaflet', 'react-leaflet', 'react-leaflet-cluster'],
+          'map-vendor': ['leaflet', 'react-leaflet', 'react-leaflet-cluster', 'leaflet.heat'],
         },
       },
     },

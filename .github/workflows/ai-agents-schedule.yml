@@ -1,0 +1,47 @@
+name: AI Agents Schedule
+
+# Runs the multi-agent pipeline in dependency order (Situation Awareness ->
+# Prioritization -> Resource Allocation -> Route Optimization -> Volunteer
+# Assignment), since later agents read what earlier ones wrote to the shared
+# Postgres "blackboard" tables. A manual "Run AI Analysis" button in the admin
+# Command Dashboard triggers the same functions on-demand via the admin-JWT
+# auth path - this workflow is only the unattended cron path.
+
+on:
+  schedule:
+    - cron: '0 */2 * * *' # every 2 hours - tune to taste
+  workflow_dispatch: {} # lets a human trigger a run from the Actions tab
+
+jobs:
+  run-agents:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Situation Awareness Agent
+        run: |
+          curl -sf -X POST "${{ secrets.SUPABASE_FUNCTIONS_URL }}/situation-awareness-agent" \
+            -H "x-agent-cron-secret: ${{ secrets.AGENT_CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Incident Prioritization Agent
+        run: |
+          curl -sf -X POST "${{ secrets.SUPABASE_FUNCTIONS_URL }}/incident-prioritization-agent" \
+            -H "x-agent-cron-secret: ${{ secrets.AGENT_CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Resource Allocation Agent
+        run: |
+          curl -sf -X POST "${{ secrets.SUPABASE_FUNCTIONS_URL }}/resource-allocation-agent" \
+            -H "x-agent-cron-secret: ${{ secrets.AGENT_CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Route Optimization Agent
+        run: |
+          curl -sf -X POST "${{ secrets.SUPABASE_FUNCTIONS_URL }}/route-optimization-agent" \
+            -H "x-agent-cron-secret: ${{ secrets.AGENT_CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Volunteer Assignment Agent
+        run: |
+          curl -sf -X POST "${{ secrets.SUPABASE_FUNCTIONS_URL }}/volunteer-assignment-agent" \
+            -H "x-agent-cron-secret: ${{ secrets.AGENT_CRON_SECRET }}" \
+            -H "Content-Type: application/json"

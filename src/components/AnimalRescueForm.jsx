@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useAnimalRescueStore } from '../store';
 import LocationPicker from './LocationPicker';
+import LiteModeBanner from './shared/LiteModeBanner';
+import { useConnectionQuality } from '../utils/connectionQuality';
+import { isOnline, queueOfflineSubmission } from '../utils/offlineManager';
 
 function AnimalRescueForm() {
     const { register, handleSubmit, formState: { errors }, reset, watch, control, setValue } = useForm();
@@ -10,6 +13,7 @@ function AnimalRescueForm() {
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
     const [photoPreview, setPhotoPreview] = useState(null);
+    const { isSlow: liteMode } = useConnectionQuality();
 
     const isDangerous = watch('isDangerous');
     const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
@@ -68,7 +72,13 @@ function AnimalRescueForm() {
                 status: 'Active'
             };
 
-            await addAnimalRescue(newReport);
+            if (!isOnline()) {
+                console.log('📡 Offline - queueing animal rescue report');
+                await queueOfflineSubmission('animal_rescue', newReport);
+                alert('📡 You are offline. Your report has been saved and will be submitted automatically when connection returns.');
+            } else {
+                await addAnimalRescue(newReport);
+            }
 
             // Show success message
             setSubmitSuccess(true);
@@ -97,6 +107,8 @@ function AnimalRescueForm() {
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
                     🐾 Animal Rescue Report
                 </h2>
+
+                {liteMode && <LiteModeBanner photoHidden={false} />}
 
                 {submitSuccess && (
                     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>

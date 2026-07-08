@@ -5,6 +5,7 @@ import { supabase } from '../config/supabase';
 import { checkIsAdmin } from '../services/adminService';
 import { SRI_LANKA_DISTRICTS, CAMP_TYPES, FACILITY_OPTIONS, NEEDS_OPTIONS } from '../services/campManagementService';
 import LocationPicker from '../components/LocationPicker';
+import { regenerateInventoryAccessCode } from '../services/inventoryService';
 
 /**
  * Admin Edit Camp
@@ -30,6 +31,7 @@ function AdminEditCamp() {
 
     // Admin status
     const [adminStatus, setAdminStatus] = useState({ isAdmin: false, role: null });
+    const [regeneratingCode, setRegeneratingCode] = useState(false);
 
     // Form state - matches camps table schema
     const [formData, setFormData] = useState({
@@ -167,6 +169,18 @@ function AdminEditCamp() {
             longitude: location.lng,
             address: location.address || prev.address
         }));
+    };
+
+    const handleRegenerateCode = async () => {
+        setRegeneratingCode(true);
+        const result = await regenerateInventoryAccessCode(id);
+        if (result.success) {
+            setCamp(prev => ({ ...prev, inventory_access_code: result.accessCode }));
+            setSuccess(`New inventory access code: ${result.accessCode}`);
+        } else {
+            setError(result.error || 'Failed to regenerate access code');
+        }
+        setRegeneratingCode(false);
     };
 
     const handleSubmit = async (e) => {
@@ -572,6 +586,28 @@ function AdminEditCamp() {
                                         <span className="text-sm">{need}</span>
                                     </label>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* Inventory Access Code */}
+                        <div className="bg-white rounded-lg shadow-sm p-6">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">📦 Inventory Access Code</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Share this code with a volunteer so they can log camp inventory (received/distributed supplies) at
+                                <span className="font-mono"> /camp-inventory</span> without needing an account.
+                            </p>
+                            <div className="flex items-center gap-4">
+                                <div className="font-mono text-2xl tracking-widest bg-gray-100 px-4 py-2 rounded-lg border">
+                                    {camp.inventory_access_code || 'Not set'}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleRegenerateCode}
+                                    disabled={regeneratingCode}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                >
+                                    {regeneratingCode ? 'Generating...' : camp.inventory_access_code ? 'Regenerate Code' : 'Generate Code'}
+                                </button>
                             </div>
                         </div>
 

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useDisasterStore } from '../store';
 import LocationPicker from './LocationPicker';
+import LiteModeBanner from './shared/LiteModeBanner';
+import { useConnectionQuality } from '../utils/connectionQuality';
+import { isOnline, queueOfflineSubmission } from '../utils/offlineManager';
 
 function DisasterReportForm() {
     const { register, handleSubmit, formState: { errors }, reset, control, watch, setValue } = useForm();
@@ -10,6 +13,7 @@ function DisasterReportForm() {
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
     const [photoPreview, setPhotoPreview] = useState(null);
+    const { isSlow: liteMode } = useConnectionQuality();
 
     const disasterType = watch('disasterType');
     const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
@@ -75,7 +79,13 @@ function DisasterReportForm() {
                 status: 'Active'
             };
 
-            await addDisaster(newReport);
+            if (!isOnline()) {
+                console.log('📡 Offline - queueing disaster report');
+                await queueOfflineSubmission('disaster', newReport);
+                alert('📡 You are offline. Your report has been saved and will be submitted automatically when connection returns.');
+            } else {
+                await addDisaster(newReport);
+            }
 
             setSubmitSuccess(true);
             setFadeOut(false);
@@ -113,6 +123,8 @@ function DisasterReportForm() {
                         </div>
                     </div>
                 )}
+
+                {liteMode && <LiteModeBanner />}
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {/* Disaster Information */}
@@ -171,40 +183,44 @@ function DisasterReportForm() {
                         </div>
                     </div>
 
-                    {/* Photo Upload */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-                            📸 Photo Evidence (Optional)
-                        </h3>
+                    {/* Photo Upload - hidden in Lite Mode: a multi-MB base64 image is the
+                        single biggest bandwidth cost in this form and could cause the whole
+                        submission to fail on a real 2G connection. */}
+                    {!liteMode && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                                📸 Photo Evidence (Optional)
+                            </h3>
 
-                        <div className="flex flex-col md:flex-row gap-4 items-start">
-                            <div className="flex-1">
-                                <label className="block text-gray-700 font-medium mb-2">
-                                    Upload Photo
-                                </label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    {...register('photo')}
-                                    onChange={handlePhotoChange}
-                                    className="input-field"
-                                />
-                                <p className="text-sm text-gray-500 mt-1">
-                                    Photo helps assess the situation (max 5MB)
-                                </p>
-                            </div>
-
-                            {photoPreview && (
-                                <div className="flex-shrink-0">
-                                    <img
-                                        src={photoPreview}
-                                        alt="Preview"
-                                        className="w-32 h-32 object-cover rounded-lg border-2 border-primary-300 shadow-md"
+                            <div className="flex flex-col md:flex-row gap-4 items-start">
+                                <div className="flex-1">
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Upload Photo
+                                    </label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        {...register('photo')}
+                                        onChange={handlePhotoChange}
+                                        className="input-field"
                                     />
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        Photo helps assess the situation (max 5MB)
+                                    </p>
                                 </div>
-                            )}
+
+                                {photoPreview && (
+                                    <div className="flex-shrink-0">
+                                        <img
+                                            src={photoPreview}
+                                            alt="Preview"
+                                            className="w-32 h-32 object-cover rounded-lg border-2 border-primary-300 shadow-md"
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Impact Assessment */}
                     <div>

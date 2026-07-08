@@ -55,179 +55,34 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_PUBLISHABLE_KEY_HERE
 
 **IMPORTANT:** The Secret Key should NEVER be in your frontend code. You'll need it for the backend endpoint (see Step 4).
 
-### Step 4: Create Payment Intent Endpoint (Backend Required)
+### Step 4: Payment Intent Endpoint - ✅ Already Implemented
 
-The donation form needs a backend endpoint to create Stripe payment intents. Choose one option:
+This used to be a manual step; it's now implemented at `supabase/functions/create-payment-intent/index.ts`. It differs from the template that used to be here in one deliberate way: it calls Stripe's REST API directly via `fetch` instead of the `stripe` npm/Deno package, matching the rest of this codebase's "no heavy SDK, just fetch what's needed" style (the same approach `sms-report` uses for Gemini). It also inserts the `donations` row itself (as `pending`) - the browser never writes to `donations` directly, which is what closes the RLS hole described in `AI_AGENTS_SETUP.md`.
 
-#### Option A: Supabase Edge Function (Recommended)
-
-Create `supabase/functions/create-payment-intent/index.ts`:
-
-```typescript
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@13.6.0?target=deno";
-
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") as string, {
-  apiVersion: "2023-10-16",
-  httpClient: Stripe.createFetchHttpClient(),
-});
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
-
-  try {
-    const { amount, currency, email, metadata } = await req.json();
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert dollars to cents
-      currency: currency || "usd",
-      receipt_email: email,
-      metadata: metadata || {},
-    });
-
-    return new Response(
-      JSON.stringify({
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id,
-      }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-});
-```
-
-Deploy:
+Deploy it (no JWT verification, since donors have no Supabase session):
 
 ```bash
-supabase functions deploy create-payment-intent
+supabase functions deploy create-payment-intent --no-verify-jwt
 supabase secrets set STRIPE_SECRET_KEY=sk_test_your_secret_key
 ```
 
-Update `DonationForm.jsx` line ~90 to use your endpoint:
+`DonationForm.jsx` already calls this via `supabase.functions.invoke('create-payment-intent', ...)` - no manual endpoint wiring needed.
 
-```javascript
-const response = await fetch('YOUR_SUPABASE_FUNCTION_URL/create-payment-intent', {
-```
+### Step 5: Stripe Webhook - ✅ Already Implemented
 
-#### Option B: Vercel Serverless Function
-
-Create `api/create-payment-intent.js`:
-
-```javascript
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
-module.exports = async (req, res) => {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  try {
-    const { amount, currency, email, metadata } = req.body;
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency: currency || "usd",
-      receipt_email: email,
-      metadata: metadata || {},
-    });
-
-    res.status(200).json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-    });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-```
-
-Add to Vercel environment variables:
-
-```
-STRIPE_SECRET_KEY=sk_test_your_secret_key
-```
-
-### Step 5: (Optional) Set Up Stripe Webhooks
-
-To automatically update payment statuses when payments succeed/fail:
+Implemented at `supabase/functions/stripe-webhook/index.ts` (signature verification via Web Crypto `crypto.subtle`, no `stripe` package needed).
 
 1. In Stripe Dashboard, go to **Developers → Webhooks**
-2. Add endpoint: `YOUR_SUPABASE_FUNCTION_URL/stripe-webhook`
+2. Add endpoint: `https://<project-ref>.supabase.co/functions/v1/stripe-webhook`
 3. Select events: `payment_intent.succeeded`, `payment_intent.payment_failed`
-4. Copy the webhook signing secret
+4. Copy the webhook signing secret and set it:
 
-Create webhook handler (Supabase Edge Function):
-
-```typescript
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@13.6.0?target=deno";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
-
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") as string, {
-  apiVersion: "2023-10-16",
-  httpClient: Stripe.createFetchHttpClient(),
-});
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
-
-serve(async (req) => {
-  const signature = req.headers.get("stripe-signature");
-  const body = await req.text();
-
-  try {
-    const event = stripe.webhooks.constructEvent(
-      body,
-      signature!,
-      Deno.env.get("STRIPE_WEBHOOK_SECRET")!
-    );
-
-    if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object;
-
-      await supabase
-        .from("donations")
-        .update({ stripe_payment_status: "succeeded" })
-        .eq("stripe_payment_id", paymentIntent.id);
-    }
-
-    if (event.type === "payment_intent.payment_failed") {
-      const paymentIntent = event.data.object;
-
-      await supabase
-        .from("donations")
-        .update({ stripe_payment_status: "failed" })
-        .eq("stripe_payment_id", paymentIntent.id);
-    }
-
-    return new Response(JSON.stringify({ received: true }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-});
+```bash
+supabase functions deploy stripe-webhook --no-verify-jwt
+supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 ```
+
+For local testing, use the Stripe CLI: `stripe listen --forward-to http://localhost:54321/functions/v1/stripe-webhook`.
 
 ---
 

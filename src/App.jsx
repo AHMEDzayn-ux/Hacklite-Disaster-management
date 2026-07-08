@@ -35,6 +35,9 @@ const AdminManageCamps = lazy(() => import('./pages/AdminManageCamps'));
 const AdminEditCamp = lazy(() => import('./pages/AdminEditCamp'));
 const AdminRecords = lazy(() => import('./pages/AdminRecords'));
 const CampRequestForm = lazy(() => import('./components/CampRequestForm'));
+const AdminCommandDashboard = lazy(() => import('./pages/AdminCommandDashboard'));
+const AdminInventoryOverview = lazy(() => import('./pages/AdminInventoryOverview'));
+const CampInventory = lazy(() => import('./pages/CampInventory'));
 
 // Loading fallback component
 function PageLoader() {
@@ -83,6 +86,9 @@ function App() {
             {/* Public Camp Request Form (NO AUTH REQUIRED) */}
             <Route path="/request-camp" element={<><Navbar userType="responder" /><CampRequestForm /></>} />
 
+            {/* Camp Inventory - public, code-gated (no login, no Navbar - mobile field tool) */}
+            <Route path="/camp-inventory" element={<CampInventory />} />
+
             {/* Admin Routes - Authentication required ONLY for these */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
@@ -91,6 +97,8 @@ function App() {
             <Route path="/admin/manage-camps" element={<ProtectedRoute><AdminManageCamps /></ProtectedRoute>} />
             <Route path="/admin/edit-camp/:id" element={<ProtectedRoute><AdminEditCamp /></ProtectedRoute>} />
             <Route path="/admin/records" element={<ProtectedRoute><AdminRecords /></ProtectedRoute>} />
+            <Route path="/admin/command" element={<ProtectedRoute><AdminCommandDashboard /></ProtectedRoute>} />
+            <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventoryOverview /></ProtectedRoute>} />
 
             {/* Bulk Test Data Generator */}
             <Route path="/bulk-test-data" element={<BulkTestData />} />

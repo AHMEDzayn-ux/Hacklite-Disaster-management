@@ -1,108 +1,69 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { motion } from 'framer-motion';
+import DonationForm from '../components/DonationForm';
+import DonationCounter from '../components/DonationCounter';
+import RecentDonations from '../components/RecentDonations';
+import { useDonationStore } from '../store/supabaseStore';
+
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY
+    ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
+    : null;
 
 function Donations() {
+    const { subscribeToDonations } = useDonationStore();
+    const [successMessage, setSuccessMessage] = useState(null);
+
+    useEffect(() => {
+        subscribeToDonations?.();
+    }, [subscribeToDonations]);
+
+    const handleSuccess = () => {
+        setSuccessMessage('Thank you! Your payment is being confirmed - it will appear in the public ledger once processed.');
+        setTimeout(() => setSuccessMessage(null), 8000);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-            <div className="container mx-auto px-4 py-16">
-                {/* Coming Soon Content */}
+            <div className="container mx-auto px-4 py-10">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="max-w-2xl mx-auto text-center"
+                    className="text-center mb-8"
                 >
-                    {/* Icon */}
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                        className="text-8xl mb-8"
-                    >
-                        💝
-                    </motion.div>
-
-                    {/* Title */}
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                        Donations
-                    </h1>
-
-                    {/* Coming Soon Badge */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="inline-block mb-6"
-                    >
-                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-lg font-semibold shadow-lg">
-                            🚀 Coming Soon
-                        </span>
-                    </motion.div>
-
-                    {/* Description */}
-                    <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                        We're working hard to bring you a secure and transparent donation platform.
-                        Soon you'll be able to contribute to disaster relief efforts and help
-                        families affected by natural calamities in Sri Lanka.
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Support Disaster Relief</h1>
+                    <p className="text-gray-600 max-w-2xl mx-auto">
+                        Every donation is recorded in a public, auditable ledger. Payments are processed securely via Stripe.
                     </p>
-
-                    {/* Features Preview */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-white rounded-2xl shadow-xl p-8 mb-8"
-                    >
-                        <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                            What to Expect
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                                <span className="text-2xl">🔒</span>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Secure Payments</h3>
-                                    <p className="text-sm text-gray-600">Bank-grade security for all transactions</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                                <span className="text-2xl">📊</span>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Full Transparency</h3>
-                                    <p className="text-sm text-gray-600">Track how donations are used</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                                <span className="text-2xl">💳</span>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Multiple Currencies</h3>
-                                    <p className="text-sm text-gray-600">LKR, USD, EUR, and more</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
-                                <span className="text-2xl">📧</span>
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Instant Receipts</h3>
-                                    <p className="text-sm text-gray-600">Email confirmation for all donations</p>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Contact Info */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="text-gray-500"
-                    >
-                        <p className="mb-2">
-                            Want to donate now? Contact us directly:
-                        </p>
-                        <p className="font-semibold text-gray-700">
-                            📞 Disaster Management Centre: 117
-                        </p>
-                    </motion.div>
                 </motion.div>
+
+                <div className="max-w-md mx-auto mb-8">
+                    <DonationCounter />
+                </div>
+
+                {successMessage && (
+                    <div className="max-w-2xl mx-auto mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-center">
+                        {successMessage}
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <div>
+                        {stripePromise ? (
+                            <Elements stripe={stripePromise}>
+                                <DonationForm onSuccess={handleSuccess} />
+                            </Elements>
+                        ) : (
+                            <div className="bg-white rounded-xl shadow-lg p-6 text-center text-gray-600">
+                                Payment processing is not configured (missing VITE_STRIPE_PUBLIC_KEY).
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <RecentDonations limit={10} showTicker={false} />
+                    </div>
+                </div>
             </div>
         </div>
     );

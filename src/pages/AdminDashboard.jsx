@@ -81,8 +81,40 @@ function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Action Cards - 2x2 Grid */}
+                {/* Action Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {/* Emergency Command Dashboard */}
+                    <Link to="/admin/command" className="block group">
+                        <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all border-l-4 border-danger-500 h-full">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="text-3xl">🚨</div>
+                                <h3 className="text-lg font-bold text-gray-800">Command Dashboard</h3>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-3">
+                                AI situation map, priority queue, resource allocation
+                            </p>
+                            <span className="text-danger-600 font-medium text-sm group-hover:underline">
+                                Open Dashboard →
+                            </span>
+                        </div>
+                    </Link>
+
+                    {/* Inventory Overview */}
+                    <Link to="/admin/inventory" className="block group">
+                        <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all border-l-4 border-blue-500 h-full">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="text-3xl">📦</div>
+                                <h3 className="text-lg font-bold text-gray-800">Inventory</h3>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-3">
+                                Cross-camp stock levels and low-stock alerts
+                            </p>
+                            <span className="text-blue-600 font-medium text-sm group-hover:underline">
+                                View Inventory →
+                            </span>
+                        </div>
+                    </Link>
+
                     {/* Review Camp Requests */}
                     <Link to="/admin/review-requests" className="block group">
                         <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all border-l-4 border-warning-500 h-full">

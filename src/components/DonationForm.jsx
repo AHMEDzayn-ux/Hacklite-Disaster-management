@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useDonationStore } from '../store/supabaseStore';
+import { supabase } from '../config/supabase';
 
 const PRESET_AMOUNTS = [500, 1000, 2500, 5000, 10000, 25000]; // LKR amounts
 
@@ -27,7 +27,6 @@ const DONATION_PURPOSES = [
 function DonationForm({ onSuccess }) {
     const stripe = useStripe();
     const elements = useElements();
-    const { addDonation } = useDonationStore();
 
     const [selectedAmount, setSelectedAmount] = useState(5000); // Default LKR 5000
     const [customAmount, setCustomAmount] = useState('');
@@ -87,30 +86,33 @@ function DonationForm({ onSuccess }) {
         setPaymentError(null);
 
         try {
-            // Step 1: Create payment intent via your backend
-            // NOTE: You need to create a serverless function for this
-            // For now, this is a placeholder - see implementation notes below
-            const response = await fetch('/api/create-payment-intent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const purposeData = DONATION_PURPOSES.find(p => p.value === formData.donation_purpose);
+
+            // Step 1: Create the Stripe PaymentIntent server-side. This also
+            // inserts the donations row as 'pending' - the browser never
+            // writes to the donations table directly (RLS blocks it anyway).
+            const { data, error: intentError } = await supabase.functions.invoke('create-payment-intent', {
+                body: {
                     amount: finalAmount,
                     currency: selectedCurrency.toLowerCase(),
-                    email: formData.donor_email,
-                    metadata: {
-                        purpose: formData.donation_purpose,
-                        donor_name: formData.is_anonymous ? 'Anonymous' : formData.donor_name
-                    }
-                })
+                    donor_name: formData.donor_name,
+                    donor_email: formData.donor_email,
+                    donor_phone: formData.donor_phone,
+                    is_anonymous: formData.is_anonymous,
+                    donation_purpose: purposeData.label,
+                    purpose_category: purposeData.category,
+                    message: formData.message,
+                }
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to initialize payment');
-            }
+            if (intentError) throw new Error(intentError.message || 'Failed to initialize payment');
+            if (data?.error) throw new Error(data.error);
 
-            const { clientSecret } = await response.json();
+            const { clientSecret } = data;
 
-            // Step 2: Confirm payment with Stripe
+            // Step 2: Confirm payment with Stripe. The webhook (server-side)
+            // is what actually flips stripe_payment_status to succeeded/failed
+            // - this UI reflects Stripe's immediate response for feedback only.
             const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
                 clientSecret,
                 {
@@ -129,29 +131,8 @@ function DonationForm({ onSuccess }) {
                 throw new Error(stripeError.message);
             }
 
-            // Step 3: Save donation to database
-            const purposeData = DONATION_PURPOSES.find(p => p.value === formData.donation_purpose);
-
-            const donationRecord = {
-                donor_name: formData.is_anonymous ? 'Anonymous' : formData.donor_name,
-                donor_email: formData.donor_email,
-                donor_phone: formData.donor_phone || null,
-                is_anonymous: formData.is_anonymous,
-                amount: finalAmount,
-                currency: selectedCurrency,
-                stripe_payment_id: paymentIntent.id,
-                stripe_payment_status: paymentIntent.status,
-                donation_purpose: purposeData.label,
-                purpose_category: purposeData.category,
-                message: formData.message || null,
-                created_at: new Date().toISOString()
-            };
-
-            await addDonation(donationRecord);
-
-            // Success!
             if (onSuccess) {
-                onSuccess(donationRecord);
+                onSuccess({ amount: finalAmount, currency: selectedCurrency, status: paymentIntent.status });
             }
 
             // Reset form
@@ -465,12 +446,6 @@ function DonationForm({ onSuccess }) {
                 {step === 3 && renderStep3()}
             </form>
 
-            {/* Important Note */}
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-xs text-yellow-800">
-                    <strong>⚠️ Developer Note:</strong> This form requires a backend endpoint at <code>/api/create-payment-intent</code> to process Stripe payments. See the schema file for implementation details.
-                </p>
-            </div>
         </div>
     );
 }

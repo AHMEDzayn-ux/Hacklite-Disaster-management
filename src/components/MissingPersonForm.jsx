@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useMissingPersonStore } from '../store';
 import LocationPicker from './LocationPicker';
+import LiteModeBanner from './shared/LiteModeBanner';
+import { useConnectionQuality } from '../utils/connectionQuality';
 import { isOnline, queueOfflineSubmission } from '../utils/offlineManager';
 
 function MissingPersonForm() {
@@ -11,6 +13,7 @@ function MissingPersonForm() {
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
     const [photoPreview, setPhotoPreview] = useState(null);
+    const { isSlow: liteMode } = useConnectionQuality();
 
     // Sample test photo (1x1 red pixel PNG)
     const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
@@ -110,6 +113,8 @@ function MissingPersonForm() {
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
                     Report Missing Person
                 </h2>
+
+                {liteMode && <LiteModeBanner photoHidden={false} />}
 
                 {submitSuccess && (
                     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
