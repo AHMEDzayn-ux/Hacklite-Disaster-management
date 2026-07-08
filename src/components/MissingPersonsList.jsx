@@ -327,7 +327,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             {/* Reporter Info */}
                             <div className="mt-2 pt-2 border-t border-gray-100">
                                 <p className="text-xs text-gray-500">
-                                    Reported by <span className="font-medium">{person.reporter_name || person.reporterName}</span> • {formatDate(person.reported_at || person.reportedAt)}
+                                    Reported by <span className="font-medium">{person.reporter_name || person.reporterName}</span> • {formatDate(person.reported_at || person.reportedAt || person.created_at)}
                                 </p>
                             </div>
                         </div>
