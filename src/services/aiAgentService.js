@@ -101,11 +101,12 @@ export const fetchPendingAllocationPlans = async () => {
     }
 };
 
-export const reviewAllocationPlan = async (planId, action, reason) => {
+export const reviewAllocationPlan = async (planId, action, options = {}) => {
     try {
         const token = await getAuthToken();
+        const { notes, receivedByName } = options;
         const { data, error } = await supabase.functions.invoke('allocation-plan-review', {
-            body: { action, planId, reason },
+            body: { action, planId, notes, receivedByName },
             headers: { Authorization: `Bearer ${token}` }
         });
         if (error) throw new Error(error.message);
@@ -113,6 +114,23 @@ export const reviewAllocationPlan = async (planId, action, reason) => {
         return { success: true, ...data };
     } catch (error) {
         return { success: false, error: error.message };
+    }
+};
+
+// approved (ledger updated, awaiting dispatch) or dispatched (left the source
+// camp, awaiting delivery confirmation) - the shipment lifecycle between
+// approval and final delivery.
+export const fetchInFlightAllocationPlans = async () => {
+    try {
+        const { data, error } = await supabase
+            .from('allocation_plans')
+            .select('*, from_camp:from_camp_id(id, name, district), to_camp:to_camp_id(id, name, district)')
+            .in('status', ['approved', 'dispatched'])
+            .order('reviewed_at', { ascending: false });
+        if (error) throw error;
+        return { success: true, data: data || [] };
+    } catch (error) {
+        return { success: false, error: error.message, data: [] };
     }
 };
 

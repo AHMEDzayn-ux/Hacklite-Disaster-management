@@ -24,8 +24,10 @@ function json(status: number, body: unknown) {
 }
 
 interface RequestBody {
-  action: 'approve' | 'reject'
+  action: 'approve' | 'reject' | 'dispatch' | 'deliver'
   planId: string
+  receivedByName?: string
+  notes?: string
 }
 
 Deno.serve(async (req: Request) => {
@@ -50,15 +52,61 @@ Deno.serve(async (req: Request) => {
   if (adminError || !adminUser) return json(403, { error: 'Unauthorized: not an active admin' })
 
   const body: RequestBody = await req.json()
-  const { action, planId } = body
-  if (!action || !['approve', 'reject'].includes(action) || !planId) {
-    return json(400, { error: 'Requires action ("approve"|"reject") and planId' })
+  const { action, planId, receivedByName, notes } = body
+  if (!action || !['approve', 'reject', 'dispatch', 'deliver'].includes(action) || !planId) {
+    return json(400, { error: 'Requires action ("approve"|"reject"|"dispatch"|"deliver") and planId' })
   }
 
   const { data: plan, error: planError } = await supabase
     .from('allocation_plans').select('*').eq('id', planId).single()
   if (planError || !plan) return json(404, { error: 'Allocation plan not found' })
-  if (plan.status !== 'pending') return json(400, { error: `Plan already ${plan.status}` })
+
+  // Each action only makes sense from a specific predecessor status - this is
+  // the real-world lifecycle: pending -> approved (ledger updated) ->
+  // dispatched (left the source camp) -> delivered (received/signed for at
+  // the destination). approve/reject only apply to a fresh recommendation.
+  const requiredPredecessor: Record<string, string[]> = {
+    approve: ['pending'], reject: ['pending'],
+    dispatch: ['approved'], deliver: ['approved', 'dispatched'],
+  }
+  if (!requiredPredecessor[action].includes(plan.status)) {
+    return json(400, { error: `Cannot ${action} a plan with status "${plan.status}" (expected ${requiredPredecessor[action].join(' or ')})` })
+  }
+
+  if (action === 'dispatch') {
+    const { error } = await supabase.from('allocation_plans').update({
+      status: 'dispatched', dispatched_at: new Date().toISOString(), dispatched_by: user.id,
+    }).eq('id', planId)
+    if (error) return json(500, { error: 'Failed to mark plan dispatched', details: error.message })
+
+    await supabase.from('audit_logs').insert({
+      admin_id: user.id, admin_email: user.email, action: 'DISPATCH_ALLOCATION_PLAN',
+      table_name: 'allocation_plans', record_id: planId, record_snapshot: plan,
+      reason: notes || 'Admin confirmed shipment left the source camp',
+      ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+      user_agent: req.headers.get('user-agent') || 'unknown',
+    })
+
+    return json(200, { success: true, message: 'Plan marked dispatched', planId })
+  }
+
+  if (action === 'deliver') {
+    const { error } = await supabase.from('allocation_plans').update({
+      status: 'delivered', delivered_at: new Date().toISOString(), delivered_by: user.id,
+      received_by_name: receivedByName || null, delivery_notes: notes || null,
+    }).eq('id', planId)
+    if (error) return json(500, { error: 'Failed to mark plan delivered', details: error.message })
+
+    await supabase.from('audit_logs').insert({
+      admin_id: user.id, admin_email: user.email, action: 'DELIVER_ALLOCATION_PLAN',
+      table_name: 'allocation_plans', record_id: planId, record_snapshot: plan,
+      reason: receivedByName ? `Received by ${receivedByName}${notes ? ` - ${notes}` : ''}` : (notes || 'Admin confirmed delivery'),
+      ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+      user_agent: req.headers.get('user-agent') || 'unknown',
+    })
+
+    return json(200, { success: true, message: 'Plan marked delivered', planId })
+  }
 
   if (action === 'reject') {
     const { error } = await supabase.from('allocation_plans').update({
