@@ -5,6 +5,7 @@ import LocationPicker from './LocationPicker';
 import LiteModeBanner from './shared/LiteModeBanner';
 import { useConnectionQuality } from '../utils/connectionQuality';
 import { isOnline, queueOfflineSubmission } from '../utils/offlineManager';
+import { IconPawPrint, IconCamera, IconInfo, IconCheck, IconFlask, IconArrowRight } from './icons/Icons';
 
 function AnimalRescueForm() {
     const { register, handleSubmit, formState: { errors }, reset, watch, control, setValue } = useForm();
@@ -104,15 +105,20 @@ function AnimalRescueForm() {
     return (
         <div className="max-w-3xl mx-auto">
             <div className="card">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    🐾 Animal Rescue Report
+                <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-white">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                        <IconPawPrint className="h-5 w-5" />
+                    </span>
+                    Animal Rescue Report
                 </h2>
 
                 {liteMode && <LiteModeBanner photoHidden={false} />}
 
                 {submitSuccess && (
                     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
-                        <span className="text-2xl">✅</span>
+                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
+                            <IconCheck className="h-4 w-4" />
+                        </span>
                         <div>
                             <p className="font-bold text-lg">Report Submitted Successfully!</p>
                             <p className="text-sm text-success-100">Your animal rescue request has been recorded.</p>
@@ -123,13 +129,14 @@ function AnimalRescueForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {/* Photo Upload - Primary Identification */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-                            📸 Photo
+                        <h3 className="mb-4 flex items-center gap-2 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                            <IconCamera className="h-5 w-5 text-slate-400" />
+                            Photo
                         </h3>
 
                         <div className="flex flex-col md:flex-row gap-4 items-start">
                             <div className="flex-1">
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Upload Photo <span className="text-danger-500">*</span>
                                 </label>
                                 <input
@@ -142,11 +149,11 @@ function AnimalRescueForm() {
                                     className="input-field"
                                 />
                                 {errors.photo && (
-                                    <span className="text-danger-500 text-sm mt-1 block">
+                                    <span className="text-danger-400 text-sm mt-1 block">
                                         {errors.photo.message}
                                     </span>
                                 )}
-                                <p className="text-sm text-gray-500 mt-1">
+                                <p className="text-sm text-slate-500 mt-1">
                                     Clear photo showing the animal (max 5MB)
                                 </p>
                             </div>
@@ -156,7 +163,7 @@ function AnimalRescueForm() {
                                     <img
                                         src={photoPreview}
                                         alt="Preview"
-                                        className="w-32 h-32 object-cover rounded-lg border-2 border-primary-300 shadow-md"
+                                        className="w-32 h-32 object-cover rounded-lg border-2 border-primary-400/40 shadow-lg shadow-black/30"
                                     />
                                 </div>
                             )}
@@ -165,13 +172,13 @@ function AnimalRescueForm() {
 
                     {/* Animal Information */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             Animal Information
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Animal Type <span className="text-danger-500">*</span>
                                 </label>
                                 <select
@@ -188,14 +195,14 @@ function AnimalRescueForm() {
                                     <option value="other">Other</option>
                                 </select>
                                 {errors.animalType && (
-                                    <span className="text-danger-500 text-sm mt-1 block">
+                                    <span className="text-danger-400 text-sm mt-1 block">
                                         {errors.animalType.message}
                                     </span>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Size/Breed (if known)
                                 </label>
                                 <input
@@ -207,7 +214,7 @@ function AnimalRescueForm() {
                         </div>
 
                         <div className="mt-4">
-                            <label className="block text-gray-700 font-medium mb-2">
+                            <label className="block text-slate-200 font-medium mb-2">
                                 Description <span className="text-danger-500">*</span>
                             </label>
                             <textarea
@@ -219,7 +226,7 @@ function AnimalRescueForm() {
                                 placeholder="Color, markings, condition, etc."
                             />
                             {errors.description && (
-                                <span className="text-danger-500 text-sm mt-1 block">
+                                <span className="text-danger-400 text-sm mt-1 block">
                                     {errors.description.message}
                                 </span>
                             )}
@@ -228,8 +235,9 @@ function AnimalRescueForm() {
 
                     {/* Safety Information */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-                            ⚠️ Safety Information
+                        <h3 className="mb-4 flex items-center gap-2 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                            <IconInfo className="h-5 w-5 text-danger-400" />
+                            Safety Information
                         </h3>
 
                         <div className="space-y-4">
@@ -240,19 +248,20 @@ function AnimalRescueForm() {
                                     className="mt-1 w-5 h-5 text-danger-500 focus:ring-danger-500"
                                 />
                                 <div>
-                                    <label className="text-gray-700 font-medium">
+                                    <label className="text-slate-200 font-medium">
                                         Animal is dangerous or may bite
                                     </label>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-slate-500">
                                         Check if the animal shows aggressive behavior
                                     </p>
                                 </div>
                             </div>
 
                             {isDangerous && (
-                                <div className="bg-danger-50 border-l-4 border-danger-500 p-4 rounded">
-                                    <p className="text-danger-700 font-medium mb-2">
-                                        ⚠️ Warning: Professional rescue team required
+                                <div className="bg-danger-500/10 border border-danger-400/30 border-l-4 border-l-danger-500 p-4 rounded">
+                                    <p className="flex items-center gap-2 text-danger-200 font-medium mb-2">
+                                        <IconInfo className="h-4 w-4 flex-shrink-0 text-danger-300" />
+                                        Warning: Professional rescue team required
                                     </p>
                                     <textarea
                                         {...register('dangerDetails')}
@@ -264,7 +273,7 @@ function AnimalRescueForm() {
                             )}
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Condition <span className="text-danger-500">*</span>
                                 </label>
                                 <select
@@ -279,14 +288,14 @@ function AnimalRescueForm() {
                                     <option value="critical">Critical Condition</option>
                                 </select>
                                 {errors.condition && (
-                                    <span className="text-danger-500 text-sm mt-1 block">
+                                    <span className="text-danger-400 text-sm mt-1 block">
                                         {errors.condition.message}
                                     </span>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Injury/Health Details (Optional)
                                 </label>
                                 <textarea
@@ -301,7 +310,7 @@ function AnimalRescueForm() {
 
                     {/* Location */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             Location
                         </h3>
 
@@ -324,7 +333,7 @@ function AnimalRescueForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Accessibility
                                 </label>
                                 <select
@@ -338,7 +347,7 @@ function AnimalRescueForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Date & Time Spotted
                                 </label>
                                 <input
@@ -352,13 +361,13 @@ function AnimalRescueForm() {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             Your Contact
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Your Name <span className="text-danger-500">*</span>
                                 </label>
                                 <input
@@ -369,14 +378,14 @@ function AnimalRescueForm() {
                                     placeholder="Your name"
                                 />
                                 {errors.reporterName && (
-                                    <span className="text-danger-500 text-sm mt-1 block">
+                                    <span className="text-danger-400 text-sm mt-1 block">
                                         {errors.reporterName.message}
                                     </span>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-200 font-medium mb-2">
                                     Phone Number <span className="text-danger-500">*</span>
                                 </label>
                                 <input
@@ -392,7 +401,7 @@ function AnimalRescueForm() {
                                     placeholder="07XXXXXXXX"
                                 />
                                 {errors.contactNumber && (
-                                    <span className="text-danger-500 text-sm mt-1 block">
+                                    <span className="text-danger-400 text-sm mt-1 block">
                                         {errors.contactNumber.message}
                                     </span>
                                 )}
@@ -405,16 +414,24 @@ function AnimalRescueForm() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            {isSubmitting ? 'Submitting...' : '📤 Submit Rescue Request'}
+                            {isSubmitting ? (
+                                'Submitting...'
+                            ) : (
+                                <>
+                                    Submit Rescue Request
+                                    <IconArrowRight className="h-4 w-4" />
+                                </>
+                            )}
                         </button>
                         <button
                             type="button"
                             onClick={autofillTestData}
-                            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                            className="px-6 py-2 bg-primary-500/80 text-white rounded-lg hover:bg-primary-500 transition-colors flex items-center justify-center gap-2"
                         >
-                            🧪 Test Autofill
+                            <IconFlask className="h-4 w-4" />
+                            Test Autofill
                         </button>
                         <button
                             type="button"
@@ -422,14 +439,17 @@ function AnimalRescueForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="px-6 py-2 border border-white/20 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
                         >
                             Clear
                         </button>
                     </div>
 
-                    <p className="text-sm text-gray-600 text-center">
-                        <span className="text-danger-500">*</span> Required fields | ✓ Works offline
+                    <p className="flex items-center justify-center gap-1.5 text-sm text-slate-400 text-center">
+                        <span className="text-danger-500">*</span> Required fields
+                        <span className="text-slate-600">|</span>
+                        <IconCheck className="h-3.5 w-3.5 text-success-400" />
+                        Works offline
                     </p>
                 </form>
             </div>

@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import {
+    IconMegaphone,
+    IconLifeBuoy,
+    IconGrid,
+    IconUserSearch,
+    IconSiren,
+    IconPawPrint,
+    IconPhone,
+    IconTent,
+    IconUsers,
+    IconHeart,
+} from './icons/Icons';
+import heroImage from '../assets/dark.png';
 
 function Navbar({ userType = 'reporter' }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -7,72 +20,91 @@ function Navbar({ userType = 'reporter' }) {
 
     // Different navigation links for different user types
     const reporterLinks = [
-        { path: '/report', label: 'Dashboard' },
-        { path: '/missing-persons', label: 'Missing Person' },
-        { path: '/disasters', label: 'Disaster' },
-        { path: '/animal-rescue', label: 'Animal Rescue' },
-        { path: '/emergency', label: 'Emergency Contacts' },
+        { path: '/report', label: 'Dashboard', icon: IconGrid },
+        { path: '/missing-persons', label: 'Missing Person', icon: IconUserSearch },
+        { path: '/disasters', label: 'Disaster', icon: IconSiren },
+        { path: '/animal-rescue', label: 'Animal Rescue', icon: IconPawPrint },
+        { path: '/emergency', label: 'Emergency Contacts', icon: IconPhone },
     ];
 
     const responderLinks = [
-        { path: '/respond', label: 'Dashboard' },
-        { path: '/missing-persons-list', label: 'Missing Persons' },
-        { path: '/disasters-list', label: 'Disasters' },
-        { path: '/animal-rescue-list', label: 'Animal Rescue' },
-        { path: '/camps', label: 'Camps' },
-        { path: '/volunteers', label: 'Volunteers' },
-        { path: '/donations', label: 'Donations' },
+        { path: '/respond', label: 'Dashboard', icon: IconGrid },
+        { path: '/missing-persons-list', label: 'Missing Persons', icon: IconUserSearch },
+        { path: '/disasters-list', label: 'Disasters', icon: IconSiren },
+        { path: '/animal-rescue-list', label: 'Animal Rescue', icon: IconPawPrint },
+        { path: '/camps', label: 'Camps', icon: IconTent },
+        { path: '/volunteers', label: 'Volunteers', icon: IconUsers },
+        { path: '/donations', label: 'Donations', icon: IconHeart },
     ];
 
     const navLinks = userType === 'reporter' ? reporterLinks : responderLinks;
-    const navColor = userType === 'reporter' ? 'bg-danger-600' : 'bg-success-600';
+    const isReporter = userType === 'reporter';
+    const Icon = isReporter ? IconMegaphone : IconLifeBuoy;
 
     const isActive = (path) => location.pathname === path;
 
     return (
-        <nav className={`${navColor} shadow-lg`}>
-            <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center h-16">
+        <nav className="sticky top-0 z-50 border-b border-white/10 shadow-lg shadow-black/30 backdrop-blur-xl">
+            <div className={`h-1 bg-gradient-to-r ${isReporter ? 'from-danger-500 via-orange-400 to-danger-600' : 'from-success-500 via-primary-400 to-success-600'}`}></div>
+
+            {/* Faint atmospheric background */}
+            <div className="absolute inset-0 overflow-hidden">
+                <img src={heroImage} alt="" className="h-full w-full object-cover object-top opacity-[0.12]" />
+                <div className="absolute inset-0 bg-slate-950/92"></div>
+            </div>
+
+            <div className="relative w-full px-4 sm:px-6 lg:px-10">
+                <div className="flex h-24 items-center">
                     {/* Logo */}
-                    <div className="flex-shrink-0">
-                        <Link to="/" className="text-white text-lg lg:text-xl font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
-                            {userType === 'reporter' ? '📢' : '🤝'}
-                            <div className="flex flex-col leading-tight">
-                                <span className="hidden sm:inline text-sm font-semibold opacity-90">Sri Lanka</span>
-                                <span className="hidden sm:inline">Disaster Management</span>
-                            </div>
-                            <span className="sm:hidden">DM SL</span>
-                        </Link>
-                    </div>
+                    <Link to="/" className="group flex flex-shrink-0 items-center gap-3 transition-opacity hover:opacity-90">
+                        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${isReporter ? 'bg-danger-500 shadow-danger-500/30' : 'bg-success-500 shadow-success-500/30'}`}>
+                            <Icon className="h-7 w-7" />
+                        </div>
+                        <div className="hidden flex-col leading-tight sm:flex">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Sri Lanka</span>
+                            <span className="text-2xl font-extrabold text-white">Disaster Management</span>
+                        </div>
+                        <span className="text-xl font-extrabold text-white sm:hidden">DM SL</span>
+                    </Link>
 
                     {/* Desktop menu and switcher - Right aligned */}
-                    <div className="hidden lg:flex items-center gap-1 ml-auto">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.path}
-                                to={link.path}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${isActive(link.path)
-                                    ? 'bg-white/25 text-white shadow-sm'
-                                    : 'text-white/90 hover:bg-white/15 hover:text-white'
-                                    }`}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
+                    <div className="ml-auto hidden items-center gap-2 lg:flex">
+                        {navLinks.map((link) => {
+                            const LinkIcon = link.icon;
+                            const active = isActive(link.path);
+                            return (
+                                <Link
+                                    key={link.path}
+                                    to={link.path}
+                                    className={`group relative flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-base font-semibold transition-all duration-300 ${active
+                                        ? isReporter
+                                            ? 'bg-danger-500/15 text-danger-300 shadow-inner'
+                                            : 'bg-success-500/15 text-success-300 shadow-inner'
+                                        : 'text-slate-300 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                >
+                                    <LinkIcon className="h-5 w-5 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                                    {link.label}
+                                    <span
+                                        className={`absolute -bottom-0.5 left-4 right-4 h-0.5 rounded-full transition-transform duration-300 origin-left ${active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'} ${isReporter ? 'bg-danger-400' : 'bg-success-400'}`}
+                                    ></span>
+                                </Link>
+                            );
+                        })}
 
                         {/* Mode Switcher */}
                         <Link
-                            to={userType === 'reporter' ? '/respond' : '/report'}
-                            className="ml-2 px-4 py-2 rounded-lg text-sm font-medium bg-white text-gray-800 hover:bg-white/90 transition-all duration-200 shadow-md flex items-center gap-2"
+                            to={isReporter ? '/respond' : '/report'}
+                            className={`group ml-3 flex items-center gap-2 rounded-full border border-white bg-white px-6 py-3 text-base font-bold text-slate-900 shadow-md transition-all duration-300 hover:-translate-y-0.5 ${isReporter ? 'hover:bg-success-600' : 'hover:bg-danger-600'} hover:text-white hover:shadow-lg`}
                         >
-                            {userType === 'reporter' ? (
+                            {isReporter ? (
                                 <>
-                                    <span>🤝</span>
+                                    <IconLifeBuoy className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
                                     <span>Respond Mode</span>
                                 </>
                             ) : (
                                 <>
-                                    <span>📢</span>
+                                    <IconMegaphone className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
                                     <span>Report Mode</span>
                                 </>
                             )}
@@ -82,10 +114,10 @@ function Navbar({ userType = 'reporter' }) {
                     {/* Mobile menu button */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="lg:hidden ml-auto text-white focus:outline-none p-2 rounded-md hover:bg-white/10 transition-colors"
+                        className="ml-auto rounded-lg p-2 text-white transition-colors hover:bg-white/10 focus:outline-none lg:hidden"
                         aria-label="Toggle menu"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isOpen ? (
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             ) : (
@@ -97,29 +129,45 @@ function Navbar({ userType = 'reporter' }) {
 
                 {/* Mobile menu */}
                 {isOpen && (
-                    <div className="lg:hidden py-3 space-y-1">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.path}
-                                to={link.path}
-                                onClick={() => setIsOpen(false)}
-                                className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-all ${isActive(link.path)
-                                    ? 'bg-white/25 text-white'
-                                    : 'text-white/90 hover:bg-white/15 hover:text-white'
-                                    }`}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
+                    <div className="space-y-1.5 border-t border-white/10 py-4 lg:hidden">
+                        {navLinks.map((link) => {
+                            const LinkIcon = link.icon;
+                            return (
+                                <Link
+                                    key={link.path}
+                                    to={link.path}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold transition-all ${isActive(link.path)
+                                        ? isReporter
+                                            ? 'bg-danger-500/15 text-danger-300'
+                                            : 'bg-success-500/15 text-success-300'
+                                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                >
+                                    <LinkIcon className="h-5 w-5 flex-shrink-0" />
+                                    {link.label}
+                                </Link>
+                            );
+                        })}
 
                         {/* Mobile Mode Switcher */}
-                        <div className="pt-3 mt-3 border-t border-white/20">
+                        <div className="mt-3 border-t border-white/10 pt-3">
                             <Link
-                                to={userType === 'reporter' ? '/respond' : '/report'}
+                                to={isReporter ? '/respond' : '/report'}
                                 onClick={() => setIsOpen(false)}
-                                className="block px-4 py-2.5 rounded-lg text-base font-medium bg-white text-gray-800 hover:bg-white/90 transition-all"
+                                className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-base font-bold text-slate-900 transition-all hover:bg-white/90"
                             >
-                                {userType === 'reporter' ? '🤝 Respond Mode' : '📢 Report Mode'}
+                                {isReporter ? (
+                                    <>
+                                        <IconLifeBuoy className="h-4 w-4" />
+                                        <span>Respond Mode</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <IconMegaphone className="h-4 w-4" />
+                                        <span>Report Mode</span>
+                                    </>
+                                )}
                             </Link>
                         </div>
                     </div>

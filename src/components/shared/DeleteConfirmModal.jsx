@@ -34,44 +34,44 @@ function DeleteConfirmModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900 border border-white/10 rounded-lg p-6 max-w-md w-full shadow-2xl">
                 {/* Warning Header */}
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-danger-100 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-danger-500/15 rounded-full flex items-center justify-center">
                         <span className="text-2xl">⚠️</span>
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-danger-700">Confirm Deletion</h3>
-                        <p className="text-sm text-gray-600">This action cannot be undone</p>
+                        <h3 className="text-lg font-bold text-white">Confirm Deletion</h3>
+                        <p className="text-sm text-slate-300">This action cannot be undone</p>
                     </div>
                 </div>
 
                 {/* Item Info */}
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-gray-600 mb-1">You are about to delete:</p>
-                    <p className="font-semibold text-gray-800">{itemName}</p>
-                    <p className="text-xs text-gray-500 mt-1">Type: {itemType}</p>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-slate-300 mb-1">You are about to delete:</p>
+                    <p className="font-semibold text-white">{itemName}</p>
+                    <p className="text-xs text-slate-400 mt-1">Type: {itemType}</p>
                 </div>
 
                 {/* Custom Warning */}
                 {warningMessage && (
-                    <div className="bg-warning-50 border border-warning-200 rounded-lg p-3 mb-4">
-                        <p className="text-sm text-warning-700">{warningMessage}</p>
+                    <div className="bg-amber-500/10 border border-amber-400/20 rounded-lg p-3 mb-4">
+                        <p className="text-sm text-amber-200">{warningMessage}</p>
                     </div>
                 )}
 
                 {/* Reason Input */}
                 {requireReason && (
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Reason for deletion <span className="text-danger-500">*</span>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">
+                            Reason for deletion <span className="text-danger-400">*</span>
                         </label>
                         <textarea
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             placeholder="Enter reason for deletion (required for audit log)"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 h-20 resize-none"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/20 text-white placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 h-20 resize-none"
                             disabled={isProcessing}
                         />
                     </div>
@@ -82,7 +82,7 @@ function DeleteConfirmModal({
                     <button
                         onClick={handleClose}
                         disabled={isProcessing}
-                        className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors disabled:opacity-50"
+                        className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
@@ -106,7 +106,7 @@ function DeleteConfirmModal({
                 </div>
 
                 {/* Audit Notice */}
-                <p className="mt-4 text-xs text-gray-400 text-center">
+                <p className="mt-4 text-xs text-slate-500 text-center">
                     🔒 This action will be logged for audit purposes
                 </p>
             </div>

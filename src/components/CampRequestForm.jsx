@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
+import { IconTent, IconCheck, IconInfo, IconUsers } from './icons/Icons';
 
 // Sri Lanka districts
 const districts = [
@@ -136,11 +137,20 @@ function CampRequestForm() {
     // Success state
     if (submitted) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-                <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-                    <div className="text-6xl mb-4">✅</div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Request Submitted!</h2>
-                    <p className="text-gray-600 mb-6">
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center px-4">
+                <div
+                    className="absolute inset-0 pointer-events-none opacity-10"
+                    style={{
+                        backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                        backgroundSize: '28px 28px',
+                    }}
+                ></div>
+                <div className="relative z-10 max-w-md w-full bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-2xl shadow-xl p-8 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-500/20 text-success-400">
+                        <IconCheck className="h-8 w-8" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Request Submitted!</h2>
+                    <p className="text-slate-300 mb-6">
                         Your camp request has been submitted successfully.
                         It will be reviewed by authorities and you will be notified once approved.
                     </p>
@@ -153,7 +163,7 @@ function CampRequestForm() {
                         </button>
                         <button
                             onClick={() => navigate('/respond')}
-                            className="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors"
+                            className="w-full px-4 py-2 border border-white/20 bg-white/10 text-white hover:bg-white/20 rounded-lg transition-colors"
                         >
                             Back to Dashboard
                         </button>
@@ -164,35 +174,50 @@ function CampRequestForm() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4">
-            <div className="max-w-3xl mx-auto">
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans py-8 px-4">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            <div className="relative z-10 max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="mb-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="text-gray-600 hover:text-gray-800 mb-4 flex items-center gap-2"
+                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
                     >
                         ← Back
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-800">📋 Request a New Relief Camp</h1>
-                    <p className="text-gray-600 mt-1">
-                        Submit a request for a new relief camp. Your request will be reviewed by authorities.
-                    </p>
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                            <IconTent className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-white">Request a New Relief Camp</h1>
+                            <p className="text-slate-400 mt-1">
+                                Submit a request for a new relief camp. Your request will be reviewed by authorities.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Form */}
-                <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
+                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Information Section */}
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>📋</span> Basic Information
+                            <h3 className="text-lg font-bold text-white mb-4">
+                                Basic Information
                             </h3>
 
                             <div className="space-y-4">
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-slate-300 mb-2">
                                             District *
                                         </label>
                                         <select
@@ -209,7 +234,7 @@ function CampRequestForm() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-semibold text-slate-300 mb-2">
                                             DS Division / Area
                                         </label>
                                         <input
@@ -224,7 +249,7 @@ function CampRequestForm() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Estimated Number of Affected People *
                                     </label>
                                     <input
@@ -237,11 +262,11 @@ function CampRequestForm() {
                                         min="1"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Approximate count is fine</p>
+                                    <p className="text-xs text-slate-500 mt-1">Approximate count is fine</p>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Urgency Level *
                                     </label>
                                     <select
@@ -261,43 +286,48 @@ function CampRequestForm() {
                         </div>
 
                         {/* Location Section */}
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>📍</span> Location Information
+                        <div className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">
+                                Location Information
                             </h3>
 
                             <div className="space-y-4">
                                 {/* GPS Auto-Detect */}
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <div>
-                                            <p className="font-medium text-gray-800 mb-1">📱 Auto-Detect Your Location</p>
-                                            <p className="text-sm text-gray-600">Use your device's GPS for accurate location</p>
+                                <div className="bg-primary-500/10 border border-primary-400/20 rounded-lg p-4">
+                                    <div className="flex items-start justify-between gap-4 mb-2">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
+                                                <IconInfo className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-white mb-1">Auto-Detect Your Location</p>
+                                                <p className="text-sm text-slate-300">Use your device's GPS for accurate location</p>
+                                            </div>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={detectLocation}
                                             disabled={gpsDetecting}
-                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                                            className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex-shrink-0"
                                         >
-                                            {gpsDetecting ? '🔄 Detecting...' : '📍 Detect GPS'}
+                                            {gpsDetecting ? 'Detecting...' : 'Detect GPS'}
                                         </button>
                                     </div>
                                     {formData.latitude && formData.longitude && (
-                                        <div className="bg-green-50 border border-green-200 rounded p-2 mt-2">
-                                            <p className="text-sm text-green-800">✅ Location detected successfully</p>
+                                        <div className="bg-success-500/10 border border-success-400/20 rounded p-2 mt-2">
+                                            <p className="text-sm text-success-300">Location detected successfully</p>
                                         </div>
                                     )}
                                     {gpsError && (
-                                        <div className="bg-amber-50 border border-amber-200 rounded p-2 mt-2">
-                                            <p className="text-sm text-amber-800">⚠️ {gpsError}</p>
+                                        <div className="bg-amber-500/10 border border-amber-400/20 rounded p-2 mt-2">
+                                            <p className="text-sm text-amber-300">{gpsError}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Manual Location Description */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Village / Area Name *
                                     </label>
                                     <input
@@ -309,11 +339,11 @@ function CampRequestForm() {
                                         placeholder="e.g., Kelaniya North, Maligawatta"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Name of your village or locality</p>
+                                    <p className="text-xs text-slate-500 mt-1">Name of your village or locality</p>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Nearby Landmark *
                                     </label>
                                     <input
@@ -325,15 +355,15 @@ function CampRequestForm() {
                                         placeholder="e.g., Near Kelaniya Temple / Main junction / Community center"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Well-known place like temple, mosque, church, school, hospital, or major junction</p>
+                                    <p className="text-xs text-slate-500 mt-1">Well-known place like temple, mosque, church, school, hospital, or major junction</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Facilities Needed */}
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>🏥</span> Facilities Needed (Select All That Apply)
+                        <div className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">
+                                Facilities Needed (Select All That Apply)
                             </h3>
                             <div className="flex flex-wrap gap-2">
                                 {facilityOptions.map(facility => (
@@ -342,8 +372,8 @@ function CampRequestForm() {
                                         type="button"
                                         onClick={() => handleFacilityToggle(facility)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.facilities_needed.includes(facility)
-                                            ? 'bg-primary-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
+                                            : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}
                                     >
                                         {facility}
@@ -353,9 +383,9 @@ function CampRequestForm() {
                         </div>
 
                         {/* Special Needs */}
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>❗</span> Special Needs
+                        <div className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">
+                                Special Needs
                             </h3>
                             <textarea
                                 name="special_needs"
@@ -369,13 +399,13 @@ function CampRequestForm() {
 • People with medical conditions
 • Injured persons needing immediate medical care"
                             />
-                            <p className="text-xs text-gray-500 mt-1">This helps authorities prioritize and prepare appropriate resources</p>
+                            <p className="text-xs text-slate-500 mt-1">This helps authorities prioritize and prepare appropriate resources</p>
                         </div>
 
                         {/* Reason */}
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>📝</span> Describe the Situation *
+                        <div className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">
+                                Describe the Situation *
                             </h3>
                             <textarea
                                 name="reason"
@@ -391,14 +421,15 @@ function CampRequestForm() {
                         </div>
 
                         {/* Your Information */}
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>👤</span> Requester Contact Information
+                        <div className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <IconUsers className="h-5 w-5 text-primary-400" />
+                                Requester Contact Information
                             </h3>
 
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Your Name *
                                     </label>
                                     <input
@@ -412,7 +443,7 @@ function CampRequestForm() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Phone Number *
                                     </label>
                                     <input
@@ -424,11 +455,11 @@ function CampRequestForm() {
                                         placeholder="077 123 4567"
                                         required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">(Primary contact method)</p>
+                                    <p className="text-xs text-slate-500 mt-1">(Primary contact method)</p>
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-slate-300 mb-2">
                                     Email
                                 </label>
                                 <input
@@ -443,9 +474,9 @@ function CampRequestForm() {
                         </div>
 
                         {/* Additional Notes */}
-                        <div className="border-t pt-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>📎</span> Additional Notes
+                        <div className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">
+                                Additional Notes
                             </h3>
                             <textarea
                                 name="additional_notes"
@@ -457,15 +488,15 @@ function CampRequestForm() {
                         </div>
 
                         {/* Submit */}
-                        <div className="border-t pt-6">
+                        <div className="border-t border-white/10 pt-6">
                             <button
                                 type="submit"
                                 disabled={submitting}
                                 className="w-full btn-primary py-3 text-lg disabled:opacity-50"
                             >
-                                {submitting ? 'Submitting Request...' : '📤 Submit Camp Request'}
+                                {submitting ? 'Submitting Request...' : 'Submit Camp Request'}
                             </button>
-                            <p className="text-xs text-gray-500 text-center mt-3">
+                            <p className="text-xs text-slate-500 text-center mt-3">
                                 Your request will be reviewed by authorities. You will be contacted once a decision is made.
                             </p>
                         </div>

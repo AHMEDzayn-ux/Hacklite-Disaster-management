@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDonationStore } from '../store/supabaseStore';
+import { IconHeart } from './icons/Icons';
 
 function RecentDonations({ limit = 10, showTicker = true }) {
     const { donations } = useDonationStore();
@@ -54,8 +55,8 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
     if (recentDonations.length === 0) {
         return (
-            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
-                <p className="text-gray-500">No donations yet. Be the first to contribute!</p>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-6 text-center shadow-xl">
+                <p className="text-slate-400">No donations yet. Be the first to contribute!</p>
             </div>
         );
     }
@@ -69,7 +70,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                         initial={{ opacity: 0, y: -50, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                        className="bg-green-500 text-white rounded-lg p-4 shadow-xl"
+                        className="rounded-lg border border-success-400/30 bg-success-500 text-white p-4 shadow-xl shadow-success-500/30"
                     >
                         <div className="flex items-center gap-3">
                             <span className="text-3xl">🎉</span>
@@ -77,7 +78,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                 <p className="font-bold">
                                     {formatDonorName(newDonation)} just donated ${parseFloat(newDonation.amount).toFixed(2)}!
                                 </p>
-                                <p className="text-sm text-green-100">
+                                <p className="text-sm text-success-50">
                                     Thank you for your generosity! 🙏
                                 </p>
                             </div>
@@ -87,22 +88,22 @@ function RecentDonations({ limit = 10, showTicker = true }) {
             </AnimatePresence>
 
             {/* Recent Donations List */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl">
+                <div className="bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 backdrop-blur-md p-4 border-b border-white/10">
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                        <span>💝</span> Recent Donations
+                        <IconHeart className="h-5 w-5" /> Recent Donations
                     </h3>
-                    <p className="text-purple-100 text-sm">Live updates from our generous donors</p>
+                    <p className="text-slate-300 text-sm">Live updates from our generous donors</p>
                 </div>
 
-                <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+                <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
                     {recentDonations.map((donation, index) => (
                         <motion.div
                             key={donation.id}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="p-4 hover:bg-gray-50 transition-colors duration-200"
+                            className="p-4 hover:bg-white/[0.08] transition-colors duration-200"
                         >
                             <div className="flex items-start justify-between gap-4">
                                 {/* Left: Donor Info */}
@@ -111,33 +112,33 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                         <span className="text-lg">
                                             {donation.is_anonymous ? '🙏' : '👤'}
                                         </span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="font-semibold text-white">
                                             {formatDonorName(donation)}
                                         </span>
                                     </div>
 
-                                    <p className="text-sm text-gray-600 mb-1">
+                                    <p className="text-sm text-slate-400 mb-1">
                                         {donation.donation_purpose || 'General Relief'}
                                     </p>
 
                                     {donation.message && !donation.is_anonymous && (
-                                        <p className="text-sm text-gray-500 italic mt-2 border-l-2 border-gray-200 pl-3">
+                                        <p className="text-sm text-slate-400 italic mt-2 border-l-2 border-white/10 pl-3">
                                             "{donation.message?.substring(0, 100) || ''}
                                             {donation.message.length > 100 ? '...' : ''}"
                                         </p>
                                     )}
 
-                                    <p className="text-xs text-gray-400 mt-2">
+                                    <p className="text-xs text-slate-500 mt-2">
                                         {formatTimeAgo(donation.created_at)}
                                     </p>
                                 </div>
 
                                 {/* Right: Amount */}
                                 <div className="text-right">
-                                    <div className="text-2xl font-bold text-green-600">
+                                    <div className="text-2xl font-bold text-success-400">
                                         ${parseFloat(donation.amount).toFixed(2)}
                                     </div>
-                                    <div className="text-xs text-gray-500 uppercase">
+                                    <div className="text-xs text-slate-500 uppercase">
                                         {donation.currency || 'USD'}
                                     </div>
                                 </div>
@@ -148,8 +149,8 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
                 {/* View All Link */}
                 {donations.filter(d => d.stripe_payment_status === 'succeeded').length > limit && (
-                    <div className="bg-gray-50 p-3 text-center">
-                        <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                    <div className="bg-white/5 border-t border-white/10 p-3 text-center">
+                        <button className="text-primary-300 hover:text-primary-200 text-sm font-semibold">
                             View All {donations.filter(d => d.stripe_payment_status === 'succeeded').length} Donations →
                         </button>
                     </div>
@@ -158,7 +159,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
             {/* Ticker Mode (Optional) */}
             {showTicker && recentDonations.length > 3 && (
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg overflow-hidden">
+                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 backdrop-blur-md overflow-hidden">
                     <div className="ticker-container py-3">
                         <div className="ticker-content flex gap-8 items-center">
                             {[...recentDonations, ...recentDonations].map((donation, index) => (
@@ -171,10 +172,10 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                         {formatDonorName(donation)}
                                     </span>
                                     <span>donated</span>
-                                    <span className="font-bold text-yellow-300">
+                                    <span className="font-bold text-amber-300">
                                         ${parseFloat(donation.amount).toFixed(2)}
                                     </span>
-                                    <span className="text-blue-200">•</span>
+                                    <span className="text-slate-300">•</span>
                                 </div>
                             ))}
                         </div>

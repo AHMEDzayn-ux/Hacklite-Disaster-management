@@ -62,10 +62,10 @@ function LazyImage({
             {/* Skeleton placeholder - shows while loading */}
             {!isLoaded && (
                 <div
-                    className={`absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center ${placeholderClassName}`}
+                    className={`absolute inset-0 bg-white/10 animate-pulse flex items-center justify-center ${placeholderClassName}`}
                 >
                     <svg
-                        className="w-10 h-10 text-gray-400"
+                        className="w-10 h-10 text-slate-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -95,11 +95,11 @@ function LazyImage({
 
             {/* Error fallback */}
             {(hasError || !src) && (
-                <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                <div className="absolute inset-0 bg-white/10 flex items-center justify-center">
                     {fallbackSrc ? (
                         <img src={fallbackSrc} alt={alt} className="w-full h-full object-cover" />
                     ) : (
-                        <div className="text-center text-gray-400">
+                        <div className="text-center text-slate-500">
                             <svg
                                 className="w-8 h-8 mx-auto mb-1"
                                 fill="none"

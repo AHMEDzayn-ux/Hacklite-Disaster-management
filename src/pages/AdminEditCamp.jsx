@@ -6,6 +6,7 @@ import { checkIsAdmin } from '../services/adminService';
 import { SRI_LANKA_DISTRICTS, CAMP_TYPES, FACILITY_OPTIONS, NEEDS_OPTIONS } from '../services/campManagementService';
 import LocationPicker from '../components/LocationPicker';
 import { regenerateInventoryAccessCode } from '../services/inventoryService';
+import { IconTent } from '../components/icons/Icons';
 
 /**
  * Admin Edit Camp
@@ -250,18 +251,18 @@ function AdminEditCamp() {
 
     if (authLoading || !user) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     if (!adminStatus.isAdmin) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
-                    <p className="text-gray-600 mb-4">You need admin privileges to access this page.</p>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+                <div className="relative z-10 text-center">
+                    <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+                    <p className="text-slate-400 mb-4">You need admin privileges to access this page.</p>
                     <Link to="/admin/dashboard" className="btn-primary">Return to Dashboard</Link>
                 </div>
             </div>
@@ -270,10 +271,10 @@ function AdminEditCamp() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mb-4"></div>
-                    <p className="text-gray-600">Loading camp data...</p>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+                <div className="relative z-10 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
+                    <p className="text-slate-400">Loading camp data...</p>
                 </div>
             </div>
         );
@@ -281,9 +282,9 @@ function AdminEditCamp() {
 
     if (!camp) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-4">Camp Not Found</h1>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+                <div className="relative z-10 text-center">
+                    <h1 className="text-2xl font-bold text-white mb-4">Camp Not Found</h1>
                     <Link to="/admin/manage-camps" className="btn-primary">Back to Camps</Link>
                 </div>
             </div>
@@ -291,52 +292,61 @@ function AdminEditCamp() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Header */}
-            <header className="bg-gray-800 text-white shadow-lg">
-                <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Link to="/admin/manage-camps" className="text-gray-400 hover:text-white transition-colors">
-                                ← Back to Camps
-                            </Link>
-                            <h1 className="text-xl font-bold">✏️ Edit Camp</h1>
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans py-8 px-4">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            <div className="relative z-10 max-w-3xl mx-auto">
+                {/* Header */}
+                <div className="mb-6">
+                    <Link to="/admin/manage-camps" className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit">
+                        ← Back to Camps
+                    </Link>
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                            <IconTent className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-white">Edit Camp</h1>
                         </div>
                     </div>
                 </div>
-            </header>
 
-            {/* Main Content */}
-            <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
-                <div className="max-w-4xl mx-auto">
-                    {/* Camp Info Header */}
-                    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">{camp.name || camp.camp_name}</h2>
-                        <p className="text-gray-600 mt-1">
-                            ID: <span className="font-mono text-sm">{camp.id}</span>
-                        </p>
+                {/* Camp Info Header */}
+                <div className="card mb-6">
+                    <h2 className="text-2xl font-bold text-white">{camp.name || camp.camp_name}</h2>
+                    <p className="text-slate-400 mt-1">
+                        ID: <span className="font-mono text-sm text-slate-300">{camp.id}</span>
+                    </p>
+                </div>
+
+                {/* Error/Success Messages */}
+                {error && (
+                    <div className="bg-danger-500/10 border border-danger-400/30 text-danger-300 px-4 py-3 rounded-lg mb-6">
+                        {error}
                     </div>
+                )}
+                {success && (
+                    <div className="bg-success-500/10 border border-success-400/30 text-success-300 px-4 py-3 rounded-lg mb-6">
+                        {success}
+                    </div>
+                )}
 
-                    {/* Error/Success Messages */}
-                    {error && (
-                        <div className="bg-danger-50 border border-danger-300 text-danger-700 px-4 py-3 rounded-lg mb-6">
-                            {error}
-                        </div>
-                    )}
-                    {success && (
-                        <div className="bg-success-50 border border-success-300 text-success-700 px-4 py-3 rounded-lg mb-6">
-                            {success}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Form */}
+                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
+                    <form onSubmit={handleSubmit} className="space-y-8">
                         {/* Basic Information */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">📋 Basic Information</h3>
+                        <section>
+                            <h3 className="text-lg font-bold text-white mb-4">Basic Information</h3>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Camp Name <span className="text-danger-500">*</span>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                                        Camp Name <span className="text-danger-400">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -348,7 +358,7 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Camp Type</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Camp Type</label>
                                     <select
                                         name="type"
                                         value={formData.type}
@@ -362,7 +372,7 @@ function AdminEditCamp() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Status</label>
                                     <select
                                         name="status"
                                         value={formData.status}
@@ -375,7 +385,7 @@ function AdminEditCamp() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">District</label>
                                     <select
                                         name="district"
                                         value={formData.district}
@@ -389,7 +399,7 @@ function AdminEditCamp() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">DS Division</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">DS Division</label>
                                     <input
                                         type="text"
                                         name="ds_division"
@@ -400,14 +410,14 @@ function AdminEditCamp() {
                                     />
                                 </div>
                             </div>
-                        </div>
+                        </section>
 
                         {/* Capacity Section */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">👥 Capacity</h3>
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">Capacity</h3>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Total Capacity</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Total Capacity</label>
                                     <input
                                         type="number"
                                         name="capacity"
@@ -418,7 +428,7 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Current Occupancy</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Current Occupancy</label>
                                     <input
                                         type="number"
                                         name="current_occupancy"
@@ -433,15 +443,15 @@ function AdminEditCamp() {
                             {formData.capacity && formData.current_occupancy !== '' && (
                                 <div className="mt-4">
                                     <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-600">Occupancy</span>
-                                        <span className="font-medium">
+                                        <span className="text-slate-400">Occupancy</span>
+                                        <span className="font-medium text-white">
                                             {Math.round((formData.current_occupancy / formData.capacity) * 100)}%
                                         </span>
                                     </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div className="w-full bg-white/10 rounded-full h-2">
                                         <div
                                             className={`h-2 rounded-full ${(formData.current_occupancy / formData.capacity) >= 0.9 ? 'bg-danger-500' :
-                                                (formData.current_occupancy / formData.capacity) >= 0.7 ? 'bg-warning-500' :
+                                                (formData.current_occupancy / formData.capacity) >= 0.7 ? 'bg-amber-500' :
                                                     'bg-success-500'
                                                 }`}
                                             style={{ width: `${Math.min((formData.current_occupancy / formData.capacity) * 100, 100)}%` }}
@@ -449,15 +459,15 @@ function AdminEditCamp() {
                                     </div>
                                 </div>
                             )}
-                        </div>
+                        </section>
 
                         {/* Contact Information */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">📞 Contact Information</h3>
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">Contact Information</h3>
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Contact Person <span className="text-danger-500">*</span>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                                        Contact Person <span className="text-danger-400">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -469,8 +479,8 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Phone Number <span className="text-danger-500">*</span>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                                        Phone Number <span className="text-danger-400">*</span>
                                     </label>
                                     <input
                                         type="tel"
@@ -482,7 +492,7 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Email</label>
                                     <input
                                         type="email"
                                         name="contact_email"
@@ -492,14 +502,14 @@ function AdminEditCamp() {
                                     />
                                 </div>
                             </div>
-                        </div>
+                        </section>
 
                         {/* Location */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">📍 Location</h3>
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">Location</h3>
                             <div className="grid md:grid-cols-2 gap-4 mb-4">
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Address</label>
                                     <input
                                         type="text"
                                         name="address"
@@ -509,7 +519,7 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Village/Area</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Village/Area</label>
                                     <input
                                         type="text"
                                         name="village_area"
@@ -519,7 +529,7 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Nearby Landmark</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Nearby Landmark</label>
                                     <input
                                         type="text"
                                         name="nearby_landmark"
@@ -530,10 +540,10 @@ function AdminEditCamp() {
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-slate-300 mb-2">
                                     Map Location
                                     {formData.latitude && formData.longitude && (
-                                        <span className="ml-2 text-xs text-gray-500">
+                                        <span className="ml-2 text-xs text-slate-500">
                                             ({formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)})
                                         </span>
                                     )}
@@ -546,14 +556,14 @@ function AdminEditCamp() {
                                     } : null}
                                 />
                             </div>
-                        </div>
+                        </section>
 
                         {/* Facilities */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">🏗️ Facilities Available</h3>
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">Facilities Available</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {FACILITY_OPTIONS.map(facility => (
-                                    <label key={facility.value} className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <label key={facility.value} className="flex items-center gap-2 p-2 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 text-slate-300 transition-colors">
                                         <input
                                             type="checkbox"
                                             name={`facility_${facility.value}`}
@@ -566,57 +576,57 @@ function AdminEditCamp() {
                                     </label>
                                 ))}
                             </div>
-                        </div>
+                        </section>
 
                         {/* Current Needs */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">⚠️ Current Urgent Needs</h3>
-                            <p className="text-sm text-gray-600 mb-4">Select items that the camp urgently requires</p>
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">Current Urgent Needs</h3>
+                            <p className="text-sm text-slate-400 mb-4">Select items that the camp urgently requires</p>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {NEEDS_OPTIONS.map(need => (
-                                    <label key={need} className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${formData.needs.includes(need) ? 'bg-warning-50 border-warning-300' : 'hover:bg-gray-50'
+                                    <label key={need} className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${formData.needs.includes(need) ? 'bg-amber-500/15 border-amber-400/30 text-amber-200' : 'border-white/10 text-slate-300 hover:bg-white/5'
                                         }`}>
                                         <input
                                             type="checkbox"
                                             name={`need_${need}`}
                                             checked={formData.needs.includes(need)}
                                             onChange={handleInputChange}
-                                            className="w-4 h-4 text-warning-600"
+                                            className="w-4 h-4 text-amber-500"
                                         />
                                         <span className="text-sm">{need}</span>
                                     </label>
                                 ))}
                             </div>
-                        </div>
+                        </section>
 
                         {/* Inventory Access Code */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">📦 Inventory Access Code</h3>
-                            <p className="text-sm text-gray-600 mb-4">
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-2">Inventory Access Code</h3>
+                            <p className="text-sm text-slate-400 mb-4">
                                 Share this code with a volunteer so they can log camp inventory (received/distributed supplies) at
-                                <span className="font-mono"> /camp-inventory</span> without needing an account.
+                                <span className="font-mono text-slate-300"> /camp-inventory</span> without needing an account.
                             </p>
                             <div className="flex items-center gap-4">
-                                <div className="font-mono text-2xl tracking-widest bg-gray-100 px-4 py-2 rounded-lg border">
+                                <div className="font-mono text-2xl tracking-widest bg-white/5 text-white px-4 py-2 rounded-lg border border-white/15">
                                     {camp.inventory_access_code || 'Not set'}
                                 </div>
                                 <button
                                     type="button"
                                     onClick={handleRegenerateCode}
                                     disabled={regeneratingCode}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     {regeneratingCode ? 'Generating...' : camp.inventory_access_code ? 'Regenerate Code' : 'Generate Code'}
                                 </button>
                             </div>
-                        </div>
+                        </section>
 
                         {/* Additional Information */}
-                        <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">📝 Additional Information</h3>
+                        <section className="border-t border-white/10 pt-6">
+                            <h3 className="text-lg font-bold text-white mb-4">Additional Information</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">
                                         Special Accommodations
                                     </label>
                                     <textarea
@@ -629,7 +639,7 @@ function AdminEditCamp() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Notes</label>
                                     <textarea
                                         name="notes"
                                         value={formData.notes}
@@ -640,13 +650,13 @@ function AdminEditCamp() {
                                     />
                                 </div>
                             </div>
-                        </div>
+                        </section>
 
                         {/* Submit Buttons */}
-                        <div className="flex gap-4 justify-end">
+                        <div className="pt-6 border-t border-white/10 flex gap-4 justify-end">
                             <Link
                                 to="/admin/manage-camps"
-                                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
                             >
                                 Cancel
                             </Link>
@@ -661,13 +671,13 @@ function AdminEditCamp() {
                                         Saving...
                                     </>
                                 ) : (
-                                    <>💾 Save Changes</>
+                                    <>Save Changes</>
                                 )}
                             </button>
                         </div>
                     </form>
                 </div>
-            </main>
+            </div>
         </div>
     );
 }

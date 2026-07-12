@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateAllTestData, generateMissingPersons, generateDisasters, generateAnimalRescues, generateCamps, generateDonations } from '../utils/bulkTestData';
+import { IconFlask } from '../components/icons/Icons';
 
 function BulkTestData() {
     const navigate = useNavigate();
@@ -47,31 +48,46 @@ function BulkTestData() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="container mx-auto px-4 max-w-4xl">
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            <div className="relative z-10 mx-auto max-w-4xl px-4 py-8 sm:px-6">
                 {/* Header */}
-                <div className="mb-6">
+                <div className="mb-8">
                     <button
                         onClick={() => navigate('/')}
-                        className="text-primary-600 hover:text-primary-800 mb-4 flex items-center gap-2"
+                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors text-sm font-medium"
                     >
                         ← Back to Home
                     </button>
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2">🧪 Bulk Test Data Generator</h1>
-                    <p className="text-gray-600">Generate realistic test data for testing and demo purposes</p>
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                            <IconFlask className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-black text-white md:text-4xl">Bulk Test Data Generator</h1>
+                            <p className="mt-1 text-slate-300">Generate realistic test data for testing and demo purposes</p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Loading State */}
                 {loading && (
-                    <div className="card bg-blue-50 border-l-4 border-blue-500 mb-6">
+                    <div className="card border-l-4 border-l-primary-400 bg-primary-500/10 mb-6">
                         <div className="flex items-center gap-3">
-                            <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-400 border-t-transparent"></div>
                             <div>
-                                <p className="text-blue-800 font-semibold">Generating data...</p>
-                                {progress && <p className="text-sm text-blue-600 mt-1">{progress}</p>}
+                                <p className="text-primary-200 font-semibold">Generating data...</p>
+                                {progress && <p className="text-sm text-primary-300 mt-1">{progress}</p>}
                             </div>
                         </div>
-                        <p className="text-sm text-blue-600 mt-3">
+                        <p className="text-sm text-primary-300 mt-3">
                             This may take 1-3 minutes. Check browser console (F12) for detailed progress.
                         </p>
                     </div>
@@ -79,37 +95,37 @@ function BulkTestData() {
 
                 {/* Success Result */}
                 {result && (
-                    <div className="card bg-green-50 border-l-4 border-green-500 mb-6">
-                        <h3 className="font-bold text-green-800 mb-2">✅ Generation Complete!</h3>
+                    <div className="card border-l-4 border-l-success-400 bg-success-500/10 mb-6">
+                        <h3 className="font-bold text-success-200 mb-2">✅ Generation Complete!</h3>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                            <div className="bg-white rounded p-3 text-center">
-                                <p className="text-2xl font-bold text-primary-600">{result.counts.missingPersons}</p>
-                                <p className="text-xs text-gray-600">Missing Persons</p>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+                                <p className="text-2xl font-bold text-primary-300">{result.counts.missingPersons}</p>
+                                <p className="text-xs text-slate-400">Missing Persons</p>
                             </div>
-                            <div className="bg-white rounded p-3 text-center">
-                                <p className="text-2xl font-bold text-danger-600">{result.counts.disasters}</p>
-                                <p className="text-xs text-gray-600">Disasters</p>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+                                <p className="text-2xl font-bold text-danger-300">{result.counts.disasters}</p>
+                                <p className="text-xs text-slate-400">Disasters</p>
                             </div>
-                            <div className="bg-white rounded p-3 text-center">
-                                <p className="text-2xl font-bold text-warning-600">{result.counts.animalRescues}</p>
-                                <p className="text-xs text-gray-600">Animal Rescues</p>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+                                <p className="text-2xl font-bold text-amber-300">{result.counts.animalRescues}</p>
+                                <p className="text-xs text-slate-400">Animal Rescues</p>
                             </div>
-                            <div className="bg-white rounded p-3 text-center">
-                                <p className="text-2xl font-bold text-success-600">{result.counts.camps}</p>
-                                <p className="text-xs text-gray-600">Camps</p>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+                                <p className="text-2xl font-bold text-success-300">{result.counts.camps}</p>
+                                <p className="text-xs text-slate-400">Camps</p>
                             </div>
-                            <div className="bg-white rounded p-3 text-center">
-                                <p className="text-2xl font-bold text-blue-600">{result.counts.donations}</p>
-                                <p className="text-xs text-gray-600">Donations</p>
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
+                                <p className="text-2xl font-bold text-blue-300">{result.counts.donations}</p>
+                                <p className="text-xs text-slate-400">Donations</p>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {/* Warning */}
-                <div className="card bg-yellow-50 border-l-4 border-yellow-500 mb-6">
-                    <h3 className="font-bold text-yellow-800 mb-2">⚠️ Important Notes</h3>
-                    <ul className="text-yellow-700 text-sm space-y-1">
+                <div className="card border-l-4 border-l-amber-400 bg-amber-500/10 mb-6">
+                    <h3 className="font-bold text-amber-200 mb-2">⚠️ Important Notes</h3>
+                    <ul className="text-amber-100/80 text-sm space-y-1">
                         <li>• This creates test records in your Supabase database</li>
                         <li>• Data is realistic but randomly generated</li>
                         <li>• ✨ Photos are included from Unsplash (professional stock images)</li>
@@ -120,15 +136,15 @@ function BulkTestData() {
                 </div>
 
                 {/* Generate All Button */}
-                <div className="card mb-6 bg-gradient-to-r from-primary-500 to-primary-700 text-white">
-                    <h3 className="font-bold text-xl mb-2">🚀 Generate All Test Data</h3>
-                    <p className="text-primary-100 mb-4">
+                <div className="card mb-6 bg-gradient-to-r from-primary-600/30 to-primary-500/20 border-primary-400/20">
+                    <h3 className="font-bold text-xl text-white mb-2">🚀 Generate All Test Data</h3>
+                    <p className="text-slate-300 mb-4">
                         Creates 190 records: 50 Missing Persons + 30 Disasters + 40 Animal Rescues + 20 Camps + 50 Donations
                     </p>
                     <button
                         onClick={handleGenerateAll}
                         disabled={loading}
-                        className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Generating...' : '🎯 Generate All (190 records)'}
                     </button>
@@ -138,11 +154,11 @@ function BulkTestData() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Missing Persons */}
                     <div className="card">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             <span className="text-2xl">📋</span>
                             Missing Persons
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-slate-400 mb-4">
                             Generates reports with names, ages, locations, and contact details
                         </p>
                         <button
@@ -156,11 +172,11 @@ function BulkTestData() {
 
                     {/* Disasters */}
                     <div className="card">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             <span className="text-2xl">⚠️</span>
                             Disaster Reports
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-slate-400 mb-4">
                             Various disaster types with severities and locations across Sri Lanka
                         </p>
                         <button
@@ -174,11 +190,11 @@ function BulkTestData() {
 
                     {/* Animal Rescues */}
                     <div className="card">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             <span className="text-2xl">🐕</span>
                             Animal Rescues
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-slate-400 mb-4">
                             Different animal types with various conditions and rescue statuses
                         </p>
                         <button
@@ -192,11 +208,11 @@ function BulkTestData() {
 
                     {/* Camps */}
                     <div className="card">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             <span className="text-2xl">⛺</span>
                             Relief Camps
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-slate-400 mb-4">
                             Emergency camps with capacities, facilities, and contact information
                         </p>
                         <button
@@ -210,11 +226,11 @@ function BulkTestData() {
 
                     {/* Donations */}
                     <div className="card">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             <span className="text-2xl">💰</span>
                             Donations
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-slate-400 mb-4">
                             Donation records with various amounts, currencies, and donor information
                         </p>
                         <button
@@ -229,11 +245,11 @@ function BulkTestData() {
 
                 {/* Features List */}
                 <div className="card mt-6">
-                    <h3 className="font-bold text-gray-800 mb-3">📦 What's Generated:</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <h3 className="font-bold text-white mb-3">📦 What's Generated:</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
                         <div>
-                            <p className="font-semibold mb-2">✓ Realistic Data:</p>
-                            <ul className="space-y-1 ml-4">
+                            <p className="font-semibold text-slate-200 mb-2">✓ Realistic Data:</p>
+                            <ul className="space-y-1 ml-4 text-slate-400">
                                 <li>• Sri Lankan names</li>
                                 <li>• Valid phone numbers (070-078)</li>
                                 <li>• All 25 districts with real areas</li>
@@ -242,8 +258,8 @@ function BulkTestData() {
                             </ul>
                         </div>
                         <div>
-                            <p className="font-semibold mb-2">✓ Features:</p>
-                            <ul className="space-y-1 ml-4">
+                            <p className="font-semibold text-slate-200 mb-2">✓ Features:</p>
+                            <ul className="space-y-1 ml-4 text-slate-400">
                                 <li>• Mixed statuses (Active/Resolved)</li>
                                 <li>• Various severities & conditions</li>
                                 <li>• Real GPS coordinates (accurate)</li>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { IconPhone, IconShieldCheck } from '../components/icons/Icons';
 
 function EmergencyContacts() {
     const [expandedDistrict, setExpandedDistrict] = useState(null);
@@ -48,72 +49,82 @@ function EmergencyContacts() {
     };
 
     return (
-        <div className="px-4 py-3 overflow-x-hidden">
-            <h1 className="text-xl font-bold text-gray-800 mb-3">🚨 Emergency Contacts</h1>
-
-            {/* National Hotlines */}
-            <div className="bg-white rounded-lg shadow-sm p-3 mb-3">
-                <h2 className="text-base font-bold text-gray-800 mb-2">📞 National Emergency Hotlines</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-                    {nationalHotlines.map((hotline, index) => (
-                        <a
-                            key={index}
-                            href={`tel:${hotline.number}`}
-                            className="border-l-4 pl-2 py-1 rounded-r cursor-pointer hover:bg-gray-50 transition-colors block"
-                            style={{
-                                borderColor: hotline.type === 'emergency' ? '#dc2626' : hotline.type === 'military' ? '#2563eb' : '#16a34a'
-                            }}
-                        >
-                            <h3 className="font-semibold text-xs text-gray-800">{hotline.name}</h3>
-                            <p className="text-base font-bold whitespace-nowrap" style={{
-                                color: hotline.type === 'emergency' ? '#dc2626' : hotline.type === 'military' ? '#2563eb' : '#16a34a'
-                            }}>
-                                {hotline.number}
-                            </p>
-                        </a>
-                    ))}
+        <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-8 font-sans sm:px-8 lg:px-12">
+            <div className="mx-auto max-w-[1600px]">
+                <div className="mb-8 flex items-center gap-4">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
+                        <IconPhone className="h-7 w-7" />
+                    </div>
+                    <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">Emergency Contacts</h1>
                 </div>
-            </div>
 
-            {/* District Contacts */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-                <h2 className="text-lg font-bold text-gray-800 mb-2">🏛️ District Disaster Management Centre Units</h2>
-                <p className="text-sm text-gray-600 mb-3">Click on your district to view contact details</p>
+                {/* National Hotlines */}
+                <div className="mb-6 rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md">
+                    <h2 className="mb-4 text-lg font-bold text-white">National Emergency Hotlines</h2>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                        {nationalHotlines.map((hotline, index) => {
+                            const color = hotline.type === 'emergency' ? 'danger' : hotline.type === 'military' ? 'primary' : 'success';
+                            return (
+                                <a
+                                    key={index}
+                                    href={`tel:${hotline.number}`}
+                                    className={`block rounded-xl border-l-4 bg-white/5 py-2.5 pl-3 pr-2 transition-colors hover:bg-white/10 ${color === 'danger' ? 'border-danger-500' : color === 'primary' ? 'border-primary-500' : 'border-success-500'
+                                        }`}
+                                >
+                                    <h3 className="text-xs font-semibold text-slate-300">{hotline.name}</h3>
+                                    <p className={`text-lg font-bold whitespace-nowrap ${color === 'danger' ? 'text-danger-400' : color === 'primary' ? 'text-primary-300' : 'text-success-400'
+                                        }`}>
+                                        {hotline.number}
+                                    </p>
+                                </a>
+                            );
+                        })}
+                    </div>
+                </div>
 
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                    {districtContacts.map((contact, index) => (
-                        <div key={index}>
-                            <button
-                                onClick={() => toggleDistrict(contact.district)}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${expandedDistrict === contact.district
-                                    ? 'bg-primary-500 text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                    }`}
-                            >
-                                {contact.district}
-                            </button>
+                {/* District Contacts */}
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md">
+                    <div className="mb-4 flex items-center gap-3">
+                        <IconShieldCheck className="h-5 w-5 text-primary-300" />
+                        <h2 className="text-lg font-bold text-white">District Disaster Management Centre Units</h2>
+                    </div>
+                    <p className="mb-4 text-sm text-slate-400">Click on your district to view contact details</p>
 
-                            {expandedDistrict === contact.district && (
-                                <div className="mt-2 p-3 bg-primary-50 border border-primary-200 rounded-lg text-sm">
-                                    <p className="font-semibold text-gray-800 mb-2">{contact.officer}</p>
-                                    <div className="space-y-1">
-                                        <a
-                                            href={`tel:${contact.mobile}`}
-                                            className="block text-success-600 hover:underline font-medium"
-                                        >
-                                            📱 {contact.mobile}
-                                        </a>
-                                        <a
-                                            href={`tel:${contact.office}`}
-                                            className="block text-primary-600 hover:underline"
-                                        >
-                                            ☎️ {contact.office}
-                                        </a>
+                    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                        {districtContacts.map((contact, index) => (
+                            <div key={index}>
+                                <button
+                                    onClick={() => toggleDistrict(contact.district)}
+                                    className={`w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${expandedDistrict === contact.district
+                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        : 'bg-white/5 text-slate-200 hover:bg-white/10'
+                                        }`}
+                                >
+                                    {contact.district}
+                                </button>
+
+                                {expandedDistrict === contact.district && (
+                                    <div className="mt-2 rounded-xl border border-primary-400/20 bg-primary-500/10 p-3 text-sm">
+                                        <p className="mb-2 font-semibold text-white">{contact.officer}</p>
+                                        <div className="space-y-1">
+                                            <a
+                                                href={`tel:${contact.mobile}`}
+                                                className="block font-medium text-success-400 hover:underline"
+                                            >
+                                                {contact.mobile}
+                                            </a>
+                                            <a
+                                                href={`tel:${contact.office}`}
+                                                className="block text-primary-300 hover:underline"
+                                            >
+                                                {contact.office}
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

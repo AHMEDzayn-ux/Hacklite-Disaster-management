@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { checkIsAdmin, secureDeleteRecord, DELETABLE_TABLES } from '../services/adminService';
 import { fetchCampRequests, rejectCampRequest } from '../services/campManagementService';
 import DeleteConfirmModal from '../components/shared/DeleteConfirmModal';
+import { IconTent } from '../components/icons/Icons';
 
 /**
  * Admin Review Requests Page
@@ -156,11 +157,11 @@ function AdminReviewRequests() {
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-            approved: 'bg-green-100 text-green-800 border-green-300',
-            rejected: 'bg-red-100 text-red-800 border-red-300'
+            pending: 'bg-amber-500/15 text-amber-300 border-amber-400/20',
+            approved: 'bg-success-500/15 text-success-300 border-success-400/20',
+            rejected: 'bg-danger-500/15 text-danger-300 border-danger-400/20'
         };
-        return badges[status] || 'bg-gray-100 text-gray-700';
+        return badges[status] || 'bg-white/10 text-slate-300 border-white/10';
     };
 
     const getUrgencyBadge = (urgency) => {
@@ -171,40 +172,49 @@ function AdminReviewRequests() {
             critical: '🔴 Critical'
         };
         const colors = {
-            low: 'bg-green-50 text-green-700 border border-green-200',
-            medium: 'bg-yellow-50 text-yellow-700 border border-yellow-200',
-            high: 'bg-orange-50 text-orange-700 border border-orange-200',
-            critical: 'bg-red-50 text-red-700 border border-red-200'
+            low: 'bg-success-500/15 text-success-300 border border-success-400/20',
+            medium: 'bg-amber-500/15 text-amber-300 border border-amber-400/20',
+            high: 'bg-orange-500/15 text-orange-300 border border-orange-400/20',
+            critical: 'bg-danger-500/15 text-danger-300 border border-danger-400/20'
         };
-        return { text: badges[urgency] || urgency, className: colors[urgency] || 'bg-gray-100 text-gray-700' };
+        return { text: badges[urgency] || urgency, className: colors[urgency] || 'bg-white/10 text-slate-300 border border-white/10' };
     };
 
     if (authLoading || !user) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Header */}
-            <header className="bg-gray-800 text-white shadow-lg">
-                <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Link to="/admin/dashboard" className="text-gray-400 hover:text-white transition-colors">
-                                ← Dashboard
-                            </Link>
-                            <h1 className="text-xl font-bold">📋 Review Camp Requests</h1>
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+                {/* Header */}
+                <div className="mb-6 flex items-center gap-4">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                        ← Dashboard
+                    </Link>
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                            <IconTent className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-black text-white md:text-4xl">Review Camp Requests</h1>
+                            <p className="mt-1 text-slate-300 text-sm">Approve or reject relief camp requests from the public</p>
                         </div>
                     </div>
                 </div>
-            </header>
 
-            {/* Main Content */}
-            <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
                 {/* Filters */}
                 <div className="flex gap-2 mb-6">
                     {['pending', 'approved', 'rejected', 'all'].map((status) => (
@@ -212,8 +222,8 @@ function AdminReviewRequests() {
                             key={status}
                             onClick={() => setFilter(status)}
                             className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${filter === status
-                                ? 'bg-gray-800 text-white'
-                                : 'bg-white text-gray-700 hover:bg-gray-100'
+                                ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                 }`}
                         >
                             {status}
@@ -224,22 +234,22 @@ function AdminReviewRequests() {
                 {/* Request List */}
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
                     </div>
                 ) : requests.length === 0 ? (
-                    <div className="bg-white rounded-xl p-12 text-center">
+                    <div className="card text-center py-12">
                         <div className="text-6xl mb-4">📭</div>
-                        <h3 className="text-xl font-semibold text-gray-700 mb-2">No Requests Found</h3>
-                        <p className="text-gray-500">No {filter !== 'all' ? filter : ''} camp requests at this time.</p>
+                        <h3 className="text-xl font-semibold text-white mb-2">No Requests Found</h3>
+                        <p className="text-slate-400">No {filter !== 'all' ? filter : ''} camp requests at this time.</p>
                     </div>
                 ) : (
                     <div className="grid gap-4">
                         {requests.map((request) => (
-                            <div key={request.id} className="bg-white rounded-xl shadow-sm p-6">
+                            <div key={request.id} className="card">
                                 {/* Header with title and action buttons */}
                                 <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <h3 className="text-lg font-bold text-gray-800">{request.camp_name}</h3>
+                                        <h3 className="text-lg font-bold text-white">{request.camp_name}</h3>
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadge(request.status)}`}>
                                             {request.status}
                                         </span>
@@ -263,7 +273,7 @@ function AdminReviewRequests() {
                                                     e.stopPropagation();
                                                     handleApprove(request);
                                                 }}
-                                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
+                                                className="btn-success py-2 px-4 cursor-pointer"
                                             >
                                                 ✓ Approve
                                             </button>
@@ -274,7 +284,7 @@ function AdminReviewRequests() {
                                                     e.stopPropagation();
                                                     setRejectModal({ isOpen: true, request });
                                                 }}
-                                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
+                                                className="btn-danger py-2 px-4 cursor-pointer"
                                             >
                                                 ✕ Reject
                                             </button>
@@ -285,31 +295,31 @@ function AdminReviewRequests() {
                                 {/* Content */}
                                 <div>
                                     {/* Location & Contact Info */}
-                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-sm text-gray-600 mb-3">
-                                        <p>📍 <strong>District:</strong> {request.district}</p>
-                                        {request.village_area && <p>🏘️ <strong>Village:</strong> {request.village_area}</p>}
-                                        {request.nearby_landmark && <p>🏛️ <strong>Landmark:</strong> {request.nearby_landmark}</p>}
-                                        <p>👤 <strong>Contact:</strong> {request.requester_name}</p>
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-sm text-slate-300 mb-3">
+                                        <p>📍 <strong className="text-slate-200">District:</strong> {request.district}</p>
+                                        {request.village_area && <p>🏘️ <strong className="text-slate-200">Village:</strong> {request.village_area}</p>}
+                                        {request.nearby_landmark && <p>🏛️ <strong className="text-slate-200">Landmark:</strong> {request.nearby_landmark}</p>}
+                                        <p>👤 <strong className="text-slate-200">Contact:</strong> {request.requester_name}</p>
                                         <p>📞 {request.requester_phone}</p>
-                                        <p>👥 <strong>People:</strong> {request.estimated_capacity}</p>
+                                        <p>👥 <strong className="text-slate-200">People:</strong> {request.estimated_capacity}</p>
                                         <p>🕒 {formatDate(request.created_at)}</p>
                                     </div>
 
                                     {/* Special Needs - Highlighted */}
                                     {request.special_needs && (
-                                        <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded mb-3">
-                                            <p className="text-sm font-semibold text-amber-800 mb-1">⚠️ Special Needs:</p>
-                                            <p className="text-sm text-amber-700 whitespace-pre-line">{request.special_needs}</p>
+                                        <div className="bg-amber-500/10 border-l-4 border-amber-400 p-3 rounded mb-3">
+                                            <p className="text-sm font-semibold text-amber-200 mb-1">⚠️ Special Needs:</p>
+                                            <p className="text-sm text-amber-100/80 whitespace-pre-line">{request.special_needs}</p>
                                         </div>
                                     )}
 
                                     {/* Facilities Needed */}
                                     {request.facilities_needed && request.facilities_needed.length > 0 && (
                                         <div className="mb-3">
-                                            <p className="text-xs font-semibold text-gray-700 mb-1">Facilities Needed:</p>
+                                            <p className="text-xs font-semibold text-slate-300 mb-1">Facilities Needed:</p>
                                             <div className="flex flex-wrap gap-1">
                                                 {request.facilities_needed.map((facility, idx) => (
-                                                    <span key={idx} className="px-2 py-1 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                                                    <span key={idx} className="px-2 py-1 bg-primary-500/10 border border-primary-400/20 rounded text-xs text-primary-300">
                                                         {facility}
                                                     </span>
                                                 ))}
@@ -318,31 +328,31 @@ function AdminReviewRequests() {
                                     )}
 
                                     {/* Reason/Situation */}
-                                    <div className="bg-gray-50 p-3 rounded mb-2">
-                                        <p className="text-xs font-semibold text-gray-700 mb-1">📝 Situation Description:</p>
-                                        <p className="text-sm text-gray-700 whitespace-pre-line">{request.reason}</p>
+                                    <div className="bg-white/5 border border-white/10 p-3 rounded mb-2">
+                                        <p className="text-xs font-semibold text-slate-300 mb-1">📝 Situation Description:</p>
+                                        <p className="text-sm text-slate-300 whitespace-pre-line">{request.reason}</p>
                                     </div>
 
                                     {/* Additional Notes */}
                                     {request.additional_notes && (
-                                        <div className="bg-gray-50 p-3 rounded">
-                                            <p className="text-xs font-semibold text-gray-700 mb-1">📎 Additional Notes:</p>
-                                            <p className="text-sm text-gray-600 whitespace-pre-line">{request.additional_notes}</p>
+                                        <div className="bg-white/5 border border-white/10 p-3 rounded">
+                                            <p className="text-xs font-semibold text-slate-300 mb-1">📎 Additional Notes:</p>
+                                            <p className="text-sm text-slate-400 whitespace-pre-line">{request.additional_notes}</p>
                                         </div>
                                     )}
 
                                     {/* Rejection Reason */}
                                     {request.rejection_reason && (
-                                        <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded mt-3">
-                                            <p className="text-sm font-semibold text-red-800 mb-1">❌ Rejection Reason:</p>
-                                            <p className="text-sm text-red-700">{request.rejection_reason}</p>
+                                        <div className="bg-danger-500/10 border-l-4 border-danger-400 p-3 rounded mt-3">
+                                            <p className="text-sm font-semibold text-danger-300 mb-1">❌ Rejection Reason:</p>
+                                            <p className="text-sm text-danger-200/80">{request.rejection_reason}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Footer with delete button */}
                                 {(request.status === 'rejected' || request.status === 'pending') && adminStatus.isAdmin && (
-                                    <div className="mt-4 pt-4 border-t flex justify-end">
+                                    <div className="mt-4 pt-4 border-t border-white/10 flex justify-end">
                                         <button
                                             type="button"
                                             onClick={(e) => {
@@ -351,7 +361,7 @@ function AdminReviewRequests() {
                                                 setDeleteModal({ isOpen: true, request });
                                             }}
                                             disabled={isDeleting}
-                                            className="px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+                                            className="px-3 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
                                         >
                                             🗑️ Delete Request
                                         </button>
@@ -365,16 +375,16 @@ function AdminReviewRequests() {
                 {/* Rejection Modal */}
                 {rejectModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-xl p-6 max-w-md w-full">
-                            <h3 className="text-lg font-bold text-gray-800 mb-2">Reject Camp Request</h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Please provide a reason for rejecting "<strong>{rejectModal.request?.camp_name}</strong>"
+                        <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full shadow-2xl">
+                            <h3 className="text-lg font-bold text-white mb-2">Reject Camp Request</h3>
+                            <p className="text-sm text-slate-300 mb-4">
+                                Please provide a reason for rejecting "<strong className="text-white">{rejectModal.request?.camp_name}</strong>"
                             </p>
                             <textarea
                                 value={rejectionReason}
                                 onChange={(e) => setRejectionReason(e.target.value)}
                                 placeholder="Enter rejection reason..."
-                                className="input-field h-28 mb-4"
+                                className="input-field h-28 mb-4 resize-none"
                                 autoFocus
                             />
                             <div className="flex gap-2 justify-end">
@@ -383,14 +393,14 @@ function AdminReviewRequests() {
                                         setRejectModal({ isOpen: false, request: null });
                                         setRejectionReason('');
                                     }}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleReject}
                                     disabled={rejecting || !rejectionReason.trim()}
-                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                                    className="btn-danger py-2 px-4 disabled:opacity-50"
                                 >
                                     {rejecting ? 'Rejecting...' : 'Reject Request'}
                                 </button>
@@ -410,7 +420,7 @@ function AdminReviewRequests() {
                     isProcessing={isDeleting}
                     warningMessage="This will permanently remove this camp request from the database. The action will be recorded in the audit log."
                 />
-            </main>
+            </div>
         </div>
     );
 }
