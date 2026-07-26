@@ -177,7 +177,16 @@ function AdminInventoryOverview() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        // Scoped to this page only - the background lives on the component, not
+        // on body/layout, so no other route picks it up. Fixed attachment so the
+        // gradient stays put instead of stretching as the tree expands.
+        <div
+            className="min-h-screen bg-slate-950 bg-fixed"
+            style={{
+                backgroundImage:
+                    'linear-gradient(160deg, #000000 0%, #050b18 35%, #0a1730 70%, #0d2145 100%)',
+            }}
+        >
             <header className="bg-gray-800 text-white shadow-lg">
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
                     <Link to="/admin/dashboard" className="text-gray-400 hover:text-white transition-colors">← Dashboard</Link>
@@ -211,9 +220,9 @@ function AdminInventoryOverview() {
                 {error && <div className="bg-danger-50 border border-danger-300 text-danger-700 px-4 py-3 rounded-lg mb-4">{error}</div>}
 
                 {loading ? (
-                    <div className="bg-white rounded-lg shadow-sm px-4 py-12 text-center text-gray-500">Loading...</div>
+                    <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-12 text-center text-gray-500">Loading...</div>
                 ) : tree.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-sm px-4 py-12 text-center text-gray-500">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-12 text-center text-gray-500">
                         {filter === 'low' ? 'No items are below their reorder threshold.' : 'No inventory records yet.'}
                     </div>
                 ) : (
@@ -238,20 +247,20 @@ function ProvinceSection({ province, expanded, onToggle }) {
     const isEmpty = province.campCount === 0;
 
     return (
-        <section className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <section className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
             <button
                 onClick={() => onToggle(province.name)}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 ${isEmpty ? 'text-gray-400' : ''}`}
             >
                 <span className="text-gray-400 text-xs w-3">{isOpen ? '▼' : '▶'}</span>
-                <h2 className={`font-bold ${isEmpty ? 'text-gray-400' : 'text-gray-800'}`}>{province.name}</h2>
+                <h2 className={`font-bold ${isEmpty ? 'text-gray-400' : 'text-gray-900'}`}>{province.name}</h2>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {province.lowCount > 0 && (
                         <span className="px-2 py-1 rounded-full bg-danger-100 text-danger-700 font-semibold">
                             ⚠ {province.lowCount} low
                         </span>
                     )}
-                    <span className="text-gray-500">
+                    <span className="text-gray-700">
                         {province.campCount} {province.campCount === 1 ? 'camp' : 'camps'} · {province.itemCount} items
                     </span>
                 </span>
@@ -287,12 +296,12 @@ function DistrictSection({ province, district, expanded, onToggle }) {
                 className={`w-full flex items-center gap-3 pl-8 pr-4 py-2.5 text-left ${isEmpty ? 'cursor-default' : 'hover:bg-gray-50'}`}
             >
                 <span className="text-gray-400 text-xs w-3">{isEmpty ? '' : isOpen ? '▼' : '▶'}</span>
-                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-gray-400' : 'text-gray-700'}`}>{district.name}</h3>
+                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-gray-400' : 'text-gray-900'}`}>{district.name}</h3>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {district.lowCount > 0 && (
                         <span className="text-danger-600 font-semibold">⚠ {district.lowCount} low</span>
                     )}
-                    <span className={isEmpty ? 'text-gray-400' : 'text-gray-500'}>
+                    <span className={isEmpty ? 'text-gray-400' : 'text-gray-700'}>
                         {isEmpty ? 'No camps' : `${district.campCount} ${district.campCount === 1 ? 'camp' : 'camps'} · ${district.itemCount} items`}
                     </span>
                 </span>
@@ -310,12 +319,12 @@ function DistrictSection({ province, district, expanded, onToggle }) {
 function CampBlock({ camp }) {
     return (
         <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border-b border-gray-200">
-                <span className="text-sm font-semibold text-gray-800">{camp.name || camp.id.slice(0, 8)}</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-transparent border-b border-gray-200">
+                <span className="text-sm font-semibold text-gray-900">{camp.name || camp.id.slice(0, 8)}</span>
                 {camp.lowCount > 0 && (
                     <span className="text-xs text-danger-600 font-semibold">⚠ {camp.lowCount} low</span>
                 )}
-                <span className="ml-auto text-xs text-gray-500">{camp.items.length} items</span>
+                <span className="ml-auto text-xs text-gray-700">{camp.items.length} items</span>
             </div>
 
             {camp.items.length === 0 ? (
@@ -323,7 +332,7 @@ function CampBlock({ camp }) {
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-white text-left text-gray-500 text-xs">
+                        <thead className="bg-transparent text-left text-gray-500 text-xs">
                             <tr>
                                 <th className="px-4 py-2 font-medium">Item</th>
                                 <th className="px-4 py-2 font-medium">Category</th>
