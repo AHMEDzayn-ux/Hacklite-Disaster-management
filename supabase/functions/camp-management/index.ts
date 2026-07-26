@@ -51,6 +51,61 @@ interface RequestBody {
   campData?: CampData
   requestId?: string
   rejectionReason?: string
+  // When present, a camp_admin login is provisioned for the newly created camp
+  // and its one-time generated password is returned in the response.
+  campAdminEmail?: string
+}
+
+// Unambiguous characters only (no 0/O/1/l/I) - this password is read off a
+// screen and typed by hand, so legibility matters more than raw entropy.
+function generatePassword(length = 12): string {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#%'
+  const bytes = new Uint8Array(length)
+  crypto.getRandomValues(bytes)
+  let out = ''
+  for (let i = 0; i < length; i++) out += chars[bytes[i] % chars.length]
+  return out
+}
+
+// Provisions the camp_admin for a freshly created camp: creates the auth user
+// with a generated password (email pre-confirmed so they can log in at once)
+// and the scoped admin_users row. Returns the credentials to show once, or an
+// { error } the caller can surface without failing the whole registration -
+// the camp already exists at this point, so a camp_admin hiccup must not 500
+// the camp creation.
+async function provisionCampAdmin(
+  supabaseAdmin: any,
+  campId: string,
+  email: string,
+  createdBy: string,
+): Promise<{ email: string; password: string } | { error: string }> {
+  const password = generatePassword()
+
+  const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { role: 'camp_admin', camp_id: campId },
+  })
+  if (createErr || !created?.user) {
+    return { error: createErr?.message || 'Failed to create camp_admin auth user' }
+  }
+
+  const { error: rowErr } = await supabaseAdmin.from('admin_users').insert({
+    user_id: created.user.id,
+    email,
+    role: 'camp_admin',
+    camp_id: campId,
+    is_active: true,
+    created_by: createdBy,
+  })
+  if (rowErr) {
+    // Roll back the orphaned auth user so a retry with the same email is clean.
+    await supabaseAdmin.auth.admin.deleteUser(created.user.id).catch(() => {})
+    return { error: rowErr.message || 'Failed to create camp_admin record' }
+  }
+
+  return { email, password }
 }
 
 serve(async (req: Request) => {
@@ -112,7 +167,7 @@ serve(async (req: Request) => {
 
     // Parse request body
     const body: RequestBody = await req.json()
-    const { action, campData, requestId, rejectionReason } = body
+    const { action, campData, requestId, rejectionReason, campAdminEmail } = body
 
     // Validate action
     if (!action || !['register', 'approve', 'reject'].includes(action)) {
@@ -231,11 +286,22 @@ serve(async (req: Request) => {
 
       console.log(`[AUDIT] Admin ${user.email} registered camp directly: ${newCamp.name}`)
 
+      // Provision the camp_admin login for this camp, if an email was supplied.
+      let campAdmin: { email: string; password: string } | null = null
+      let campAdminError: string | null = null
+      if (campAdminEmail) {
+        const result = await provisionCampAdmin(supabaseAdmin, newCamp.id, campAdminEmail, user.id)
+        if ('error' in result) campAdminError = result.error
+        else campAdmin = result
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
           message: 'Camp registered successfully',
-          camp: newCamp
+          camp: newCamp,
+          campAdmin,       // { email, password } to show once, or null
+          campAdminError   // non-null if the camp was created but its admin wasn't
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
@@ -385,12 +451,23 @@ serve(async (req: Request) => {
 
       console.log(`[AUDIT] Admin ${user.email} approved request ${requestId} and created camp: ${newCamp.name}`)
 
+      // Provision the camp_admin login for this camp, if an email was supplied.
+      let campAdmin: { email: string; password: string } | null = null
+      let campAdminError: string | null = null
+      if (campAdminEmail) {
+        const result = await provisionCampAdmin(supabaseAdmin, newCamp.id, campAdminEmail, user.id)
+        if ('error' in result) campAdminError = result.error
+        else campAdmin = result
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
           message: 'Camp request approved and camp created successfully',
           camp: newCamp,
-          requestId: requestId
+          requestId: requestId,
+          campAdmin,
+          campAdminError
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )

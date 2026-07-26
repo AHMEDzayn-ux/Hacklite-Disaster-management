@@ -38,6 +38,8 @@ const CampRequestForm = lazy(() => import('./components/CampRequestForm'));
 const AdminCommandDashboard = lazy(() => import('./pages/AdminCommandDashboard'));
 const AdminInventoryOverview = lazy(() => import('./pages/AdminInventoryOverview'));
 const CampInventory = lazy(() => import('./pages/CampInventory'));
+const CampAdminLogin = lazy(() => import('./pages/CampAdminLogin'));
+const CampAdminInventory = lazy(() => import('./pages/CampAdminInventory'));
 
 // Loading fallback component
 function PageLoader() {
@@ -88,6 +90,12 @@ function App() {
 
             {/* Camp Inventory - public, code-gated (no login, no Navbar - mobile field tool) */}
             <Route path="/camp-inventory" element={<CampInventory />} />
+
+            {/* Camp Admin - logged-in user scoped to one camp (add/distribute stock).
+                The login is public; the inventory page requires auth and self-guards
+                to camp_admin, and the edge function enforces the camp scope. */}
+            <Route path="/camp-admin/login" element={<CampAdminLogin />} />
+            <Route path="/camp-admin/inventory" element={<ProtectedRoute><CampAdminInventory /></ProtectedRoute>} />
 
             {/* Admin Routes - Authentication required ONLY for these */}
             <Route path="/admin/login" element={<AdminLogin />} />

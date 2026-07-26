@@ -14,6 +14,7 @@ import {
     IconShieldCheck,
     IconUsers,
     IconGlobe,
+    IconTent,
 } from '../components/icons/Icons';
 
 const REPORT_ITEMS = [
@@ -62,8 +63,15 @@ function RoleSelection() {
                 }}
             ></div>
 
-            {/* Admin Portal Link - Top Right */}
-            <div className="absolute top-12 right-36 z-20 animate-fade-in-up">
+            {/* Portal Links - Top Right */}
+            <div className="absolute top-12 right-36 z-20 flex items-center gap-3 animate-fade-in-up">
+                <button
+                    onClick={() => navigate('/camp-admin/login')}
+                    className="flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white/85 backdrop-blur-md transition-all duration-300 hover:border-white/50 hover:bg-white/20 hover:text-white"
+                >
+                    <IconTent className="h-4 w-4" />
+                    <span>Camp Admin</span>
+                </button>
                 <button
                     onClick={() => navigate('/admin/login')}
                     className="group flex items-center gap-2 rounded-full border border-white bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-danger-600 hover:text-white hover:shadow-[0_6px_24px_rgba(220,38,38,0.5)]"
