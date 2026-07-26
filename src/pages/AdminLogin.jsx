@@ -25,15 +25,11 @@ function AdminLogin() {
             }
 
             // A camp_admin belongs on its scoped inventory page, not the full
-            // admin dashboard - route by role.
-            const { data: adminRow } = await supabase
-                .from('admin_users')
-                .select('role')
-                .eq('user_id', data.user.id)
-                .eq('is_active', true)
-                .maybeSingle();
-
-            navigate(adminRow?.role === 'camp_admin' ? '/camp-admin/inventory' : '/admin/dashboard');
+            // admin dashboard - route by the role in the session metadata (no
+            // admin_users query: that table's RLS is super_admin-only and would
+            // hang here).
+            const role = data.user?.user_metadata?.role;
+            navigate(role === 'camp_admin' ? '/camp-admin/inventory' : '/admin/dashboard');
         } catch (err) {
             setError(err.message || 'Failed to sign in');
         } finally {

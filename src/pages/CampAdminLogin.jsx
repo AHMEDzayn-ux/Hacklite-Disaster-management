@@ -25,17 +25,13 @@ function CampAdminLogin() {
             const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
             if (authError) throw authError;
 
-            // Confirm this account is actually a camp_admin before sending them on.
-            const { data: adminRow } = await supabase
-                .from('admin_users')
-                .select('role')
-                .eq('user_id', data.user.id)
-                .eq('is_active', true)
-                .maybeSingle();
-
-            if (adminRow?.role === 'camp_admin') {
+            // Confirm this account is a camp_admin from the session metadata (no
+            // admin_users query: that table's RLS is super_admin-only and would
+            // hang here).
+            const role = data.user?.user_metadata?.role;
+            if (role === 'camp_admin') {
                 navigate('/camp-admin/inventory');
-            } else if (adminRow?.role) {
+            } else if (role) {
                 // A full admin logged in here - send them to their own portal.
                 navigate('/admin/dashboard');
             } else {

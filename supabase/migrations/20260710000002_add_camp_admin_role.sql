@@ -23,7 +23,16 @@ COMMENT ON COLUMN admin_users.camp_id IS 'For role=camp_admin, the single camp t
 
 CREATE INDEX IF NOT EXISTS idx_admin_users_camp_id ON admin_users(camp_id) WHERE camp_id IS NOT NULL;
 
--- 3. A camp_admin needs to read its own camp's raw ledger history (the current
+-- 3. Let any authenticated user read their OWN admin_users row. The only
+--    existing policy restricts the table to super_admins, but the app now needs
+--    to detect a camp_admin's role client-side at login. This is non-recursive
+--    (compares user_id = auth.uid() directly, no subquery on admin_users), so a
+--    user can read exactly one row - their own - and nothing else.
+CREATE POLICY "read_own_admin_user_row" ON admin_users
+FOR SELECT TO authenticated
+USING (user_id = auth.uid());
+
+-- 4. A camp_admin needs to read its own camp's raw ledger history (the current
 --    stock view is already public). Widen the inventory_transactions read
 --    policy so a camp_admin sees only its own camp's rows; full admins keep
 --    unrestricted read via the existing policy.
