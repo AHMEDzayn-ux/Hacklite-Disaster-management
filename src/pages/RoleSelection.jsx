@@ -231,7 +231,7 @@ function RoleSelection() {
                             >
                                 <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-white/15 text-primary-200">
                                     <Icon className="h-5 w-5" />
-                                </span>
+                             </span>
                                 <div>
                                     <p className="text-sm font-semibold text-white">{title}</p>
                                     <p className="mt-0.5 text-xs leading-snug text-slate-300">{desc}</p>
