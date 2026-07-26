@@ -144,7 +144,7 @@ function CampAdminInventory() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="min-h-screen bg-blue-950 pb-24">
             <header className="bg-primary-700 text-white px-4 py-4 sticky top-0 z-10 shadow-md flex items-center justify-between">
                 <div>
                     <h1 className="text-lg font-bold">📦 {campName} Inventory</h1>
