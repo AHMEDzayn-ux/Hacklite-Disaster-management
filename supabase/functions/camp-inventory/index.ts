@@ -39,25 +39,56 @@ interface RequestBody {
   notes?: string
 }
 
-async function resolveAccess(supabase: any, req: Request, body: RequestBody): Promise<{ ok: true; isAdmin: boolean } | { ok: false; reason: string }> {
+// 'admin'      - full admin/super_admin, any camp
+// 'camp_admin' - scoped to campAdminCampId only
+// 'code'       - volunteer holding a camp's access code, scoped to body.campId
+type Access =
+  | { ok: true; kind: 'admin' | 'camp_admin' | 'code'; campAdminCampId: string | null }
+  | { ok: false; reason: string }
+
+async function resolveAccess(supabase: any, req: Request, body: RequestBody): Promise<Access> {
   const authHeader = req.headers.get('Authorization')
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     if (!authError && user) {
-      const { data: adminUser } = await supabase.from('admin_users').select('id, is_active').eq('user_id', user.id).eq('is_active', true).single()
-      if (adminUser) return { ok: true, isAdmin: true }
+      const { data: adminUser } = await supabase
+        .from('admin_users')
+        .select('id, role, camp_id, is_active')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+      if (adminUser) {
+        if (adminUser.role === 'camp_admin') {
+          return { ok: true, kind: 'camp_admin', campAdminCampId: adminUser.camp_id }
+        }
+        return { ok: true, kind: 'admin', campAdminCampId: null }
+      }
     }
   }
 
   if (body.campId && body.accessCode) {
     const { data: camp } = await supabase.from('camps').select('id, inventory_access_code').eq('id', body.campId).single()
     if (camp && camp.inventory_access_code && camp.inventory_access_code === body.accessCode) {
-      return { ok: true, isAdmin: false }
+      return { ok: true, kind: 'code', campAdminCampId: null }
     }
   }
 
   return { ok: false, reason: 'Invalid access code or admin credentials' }
+}
+
+// Current on-hand for one item at one camp, computed from the live view. Used
+// to stop a 'distributed' movement from driving stock negative.
+async function currentStock(supabase: any, campId: string, itemName: string, category: string, unit: string): Promise<number> {
+  const { data } = await supabase
+    .from('camp_inventory_levels')
+    .select('quantity_on_hand')
+    .eq('camp_id', campId)
+    .eq('item_name', itemName)
+    .eq('category', category)
+    .eq('unit', unit)
+    .maybeSingle()
+  return Number(data?.quantity_on_hand ?? 0)
 }
 
 Deno.serve(async (req: Request) => {
@@ -80,8 +111,14 @@ Deno.serve(async (req: Request) => {
   const access = await resolveAccess(supabase, req, body)
   if (!access.ok) return json(401, { error: access.reason })
 
+  // A camp_admin with no camp_id is a broken account - fail closed rather than
+  // silently letting it act on whatever campId the request happens to carry.
+  if (access.kind === 'camp_admin' && !access.campAdminCampId) {
+    return json(403, { error: 'This camp_admin account is not linked to a camp' })
+  }
+
   if (body.action === 'regenerate-code') {
-    if (!access.isAdmin) return json(403, { error: 'Only admins can regenerate a camp access code' })
+    if (access.kind !== 'admin') return json(403, { error: 'Only admins can regenerate a camp access code' })
     if (!body.campId) return json(400, { error: 'campId is required' })
 
     const newCode = generateAccessCode()
@@ -92,22 +129,30 @@ Deno.serve(async (req: Request) => {
   }
 
   if (body.action === 'get-levels') {
-    if (access.isAdmin && !body.campId) {
+    // Full admin with no camp specified sees every camp; everyone else is
+    // pinned to a single camp (their own, for a camp_admin).
+    if (access.kind === 'admin' && !body.campId) {
       const { data, error } = await supabase.from('camp_inventory_levels').select('*')
       if (error) return json(500, { error: 'Failed to fetch levels', details: error.message })
       return json(200, { success: true, levels: data })
     }
 
-    if (!body.campId) return json(400, { error: 'campId is required' })
-    const { data, error } = await supabase.from('camp_inventory_levels').select('*').eq('camp_id', body.campId)
+    const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
+    if (!campId) return json(400, { error: 'campId is required' })
+    const { data, error } = await supabase.from('camp_inventory_levels').select('*').eq('camp_id', campId)
     if (error) return json(500, { error: 'Failed to fetch levels', details: error.message })
 
-    const { data: camp } = await supabase.from('camps').select('inventory_thresholds').eq('id', body.campId).single()
+    const { data: camp } = await supabase.from('camps').select('inventory_thresholds').eq('id', campId).single()
     return json(200, { success: true, levels: data, thresholds: camp?.inventory_thresholds ?? {} })
   }
 
   if (body.action === 'record') {
-    const { campId, itemName, category, unit, transactionType, quantity, recordedByName, notes } = body
+    const { itemName, category, unit, transactionType, quantity, recordedByName, notes } = body
+
+    // A camp_admin can only ever write to its own camp, whatever campId the
+    // request asks for; everyone else uses the campId they supplied.
+    const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
+
     if (!campId || !itemName || !category || !transactionType || quantity == null) {
       return json(400, { error: 'campId, itemName, category, transactionType, and quantity are required' })
     }
@@ -118,6 +163,19 @@ Deno.serve(async (req: Request) => {
       return json(400, { error: 'quantity must be a positive number' })
     }
 
+    // Can't distribute more than is on hand - otherwise the live view sums to
+    // negative stock. Corrections that legitimately reduce below zero go
+    // through 'adjusted', not 'distributed'.
+    if (transactionType === 'distributed') {
+      const onHand = await currentStock(supabase, campId, itemName, category, unit || 'units')
+      if (quantity > onHand) {
+        return json(400, { error: `Cannot distribute ${quantity} - only ${onHand} on hand` })
+      }
+    }
+
+    const recordedBy = recordedByName ||
+      (access.kind === 'admin' ? 'admin' : access.kind === 'camp_admin' ? 'camp_admin' : 'volunteer')
+
     const { data, error } = await supabase.from('inventory_transactions').insert({
       camp_id: campId,
       item_name: itemName,
@@ -125,7 +183,7 @@ Deno.serve(async (req: Request) => {
       unit: unit || 'units',
       transaction_type: transactionType,
       quantity,
-      recorded_by_name: recordedByName || (access.isAdmin ? 'admin' : 'volunteer'),
+      recorded_by_name: recordedBy,
       notes: notes || null,
     }).select('id').single()
 

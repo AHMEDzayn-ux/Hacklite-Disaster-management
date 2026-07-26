@@ -1,3 +1,5 @@
+import { ALL_DISTRICTS } from '../data/sriLankaRegions';
+
 // Shared district boundaries for Sri Lanka
 export const districtBounds = {
     'Colombo': [[6.80, 79.80], [7.15, 80.00]],
@@ -27,13 +29,10 @@ export const districtBounds = {
     'Kegalle': [[6.95, 80.10], [7.50, 80.55]]
 };
 
-// All 25 districts in Sri Lanka
-export const allDistricts = [
-    'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha',
-    'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi',
-    'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mullaitivu',
-    'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'
-];
+// All 25 districts in Sri Lanka, alphabetized. Derived from the province map in
+// sriLankaRegions so the two lists can't drift (the hand-written list this
+// replaced was missing Ampara).
+export const allDistricts = [...ALL_DISTRICTS].sort((a, b) => a.localeCompare(b));
 
 // Shared map configuration
 export const defaultMapConfig = {

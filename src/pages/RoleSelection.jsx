@@ -6,8 +6,15 @@ function RoleSelection() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center px-4">
-            {/* Admin Portal Link - Top Right */}
-            <div className="absolute top-4 right-4">
+            {/* Portal Links - Top Right */}
+            <div className="absolute top-4 right-4 flex items-center gap-4">
+                <button
+                    onClick={() => navigate('/camp-admin/login')}
+                    className="text-white/70 hover:text-white text-sm transition-colors flex items-center gap-1"
+                >
+                    <span>📦</span>
+                    <span>Camp Admin</span>
+                </button>
                 <button
                     onClick={() => navigate('/admin/login')}
                     className="text-white/70 hover:text-white text-sm transition-colors flex items-center gap-1"
