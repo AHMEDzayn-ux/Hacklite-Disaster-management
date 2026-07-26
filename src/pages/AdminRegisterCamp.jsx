@@ -27,6 +27,11 @@ function AdminRegisterCamp() {
     const { user, loading: authLoading } = useAuth();
     const [submitting, setSubmitting] = useState(false);
     const [adminStatus, setAdminStatus] = useState({ isAdmin: false, role: null });
+    // Optional camp_admin login provisioned with the camp.
+    const [campAdminEmail, setCampAdminEmail] = useState('');
+    // Set after a successful registration to show the generated password once:
+    // { email, password, campName, next } — cleared when the admin dismisses it.
+    const [campAdminResult, setCampAdminResult] = useState(null);
 
     // Check if coming from a request approval
     const requestData = location.state;
@@ -169,26 +174,30 @@ function AdminRegisterCamp() {
 
             let result;
 
+            const email = campAdminEmail.trim() || null;
+            const next = fromRequest && requestId ? '/admin/review-requests' : '/admin/manage-camps';
+
             if (fromRequest && requestId) {
                 // Approve request and create camp
-                result = await approveCampRequest(requestId, campData);
-
-                if (result.success) {
-                    alert('✅ Camp request approved and registered successfully!\n\nThe camp is now visible to the public.');
-                    navigate('/admin/review-requests');
-                } else {
-                    throw new Error(result.error);
-                }
+                result = await approveCampRequest(requestId, campData, email);
             } else {
                 // Direct registration
-                result = await registerCampDirect(campData);
+                result = await registerCampDirect(campData, email);
+            }
 
-                if (result.success) {
-                    alert('✅ Camp registered successfully!\n\nIt is now visible to the public.');
-                    navigate('/admin/manage-camps');
-                } else {
-                    throw new Error(result.error);
-                }
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+
+            if (result.campAdminError) {
+                alert(`✅ Camp registered, but the camp admin login could not be created:\n${result.campAdminError}\n\nYou can add one later.`);
+                navigate(next);
+            } else if (result.campAdmin) {
+                // Show the one-time password before leaving the page.
+                setCampAdminResult({ ...result.campAdmin, campName: formData.name, next });
+            } else {
+                alert('✅ Camp registered successfully!\n\nIt is now visible to the public.');
+                navigate(next);
             }
         } catch (error) {
             console.error('Error registering camp:', error);
@@ -591,6 +600,26 @@ function AdminRegisterCamp() {
                                 </div>
                             </section>
 
+                            {/* === Camp Admin Login (optional) === */}
+                            <section className="bg-primary-50 border border-primary-200 rounded-lg p-6">
+                                <h2 className="text-lg font-semibold text-gray-800 mb-1">📦 Camp Admin Login (optional)</h2>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Enter an email to create a Camp Admin account for this camp. They can log in at the
+                                    Camp Admin portal to add and distribute stock for this camp only. A password is
+                                    generated and shown once after registration — leave blank to skip.
+                                </p>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Camp Admin Email</label>
+                                    <input
+                                        type="email"
+                                        value={campAdminEmail}
+                                        onChange={(e) => setCampAdminEmail(e.target.value)}
+                                        className="input-field"
+                                        placeholder="camp-admin@example.com"
+                                    />
+                                </div>
+                            </section>
+
                             {/* === Submit Buttons === */}
                             <div className="pt-6 border-t flex flex-col sm:flex-row gap-4">
                                 <button
@@ -617,6 +646,51 @@ function AdminRegisterCamp() {
                     </div>
                 </div>
             </main>
+
+            {/* One-time camp admin credentials - shown after successful registration */}
+            {campAdminResult && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-md p-6">
+                        <div className="text-center mb-4">
+                            <div className="text-4xl mb-2">✅</div>
+                            <h2 className="text-xl font-bold text-gray-800">Camp Admin Created</h2>
+                            <p className="text-sm text-gray-600 mt-1">
+                                Save this password now — it is shown only once and cannot be recovered.
+                            </p>
+                        </div>
+
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                            <div>
+                                <div className="text-xs text-gray-500">Camp</div>
+                                <div className="font-medium text-gray-800">{campAdminResult.campName}</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500">Email</div>
+                                <div className="font-mono text-sm text-gray-800 break-all">{campAdminResult.email}</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-gray-500">Password</div>
+                                <div className="font-mono text-lg font-bold text-gray-900 tracking-wide break-all">{campAdminResult.password}</div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-5">
+                            <button
+                                onClick={() => navigator.clipboard?.writeText(`Email: ${campAdminResult.email}\nPassword: ${campAdminResult.password}`)}
+                                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg"
+                            >
+                                📋 Copy
+                            </button>
+                            <button
+                                onClick={() => { const next = campAdminResult.next; setCampAdminResult(null); navigate(next); }}
+                                className="flex-1 bg-primary-700 hover:bg-primary-800 text-white font-semibold py-3 rounded-lg"
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

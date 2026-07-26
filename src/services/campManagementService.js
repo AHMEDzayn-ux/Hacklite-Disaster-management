@@ -35,17 +35,18 @@ const getAuthToken = async () => {
  * @param campData - Complete camp data to create
  * @returns Promise with success/error status and created camp
  */
-export const registerCampDirect = async (campData) => {
+export const registerCampDirect = async (campData, campAdminEmail = null) => {
     try {
         // Ensure we have a valid session
         const token = await getAuthToken();
-        
+
         console.log('Calling camp-management (register):', campData);
 
         const { data, error } = await supabase.functions.invoke('camp-management', {
             body: {
                 action: 'register',
-                campData
+                campData,
+                campAdminEmail
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -59,7 +60,7 @@ export const registerCampDirect = async (campData) => {
         }
 
         if (data?.error) {
-            const errorMsg = data.details 
+            const errorMsg = data.details
                 ? `${data.error} (${data.details})`
                 : data.error;
             throw new Error(errorMsg);
@@ -68,7 +69,9 @@ export const registerCampDirect = async (campData) => {
         return {
             success: true,
             message: data.message || 'Camp registered successfully',
-            camp: data.camp
+            camp: data.camp,
+            campAdmin: data.campAdmin ?? null,          // { email, password } to show once
+            campAdminError: data.campAdminError ?? null // camp created but admin failed
         };
 
     } catch (error) {
@@ -89,18 +92,19 @@ export const registerCampDirect = async (campData) => {
  * @param campData - Complete camp data (pre-filled from request + admin additions)
  * @returns Promise with success/error status and created camp
  */
-export const approveCampRequest = async (requestId, campData) => {
+export const approveCampRequest = async (requestId, campData, campAdminEmail = null) => {
     try {
         // Ensure we have a valid session
         const token = await getAuthToken();
-        
+
         console.log('Calling camp-management (approve):', { requestId, campData });
 
         const { data, error } = await supabase.functions.invoke('camp-management', {
             body: {
                 action: 'approve',
                 requestId,
-                campData
+                campData,
+                campAdminEmail
             },
             headers: {
                 Authorization: `Bearer ${token}`
@@ -124,7 +128,9 @@ export const approveCampRequest = async (requestId, campData) => {
             success: true,
             message: data.message || 'Camp request approved successfully',
             camp: data.camp,
-            requestId: data.requestId
+            requestId: data.requestId,
+            campAdmin: data.campAdmin ?? null,
+            campAdminError: data.campAdminError ?? null
         };
 
     } catch (error) {
