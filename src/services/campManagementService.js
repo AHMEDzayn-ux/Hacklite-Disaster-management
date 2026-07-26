@@ -56,7 +56,15 @@ export const registerCampDirect = async (campData, campAdminEmail = null) => {
         console.log('Edge function response:', { data, error });
 
         if (error) {
-            throw new Error(error.message || 'Registration failed');
+            // supabase-js hides the function's real error body behind a generic
+            // "non-2xx" message - dig it out of error.context (the raw Response).
+            let detail = error.message || 'Registration failed';
+            try {
+                const body = await error.context.json();
+                detail = body.details ? `${body.error} (${body.details})` : (body.error || detail);
+            } catch { /* body not JSON - keep generic message */ }
+            console.error('camp-management error body:', detail);
+            throw new Error(detail);
         }
 
         if (data?.error) {

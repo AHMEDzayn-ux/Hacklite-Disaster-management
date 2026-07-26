@@ -167,7 +167,7 @@ serve(async (req: Request) => {
 
     // Parse request body
     const body: RequestBody = await req.json()
-    const { action, campData, requestId, rejectionReason } = body
+    const { action, campData, requestId, rejectionReason, campAdminEmail } = body
 
     // Validate action
     if (!action || !['register', 'approve', 'reject'].includes(action)) {
