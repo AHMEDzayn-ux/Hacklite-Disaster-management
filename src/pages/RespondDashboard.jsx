@@ -12,6 +12,24 @@ import DisasterReportsList from '../components/DisasterReportsList';
 import MissingPersonsList from '../components/MissingPersonsList';
 import AnimalRescueList from '../components/AnimalRescueList';
 import CampsList from '../components/CampsList';
+import {
+    IconLifeBuoy,
+    IconGrid,
+    IconBolt,
+    IconSearch,
+    IconInfo,
+    IconSiren,
+    IconUserSearch,
+    IconPawPrint,
+    IconTent,
+    IconUsers,
+    IconMap,
+    IconMapPin,
+    IconClock,
+    IconCheck,
+    IconHeart,
+} from '../components/icons/Icons';
+import heroImage from '../assets/blue.png';
 
 /**
  * Responder Dashboard — AI-assisted Emergency Operations Center
@@ -170,12 +188,17 @@ const KIND_META = {
 // Small presentational primitives
 // ---------------------------------------------------------------------------
 
-function Card({ title, right, children, className = '' }) {
+function Card({ title, icon: Icon, right, children, className = '' }) {
     return (
-        <div className={`bg-white rounded-lg border border-gray-200 shadow-sm p-3 ${className}`}>
+        <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 transition-colors duration-300 hover:border-white/20 ${className}`}>
             {(title || right) && (
-                <div className="flex items-center justify-between mb-2.5 gap-2">
-                    {title && <h3 className="font-semibold text-gray-800 text-sm truncate">{title}</h3>}
+                <div className="flex items-center justify-between mb-3 gap-2">
+                    {title && (
+                        <h3 className="flex items-center gap-1.5 font-semibold text-white text-sm truncate min-w-0">
+                            {Icon && <Icon className="h-4 w-4 text-primary-300 flex-shrink-0" />}
+                            <span className="truncate">{title}</span>
+                        </h3>
+                    )}
                     {right}
                 </div>
             )}
@@ -184,25 +207,41 @@ function Card({ title, right, children, className = '' }) {
     );
 }
 
-function KPI({ value, label, sub, accent = 'text-gray-800', onClick }) {
+const ICON_BADGE = {
+    primary: 'bg-primary-500/15 text-primary-300',
+    danger: 'bg-danger-500/15 text-danger-300',
+    success: 'bg-success-500/15 text-success-300',
+    orange: 'bg-orange-500/15 text-orange-300',
+    emerald: 'bg-emerald-500/15 text-emerald-300',
+    slate: 'bg-white/10 text-slate-300',
+};
+
+function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor = 'slate', onClick }) {
     return (
         <button
             type="button"
             onClick={onClick}
-            className={`bg-white rounded-lg border border-gray-200 shadow-sm px-3 py-2.5 text-left w-full ${onClick ? 'hover:border-primary-400 hover:shadow transition-all' : 'cursor-default'}`}
+            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full transition-all duration-300 ${onClick ? 'hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
         >
-            <p className={`text-2xl font-bold leading-none ${accent}`}>{value}</p>
-            <p className="text-[11px] font-medium text-gray-600 mt-1.5 leading-tight">{label}</p>
-            {sub && <p className="text-[10px] text-gray-400 mt-0.5 leading-tight truncate">{sub}</p>}
+            <div className="flex items-start justify-between gap-2">
+                <p className={`text-3xl font-extrabold leading-none ${accent}`}>{value}</p>
+                {Icon && (
+                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${ICON_BADGE[iconColor]}`}>
+                        <Icon className="h-5 w-5" />
+                    </span>
+                )}
+            </div>
+            <p className="text-sm font-medium text-slate-400 mt-2 leading-tight">{label}</p>
+            {sub && <p className="text-xs text-slate-500 mt-0.5 leading-tight truncate">{sub}</p>}
         </button>
     );
 }
 
-function MiniStat({ value, label, accent = 'text-gray-800' }) {
+function MiniStat({ value, label, accent = 'text-white' }) {
     return (
-        <div className="bg-gray-50 rounded-md px-2.5 py-2 text-center">
+        <div className="rounded-xl bg-white/5 border border-white/10 px-2.5 py-2 text-center">
             <p className={`text-lg font-bold leading-none ${accent}`}>{value}</p>
-            <p className="text-[10px] text-gray-500 mt-1 leading-tight">{label}</p>
+            <p className="text-[11px] text-slate-400 mt-1 leading-tight">{label}</p>
         </div>
     );
 }
@@ -212,10 +251,10 @@ function MiniStat({ value, label, accent = 'text-gray-800' }) {
 // ---------------------------------------------------------------------------
 
 const SUBVIEWS = [
-    { key: 'overview', label: 'Overview', icon: '🎯' },
-    { key: 'analytics', label: 'Analytics', icon: '📊' },
-    { key: 'categories', label: 'Categories', icon: '🗂' },
-    { key: 'ai', label: 'AI Insights', icon: '🤖' },
+    { key: 'overview', label: 'Overview', icon: IconMap },
+    { key: 'analytics', label: 'Analytics', icon: IconGrid },
+    { key: 'categories', label: 'Categories', icon: IconSearch },
+    { key: 'ai', label: 'AI Insights', icon: IconInfo },
 ];
 
 function CommandCenter({ disasters, missingPersons, animalRescues, camps, loading }) {
@@ -233,7 +272,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[320px]">
-                <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-600 border-t-transparent" />
+                <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-500 border-t-transparent" />
             </div>
         );
     }
@@ -241,13 +280,13 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     return (
         <div className="space-y-3">
             {/* Global filter bar */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
-                <div className="flex rounded-md bg-gray-100 p-0.5">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20 animate-fade-in-up">
+                <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
                     {Object.keys(RANGE_CONF).map(r => (
                         <button
                             key={r}
                             onClick={() => setRange(r)}
-                            className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${range === r ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
                         >
                             {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
                         </button>
@@ -256,19 +295,19 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                 <select
                     value={district}
                     onChange={e => setDistrict(e.target.value)}
-                    className="text-xs border border-gray-200 rounded-md px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
                 >
-                    <option value="all">All districts</option>
-                    {allDistricts.map(d => <option key={d} value={d}>{d}</option>)}
+                    <option value="all" className="bg-slate-900 text-white">All districts</option>
+                    {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
                 </select>
-                <div className="ml-auto flex rounded-md bg-gray-100 p-0.5">
+                <div className="ml-auto flex rounded-xl bg-white/5 border border-white/10 p-0.5">
                     {SUBVIEWS.map(s => (
                         <button
                             key={s.key}
                             onClick={() => setView(s.key)}
-                            className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1 ${view === s.key ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
                         >
-                            <span>{s.icon}</span><span className="hidden sm:inline">{s.label}</span>
+                            <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
                         </button>
                     ))}
                 </div>
@@ -290,18 +329,18 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
     return (
         <div className="space-y-3">
             {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-700" />
-                <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-600" />
-                <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-600" />
-                <KPI value={A.kpi.activeMissing} label="Missing Persons" sub="active cases" accent="text-orange-600" />
-                <KPI value={A.kpi.activeAnimals} label="Animal Rescues" sub="pending" accent="text-emerald-600" />
-                <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-gray-800" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-fade-in-up">
+                <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
+                <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
+                <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
+                <KPI value={A.kpi.activeMissing} label="Missing Persons" sub="active cases" accent="text-orange-400" icon={IconUserSearch} iconColor="orange" />
+                <KPI value={A.kpi.activeAnimals} label="Animal Rescues" sub="pending" accent="text-emerald-400" icon={IconPawPrint} iconColor="emerald" />
+                <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-white" icon={IconClock} iconColor="slate" />
             </div>
 
             {/* AI operational summary */}
-            <Card title="🤖 AI Operational Summary" right={<span className="text-[10px] text-gray-400">derived live · {RANGE_CONF[range].label}</span>}>
-                <p className="text-sm text-gray-700 leading-relaxed">{A.summary.narrative}</p>
+            <Card icon={IconInfo} title="AI Operational Summary" className="animate-fade-in-up" right={<span className="text-[10px] text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
+                <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
                 {A.summary.chips.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {A.summary.chips.map((c, i) => (
@@ -313,29 +352,31 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 
             {/* Live incident map */}
             <Card
-                title="🗺 Live Incident Map"
+                icon={IconMap}
+                title="Live Incident Map"
+                className="animate-fade-in-up [animation-delay:80ms]"
                 right={
                     <div className="flex flex-wrap gap-1">
                         {['disaster', 'missing', 'animal', 'camp'].map(k => (
                             <button
                                 key={k}
                                 onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                                className={`text-[10px] px-1.5 py-0.5 rounded-full border transition-colors ${layers[k] ? 'text-white border-transparent' : 'text-gray-400 border-gray-200 bg-white'}`}
-                                style={layers[k] ? { background: KIND_META[k].color } : undefined}
+                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                                style={layers[k] ? { background: KIND_META[k].color, boxShadow: `0 6px 18px -4px ${KIND_META[k].color}99` } : undefined}
                             >
-                                {KIND_META[k].icon} {A.map.counts[k]}
+                                <span className="text-base leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
                             </button>
                         ))}
                         <button
                             onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
-                            className={`text-[10px] px-1.5 py-0.5 rounded-full border transition-colors ${layers.heat ? 'bg-gray-800 text-white border-transparent' : 'text-gray-400 border-gray-200 bg-white'}`}
+                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
                         >
-                            🔥 Heat
+                            <span className="text-base leading-none">🔥</span> Heat
                         </button>
                     </div>
                 }
             >
-                <div className="rounded-md overflow-hidden" style={{ height: 380 }}>
+                <div className="rounded-2xl border border-white/15 overflow-hidden shadow-xl" style={{ height: 380 }}>
                     <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }} preferCanvas>
                         <TileLayer
                             attribution='&copy; OpenStreetMap'
@@ -374,21 +415,21 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {/* Needs attention */}
-                <Card title="⚡ Needs Immediate Attention">
+                <Card icon={IconBolt} title="Needs Immediate Attention" className="animate-fade-in-up [animation-delay:140ms]">
                     {A.urgentFeed.length === 0 ? (
-                        <p className="text-sm text-gray-400 py-6 text-center">Nothing urgent in this scope right now.</p>
+                        <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
                     ) : (
-                        <div className="divide-y divide-gray-100 -mx-1">
+                        <div className="divide-y divide-white/10 -mx-1">
                             {A.urgentFeed.map(item => (
-                                <div key={`${item.kind}-${item.id}`} onClick={() => navigate(item.link)} className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-gray-50 rounded">
+                                <div key={`${item.kind}-${item.id}`} onClick={() => navigate(item.link)} className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <span className="text-base flex-shrink-0">{item.icon}</span>
                                         <div className="min-w-0">
-                                            <p className="text-xs font-semibold text-gray-800 truncate">{item.title}</p>
-                                            <p className="text-[11px] text-gray-500 truncate">{item.subtitle}</p>
+                                            <p className="text-xs font-semibold text-white truncate">{item.title}</p>
+                                            <p className="text-[11px] text-slate-400 truncate">{item.subtitle}</p>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-medium text-gray-400 flex-shrink-0">{item.meta}</span>
+                                    <span className="text-[10px] font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
                                 </div>
                             ))}
                         </div>
@@ -396,17 +437,17 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 </Card>
 
                 {/* Live activity timeline */}
-                <Card title="📜 Live Activity Timeline">
+                <Card icon={IconClock} title="Live Activity Timeline" className="animate-fade-in-up [animation-delay:180ms]">
                     {A.timeline.length === 0 ? (
-                        <p className="text-sm text-gray-400 py-6 text-center">No recent activity.</p>
+                        <p className="text-sm text-slate-500 py-6 text-center">No recent activity.</p>
                     ) : (
                         <div className="relative pl-4 max-h-[340px] overflow-y-auto">
-                            <span className="absolute left-1 top-1 bottom-1 w-px bg-gray-200" />
+                            <span className="absolute left-1 top-1 bottom-1 w-px bg-white/10" />
                             {A.timeline.map((ev, i) => (
                                 <div key={i} onClick={() => ev.link && navigate(ev.link)} className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group' : ''}`}>
-                                    <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-white" style={{ background: ev.color }} />
-                                    <p className="text-xs text-gray-700 group-hover:text-primary-700">{ev.icon} {ev.text}</p>
-                                    <p className="text-[10px] text-gray-400">{ev.time}</p>
+                                    <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
+                                    <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
+                                    <p className="text-[10px] text-slate-500">{ev.time}</p>
                                 </div>
                             ))}
                         </div>
@@ -424,19 +465,19 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 function AnalyticsView({ A, range }) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <Card title="📊 Report Distribution">
+            <Card icon={IconGrid} title="Report Distribution">
                 <Donut data={A.distribution} centerLabel={A.kpi.totalReports} centerSub="reports" />
             </Card>
 
-            <Card title="📊 Priority Breakdown (active disasters)">
+            <Card icon={IconBolt} title="Priority Breakdown (active disasters)">
                 <VBars data={A.priority} height={140} />
             </Card>
 
-            <Card title="📈 Report Trend" right={<span className="text-[10px] text-gray-400">incoming / {RANGE_CONF[range].label}</span>}>
+            <Card icon={IconBolt} title="Report Trend" right={<span className="text-[10px] text-slate-500">incoming / {RANGE_CONF[range].label}</span>}>
                 <TrendLine series={[{ label: 'New reports', color: CHART_COLORS[0], values: A.trend.incoming }]} labels={A.trend.labels} />
             </Card>
 
-            <Card title="📈 Resolution Trend" right={<span className="text-[10px] text-gray-400">incoming vs resolved</span>}>
+            <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-[10px] text-slate-500">incoming vs resolved</span>}>
                 <TrendLine
                     series={[
                         { label: 'Incoming', color: CHART_COLORS[7], values: A.trend.incoming },
@@ -446,15 +487,15 @@ function AnalyticsView({ A, range }) {
                 />
             </Card>
 
-            <Card title="⏱ Response Time" right={<span className="text-[10px] text-gray-400">avg hrs to resolve</span>}>
+            <Card icon={IconClock} title="Response Time" right={<span className="text-[10px] text-slate-500">avg hrs to resolve</span>}>
                 <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[4], values: A.responseTrend.values }]} labels={A.responseTrend.labels} />
             </Card>
 
-            <Card title="📍 District Analytics" right={<span className="text-[10px] text-gray-400">active reports</span>}>
+            <Card icon={IconMapPin} title="District Analytics" right={<span className="text-[10px] text-slate-500">active reports</span>}>
                 <HBars data={A.districtRanking} />
             </Card>
 
-            <Card title="📦 Resource Demand" right={<span className="text-[10px] text-gray-400">from report text</span>} className="lg:col-span-2">
+            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-[10px] text-slate-500">from report text</span>} className="lg:col-span-2">
                 <HBars data={A.resourceDemand} labelWidth={110} />
             </Card>
         </div>
@@ -470,42 +511,42 @@ function CategoriesView({ A }) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {/* Missing persons */}
-            <Card title="🔍 Missing Person Analytics">
+            <Card icon={IconUserSearch} title="Missing Person Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.missing.total} label="Total" accent="text-gray-800" />
-                    <MiniStat value={c.missing.found} label="Found" accent="text-success-600" />
-                    <MiniStat value={c.missing.searching} label="Searching" accent="text-orange-600" />
+                    <MiniStat value={c.missing.total} label="Total" accent="text-white" />
+                    <MiniStat value={c.missing.found} label="Found" accent="text-success-400" />
+                    <MiniStat value={c.missing.searching} label="Searching" accent="text-orange-400" />
                 </div>
                 <TrendLine series={[{ label: 'New cases', color: CHART_COLORS[3], values: c.missing.trend }]} labels={A.trend.labels} height={130} />
             </Card>
 
             {/* Disasters */}
-            <Card title="🌊 Disaster Analytics">
+            <Card icon={IconSiren} title="Disaster Analytics">
                 <div className="grid grid-cols-4 gap-2 mb-3">
-                    <MiniStat value={c.disaster.byType.flood || 0} label="Flood" accent="text-primary-700" />
-                    <MiniStat value={c.disaster.byType.landslide || 0} label="Landslide" accent="text-amber-700" />
-                    <MiniStat value={c.disaster.byType.fire || 0} label="Fire" accent="text-danger-600" />
-                    <MiniStat value={c.disaster.byType.cyclone || 0} label="Storm" accent="text-cyan-700" />
+                    <MiniStat value={c.disaster.byType.flood || 0} label="Flood" accent="text-primary-300" />
+                    <MiniStat value={c.disaster.byType.landslide || 0} label="Landslide" accent="text-amber-400" />
+                    <MiniStat value={c.disaster.byType.fire || 0} label="Fire" accent="text-danger-400" />
+                    <MiniStat value={c.disaster.byType.cyclone || 0} label="Storm" accent="text-cyan-400" />
                 </div>
                 <Donut data={c.disaster.donut} size={116} thickness={18} centerLabel={c.disaster.donut.reduce((s, d) => s + d.value, 0)} centerSub="types" />
             </Card>
 
             {/* Animals */}
-            <Card title="🐾 Animal Rescue Analytics">
+            <Card icon={IconPawPrint} title="Animal Rescue Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.animal.pending} label="Pending" accent="text-orange-600" />
-                    <MiniStat value={c.animal.completed} label="Completed" accent="text-success-600" />
-                    <MiniStat value={c.animal.total} label="Total" accent="text-gray-800" />
+                    <MiniStat value={c.animal.pending} label="Pending" accent="text-orange-400" />
+                    <MiniStat value={c.animal.completed} label="Completed" accent="text-success-400" />
+                    <MiniStat value={c.animal.total} label="Total" accent="text-white" />
                 </div>
                 <VBars data={c.animal.byType} height={120} />
             </Card>
 
             {/* Camps */}
-            <Card title="⛺ Relief Camp Analytics">
+            <Card icon={IconTent} title="Relief Camp Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.camp.active} label="Active Camps" accent="text-primary-700" />
-                    <MiniStat value={`${c.camp.occupancyPct}%`} label="Occupancy" accent={c.camp.occupancyPct >= 85 ? 'text-danger-600' : 'text-gray-800'} />
-                    <MiniStat value={c.camp.nearFull} label="Near Full" accent="text-danger-600" />
+                    <MiniStat value={c.camp.active} label="Active Camps" accent="text-primary-300" />
+                    <MiniStat value={`${c.camp.occupancyPct}%`} label="Occupancy" accent={c.camp.occupancyPct >= 85 ? 'text-danger-400' : 'text-white'} />
+                    <MiniStat value={c.camp.nearFull} label="Near Full" accent="text-danger-400" />
                 </div>
                 <HBars data={c.camp.byDistrict} valueSuffix="%" max={100} />
             </Card>
@@ -523,23 +564,23 @@ function AiView({ A }) {
             {/* Hotspots */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {A.hotspots.map((h, i) => (
-                    <div key={i} className="bg-white rounded-lg border border-gray-200 shadow-sm p-3">
-                        <p className="text-[11px] font-medium text-gray-500">{h.icon} {h.label}</p>
-                        <p className="text-lg font-bold text-gray-800 mt-1 truncate">{h.value}</p>
-                        <p className="text-[11px] text-gray-400 truncate">{h.detail}</p>
+                    <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-3">
+                        <p className="text-[11px] font-medium text-slate-400">{h.icon} {h.label}</p>
+                        <p className="text-lg font-bold text-white mt-1 truncate">{h.value}</p>
+                        <p className="text-[11px] text-slate-500 truncate">{h.detail}</p>
                     </div>
                 ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {/* Operational insights */}
-                <Card title="💡 AI Operational Insights">
+                <Card icon={IconInfo} title="AI Operational Insights">
                     {A.insights.length === 0 ? (
-                        <p className="text-sm text-gray-400 py-4 text-center">Not enough data in this scope for insights.</p>
+                        <p className="text-sm text-slate-500 py-4 text-center">Not enough data in this scope for insights.</p>
                     ) : (
                         <div className="space-y-2">
                             {A.insights.map((ins, i) => (
-                                <div key={i} className={`flex gap-2 p-2 rounded-md ${ins.tone}`}>
+                                <div key={i} className={`flex gap-2 p-2 rounded-lg ${ins.tone}`}>
                                     <span className="text-base flex-shrink-0">{ins.icon}</span>
                                     <p className="text-xs leading-snug">{ins.text}</p>
                                 </div>
@@ -549,18 +590,18 @@ function AiView({ A }) {
                 </Card>
 
                 {/* Duplicate detection */}
-                <Card title="🔄 Duplicate Report Detection" right={<span className="text-[10px] text-gray-400">{A.duplicates.length} cluster(s)</span>}>
+                <Card icon={IconSearch} title="Duplicate Report Detection" right={<span className="text-[10px] text-slate-500">{A.duplicates.length} cluster(s)</span>}>
                     {A.duplicates.length === 0 ? (
-                        <p className="text-sm text-gray-400 py-4 text-center">No likely duplicate clusters detected.</p>
+                        <p className="text-sm text-slate-500 py-4 text-center">No likely duplicate clusters detected.</p>
                     ) : (
                         <div className="space-y-2">
                             {A.duplicates.map((d, i) => (
-                                <div key={i} className="border border-gray-100 rounded-md p-2">
+                                <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-gray-800">{d.icon} {d.title}</p>
-                                        <span className="text-[10px] font-bold text-danger-600 bg-danger-50 rounded-full px-2 py-0.5">{d.count} reports</span>
+                                        <p className="text-xs font-semibold text-white">{d.icon} {d.title}</p>
+                                        <span className="text-[10px] font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
                                     </div>
-                                    <p className="text-[11px] text-gray-500">{d.location} · primary submitted {d.primaryAgo}</p>
+                                    <p className="text-[11px] text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
                                 </div>
                             ))}
                         </div>
@@ -569,19 +610,19 @@ function AiView({ A }) {
             </div>
 
             {/* Resource recommendations */}
-            <Card title="🧠 AI Resource Recommendations">
+            <Card icon={IconBolt} title="AI Resource Recommendations">
                 {A.recommendations.length === 0 ? (
-                    <p className="text-sm text-gray-400 py-4 text-center">No recommendations — operations look balanced in this scope.</p>
+                    <p className="text-sm text-slate-500 py-4 text-center">No recommendations — operations look balanced in this scope.</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
                         {A.recommendations.map((r, i) => (
-                            <div key={i} className="border border-gray-100 rounded-md p-2.5 flex flex-col">
+                            <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2.5 flex flex-col">
                                 <div className="flex items-start justify-between gap-2">
-                                    <p className="text-xs font-semibold text-gray-800">{r.icon} {r.action}</p>
-                                    <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-50 text-success-700' : r.confidence >= 50 ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>{r.confidence}%</span>
+                                    <p className="text-xs font-semibold text-white">{r.icon} {r.action}</p>
+                                    <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-1 flex-1">{r.reason}</p>
-                                <p className="text-[10px] text-gray-400 mt-1.5">⏱ {r.impact}</p>
+                                <p className="text-[11px] text-slate-400 mt-1 flex-1">{r.reason}</p>
+                                <p className="text-[10px] text-slate-500 mt-1.5">⏱ {r.impact}</p>
                             </div>
                         ))}
                     </div>
@@ -823,10 +864,10 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
 
     // ---- Operational insights (real deltas)
     const insights = [];
-    const infoTone = 'bg-primary-50 text-primary-800';
-    const warnTone = 'bg-amber-50 text-amber-800';
-    const dangerTone = 'bg-danger-50 text-danger-800';
-    const okTone = 'bg-success-50 text-success-800';
+    const infoTone = 'bg-primary-500/15 text-primary-300';
+    const warnTone = 'bg-amber-500/15 text-amber-300';
+    const dangerTone = 'bg-danger-500/15 text-danger-300';
+    const okTone = 'bg-success-500/15 text-success-300';
 
     const curTotal = countInWindow(incidents, span, i => i.created_at, 0);
     const prevTotal = countInWindow(incidents, span, i => i.created_at, 1);
@@ -875,10 +916,10 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
         + `${kpi.newInWindow} report(s) came in over the last ${RANGE_CONF[range].label}, and average resolution time is ${fmtDuration(avgResponseH)}.`
         + (topResource ? ` Most-referenced need: ${topResource.label}.` : '');
     const chips = [];
-    if (topFlood) chips.push({ text: `🌊 Flood hotspot: ${topFlood[0]}`, tone: 'bg-primary-50 text-primary-700' });
-    if (trapped > 0) chips.push({ text: `🆘 ${trapped} trapped mentions`, tone: 'bg-danger-50 text-danger-700' });
-    if (nearFull.length > 0) chips.push({ text: `⛺ ${nearFull.length} camps near full`, tone: 'bg-amber-50 text-amber-700' });
-    if (duplicates.length > 0) chips.push({ text: `🔄 ${duplicates.length} duplicate clusters`, tone: 'bg-gray-100 text-gray-600' });
+    if (topFlood) chips.push({ text: `🌊 Flood hotspot: ${topFlood[0]}`, tone: 'bg-primary-500/15 text-primary-300' });
+    if (trapped > 0) chips.push({ text: `🆘 ${trapped} trapped mentions`, tone: 'bg-danger-500/15 text-danger-300' });
+    if (nearFull.length > 0) chips.push({ text: `⛺ ${nearFull.length} camps near full`, tone: 'bg-amber-500/15 text-amber-300' });
+    if (duplicates.length > 0) chips.push({ text: `🔄 ${duplicates.length} duplicate clusters`, tone: 'bg-white/10 text-slate-300' });
 
     return {
         kpi, distribution, priority, trend, responseTrend, districtRanking, resourceDemand,
@@ -892,11 +933,11 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
 // ---------------------------------------------------------------------------
 
 const TABS = [
-    { key: 'command', label: 'Command Center', icon: '🎯' },
-    { key: 'disasters', label: 'Disasters', icon: '🚨' },
-    { key: 'missing', label: 'Missing Persons', icon: '🔍' },
-    { key: 'animals', label: 'Animal Rescues', icon: '🐾' },
-    { key: 'camps', label: 'Camps', icon: '⛺' },
+    { key: 'command', label: 'Command Center', icon: IconGrid },
+    { key: 'disasters', label: 'Disasters', icon: IconSiren },
+    { key: 'missing', label: 'Missing Persons', icon: IconUserSearch },
+    { key: 'animals', label: 'Animal Rescues', icon: IconPawPrint },
+    { key: 'camps', label: 'Camps', icon: IconTent },
 ];
 
 function RespondDashboard() {
@@ -925,49 +966,90 @@ function RespondDashboard() {
     };
 
     return (
-        <div className="px-3 py-3 max-w-[1600px] mx-auto">
-            <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-800 leading-tight">🚑 Responder Operations Center</h1>
-                    <p className="text-gray-500 text-xs">Live incidents, AI-derived insights and resource decision support</p>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                    <Link to="/volunteers" className="px-2.5 py-1.5 bg-success-50 text-success-700 rounded-md text-xs font-semibold hover:bg-success-100">🙋 Volunteer</Link>
-                    <Link to="/donations" className="px-2.5 py-1.5 bg-purple-50 text-purple-700 rounded-md text-xs font-semibold hover:bg-purple-100">💰 Donate</Link>
-                    <Link to="/request-camp" className="px-2.5 py-1.5 bg-primary-50 text-primary-700 rounded-md text-xs font-semibold hover:bg-primary-100">⛺ Request Camp</Link>
-                </div>
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            {/* Slow-moving colour blobs for depth */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
+                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob [animation-delay:4s]"></div>
             </div>
 
-            {/* Top-level tabs */}
-            <div className="flex flex-wrap gap-1.5 mb-3">
-                {TABS.map(tab => (
-                    <button
-                        key={tab.key}
-                        onClick={() => setActiveTab(tab.key)}
-                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'}`}
-                    >
-                        <span>{tab.icon}</span>
-                        {tab.label}
-                        {tab.key !== 'command' && (
-                            <span className={`text-[10px] font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-gray-100 text-gray-600'}`}>{tabCounts[tab.key]}</span>
-                        )}
-                    </button>
-                ))}
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            {/* Cinematic command-center banner */}
+            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56 animate-fade-in-up">
+                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
-            {activeTab === 'command' && (
-                <CommandCenter
-                    disasters={disasters}
-                    missingPersons={missingPersons}
-                    animalRescues={animalRescues}
-                    camps={camps}
-                    loading={loading}
-                />
-            )}
-            {activeTab === 'disasters' && <DisasterReportsList role="responder" />}
-            {activeTab === 'missing' && <MissingPersonsList role="responder" />}
-            {activeTab === 'animals' && <AnimalRescueList role="responder" />}
-            {activeTab === 'camps' && <CampsList role="responder" />}
+            <div className="relative z-10 mx-auto -mt-12 max-w-[1800px] px-4 pb-6 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-6 animate-fade-in-up">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
+                            <IconLifeBuoy className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2.5">
+                                <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">Responder Operations Center</h1>
+                                <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75"></span>
+                                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success-500"></span>
+                                </span>
+                            </div>
+                            <p className="text-slate-300 text-sm mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
+                            <IconUsers className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Volunteer
+                        </Link>
+                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-purple-500/40">
+                            <IconHeart className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Donate
+                        </Link>
+                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
+                            <IconTent className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Request Camp
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Top-level tabs */}
+                <div className="flex flex-wrap gap-2 mb-6 animate-fade-in-up [animation-delay:40ms]">
+                    {TABS.map(tab => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white'}`}
+                        >
+                            <tab.icon className="h-4 w-4" />
+                            {tab.label}
+                            {tab.key !== 'command' && (
+                                <span className={`text-[10px] font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {activeTab === 'command' && (
+                    <CommandCenter
+                        disasters={disasters}
+                        missingPersons={missingPersons}
+                        animalRescues={animalRescues}
+                        camps={camps}
+                        loading={loading}
+                    />
+                )}
+                {activeTab === 'disasters' && <DisasterReportsList role="responder" />}
+                {activeTab === 'missing' && <MissingPersonsList role="responder" />}
+                {activeTab === 'animals' && <AnimalRescueList role="responder" />}
+                {activeTab === 'camps' && <CampsList role="responder" />}
+            </div>
         </div>
     );
 }

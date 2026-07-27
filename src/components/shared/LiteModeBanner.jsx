@@ -11,9 +11,9 @@ import React from 'react';
  */
 function LiteModeBanner({ photoHidden = true }) {
     return (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+        <div className="mb-4 p-3 bg-amber-500/10 border border-amber-400/20 rounded-lg flex items-start gap-2">
             <span className="text-lg">📶</span>
-            <div className="text-sm text-amber-800">
+            <div className="text-sm text-amber-200">
                 <strong>Lite Mode:</strong> Slow connection detected.{' '}
                 {photoHidden
                     ? 'Photo attachment is hidden to keep your report small enough to send. Text and location will still be submitted normally.'

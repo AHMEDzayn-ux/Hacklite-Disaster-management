@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { fetchAllInventoryLevels } from '../services/inventoryService';
 import { supabase } from '../config/supabase';
 import { PROVINCES, UNKNOWN_PROVINCE, resolveDistrict } from '../data/sriLankaRegions';
+import { IconChevronRight } from '../components/icons/Icons';
 
 /**
  * Admin Inventory Overview
@@ -170,59 +171,67 @@ function AdminInventoryOverview() {
 
     if (authLoading || !user) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        // Scoped to this page only - the background lives on the component, not
-        // on body/layout, so no other route picks it up. Fixed attachment so the
-        // gradient stays put instead of stretching as the tree expands.
-        <div
-            className="min-h-screen bg-slate-950 bg-fixed"
-            style={{
-                backgroundImage:
-                    'linear-gradient(160deg, #000000 0%, #050b18 35%, #0a1730 70%, #0d2145 100%)',
-            }}
-        >
-            <header className="bg-gray-800 text-white shadow-lg">
-                <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
-                    <Link to="/admin/dashboard" className="text-gray-400 hover:text-white transition-colors">← Dashboard</Link>
-                    <h1 className="text-xl font-bold">📦 Inventory Overview</h1>
-                </div>
-            </header>
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
 
-            <main className="w-full px-4 sm:px-6 lg:px-8 py-6">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+                {/* Header */}
+                <div className="mb-6 flex items-center gap-4">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                        ← Dashboard
+                    </Link>
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white text-2xl shadow-lg shadow-primary-500/30">
+                            📦
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-black text-white md:text-4xl">Inventory Overview</h1>
+                            <p className="mt-1 text-slate-300 text-sm">Stock levels across all relief camps</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                     <div className="flex gap-2">
                         <button
                             onClick={() => setFilter('all')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === 'all' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 border'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                         >
                             All Items ({levels.length})
                         </button>
                         <button
                             onClick={() => setFilter('low')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === 'low' ? 'bg-danger-600 text-white' : 'bg-white text-gray-700 border'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'low' ? 'bg-danger-600 text-white shadow-md shadow-danger-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                         >
                             ⚠ Low Stock ({lowStockCount})
                         </button>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => setAll(true)} className="px-3 py-2 bg-white border rounded-lg text-sm hover:bg-gray-50">Expand all</button>
-                        <button onClick={() => setAll(false)} className="px-3 py-2 bg-white border rounded-lg text-sm hover:bg-gray-50">Collapse all</button>
-                        <button onClick={load} className="px-4 py-2 bg-white border rounded-lg text-sm hover:bg-gray-50">🔄 Refresh</button>
+                        <button onClick={() => setAll(true)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10 transition-colors">Expand all</button>
+                        <button onClick={() => setAll(false)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10 transition-colors">Collapse all</button>
+                        <button onClick={load} className="px-4 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10 transition-colors">🔄 Refresh</button>
                     </div>
                 </div>
 
-                {error && <div className="bg-danger-50 border border-danger-300 text-danger-700 px-4 py-3 rounded-lg mb-4">{error}</div>}
+                {error && <div className="bg-danger-500/10 border border-danger-400/20 text-danger-300 px-4 py-3 rounded-lg mb-4">{error}</div>}
 
                 {loading ? (
-                    <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-12 text-center text-gray-500">Loading...</div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-12 text-center text-slate-400">Loading...</div>
                 ) : tree.length === 0 ? (
-                    <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-12 text-center text-gray-500">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-12 text-center text-slate-400">
                         {filter === 'low' ? 'No items are below their reorder threshold.' : 'No inventory records yet.'}
                     </div>
                 ) : (
@@ -237,7 +246,7 @@ function AdminInventoryOverview() {
                         ))}
                     </div>
                 )}
-            </main>
+            </div>
         </div>
     );
 }
@@ -247,27 +256,27 @@ function ProvinceSection({ province, expanded, onToggle }) {
     const isEmpty = province.campCount === 0;
 
     return (
-        <section className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+        <section className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden">
             <button
                 onClick={() => onToggle(province.name)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 ${isEmpty ? 'text-gray-400' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${isEmpty ? 'text-slate-500' : ''}`}
             >
-                <span className="text-gray-400 text-xs w-3">{isOpen ? '▼' : '▶'}</span>
-                <h2 className={`font-bold ${isEmpty ? 'text-gray-400' : 'text-gray-900'}`}>{province.name}</h2>
+                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                <h2 className={`font-bold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{province.name}</h2>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {province.lowCount > 0 && (
-                        <span className="px-2 py-1 rounded-full bg-danger-100 text-danger-700 font-semibold">
+                        <span className="px-2 py-1 rounded-full bg-danger-500/15 text-danger-300 font-semibold">
                             ⚠ {province.lowCount} low
                         </span>
                     )}
-                    <span className="text-gray-700">
+                    <span className="text-slate-400">
                         {province.campCount} {province.campCount === 1 ? 'camp' : 'camps'} · {province.itemCount} items
                     </span>
                 </span>
             </button>
 
             {isOpen && (
-                <div className="border-t border-gray-100 divide-y divide-gray-100">
+                <div className="border-t border-white/10 divide-y divide-white/5">
                     {province.districts.map(district => (
                         <DistrictSection
                             key={district.name}
@@ -289,19 +298,23 @@ function DistrictSection({ province, district, expanded, onToggle }) {
     const isEmpty = district.campCount === 0;
 
     return (
-        <div className={isEmpty ? 'bg-gray-50/60' : ''}>
+        <div className={isEmpty ? 'bg-white/[0.02]' : ''}>
             <button
                 onClick={() => !isEmpty && onToggle(key)}
                 disabled={isEmpty}
-                className={`w-full flex items-center gap-3 pl-8 pr-4 py-2.5 text-left ${isEmpty ? 'cursor-default' : 'hover:bg-gray-50'}`}
+                className={`w-full flex items-center gap-3 pl-8 pr-4 py-2.5 text-left transition-colors ${isEmpty ? 'cursor-default' : 'hover:bg-white/5'}`}
             >
-                <span className="text-gray-400 text-xs w-3">{isEmpty ? '' : isOpen ? '▼' : '▶'}</span>
-                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-gray-400' : 'text-gray-900'}`}>{district.name}</h3>
+                {isEmpty ? (
+                    <span className="w-3.5 flex-shrink-0" />
+                ) : (
+                    <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                )}
+                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{district.name}</h3>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {district.lowCount > 0 && (
-                        <span className="text-danger-600 font-semibold">⚠ {district.lowCount} low</span>
+                        <span className="text-danger-400 font-semibold">⚠ {district.lowCount} low</span>
                     )}
-                    <span className={isEmpty ? 'text-gray-400' : 'text-gray-700'}>
+                    <span className={isEmpty ? 'text-slate-500' : 'text-slate-400'}>
                         {isEmpty ? 'No camps' : `${district.campCount} ${district.campCount === 1 ? 'camp' : 'camps'} · ${district.itemCount} items`}
                     </span>
                 </span>
@@ -318,21 +331,21 @@ function DistrictSection({ province, district, expanded, onToggle }) {
 
 function CampBlock({ camp }) {
     return (
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2 bg-transparent border-b border-gray-200">
-                <span className="text-sm font-semibold text-gray-900">{camp.name || camp.id.slice(0, 8)}</span>
+        <div className="rounded-lg border border-white/10 overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/[0.03] border-b border-white/10">
+                <span className="text-sm font-semibold text-white">{camp.name || camp.id.slice(0, 8)}</span>
                 {camp.lowCount > 0 && (
-                    <span className="text-xs text-danger-600 font-semibold">⚠ {camp.lowCount} low</span>
+                    <span className="text-xs text-danger-400 font-semibold">⚠ {camp.lowCount} low</span>
                 )}
-                <span className="ml-auto text-xs text-gray-700">{camp.items.length} items</span>
+                <span className="ml-auto text-xs text-slate-400">{camp.items.length} items</span>
             </div>
 
             {camp.items.length === 0 ? (
-                <p className="px-4 py-3 text-xs text-gray-500">No inventory recorded for this camp yet.</p>
+                <p className="px-4 py-3 text-xs text-slate-500">No inventory recorded for this camp yet.</p>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-transparent text-left text-gray-500 text-xs">
+                        <thead className="text-left text-slate-500 text-xs">
                             <tr>
                                 <th className="px-4 py-2 font-medium">Item</th>
                                 <th className="px-4 py-2 font-medium">Category</th>
@@ -340,15 +353,15 @@ function CampBlock({ camp }) {
                                 <th className="px-4 py-2 font-medium">Last Movement</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-white/5">
                             {camp.items.map(item => (
-                                <tr key={`${item.item_name}-${item.category}-${item.unit}`} className={item.low ? 'bg-red-50' : ''}>
-                                    <td className="px-4 py-2">{item.item_name}</td>
-                                    <td className="px-4 py-2 capitalize text-gray-600">{item.category}</td>
-                                    <td className={`px-4 py-2 text-right font-bold ${item.low ? 'text-red-600' : 'text-gray-800'}`}>
+                                <tr key={`${item.item_name}-${item.category}-${item.unit}`} className={item.low ? 'bg-danger-500/10' : ''}>
+                                    <td className="px-4 py-2 text-slate-200">{item.item_name}</td>
+                                    <td className="px-4 py-2 capitalize text-slate-400">{item.category}</td>
+                                    <td className={`px-4 py-2 text-right font-bold ${item.low ? 'text-danger-400' : 'text-white'}`}>
                                         {item.quantity_on_hand} {item.unit}
                                     </td>
-                                    <td className="px-4 py-2 text-gray-500 text-xs">
+                                    <td className="px-4 py-2 text-slate-500 text-xs">
                                         {item.last_movement_at ? new Date(item.last_movement_at).toLocaleString() : '-'}
                                     </td>
                                 </tr>

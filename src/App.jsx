@@ -44,10 +44,10 @@ const CampAdminInventory = lazy(() => import('./pages/CampAdminInventory'));
 // Loading fallback component
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-slate-950">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        <p className="mt-4 text-slate-400">Loading...</p>
       </div>
     </div>
   );
@@ -56,7 +56,7 @@ function PageLoader() {
 function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-950">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Landing - Role Selection (No Navbar) - Eager loaded */}

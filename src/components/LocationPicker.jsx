@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { IconMap, IconMapPin, IconInfo } from './icons/Icons';
 
 /**
  * LocationPicker Component
@@ -111,7 +112,7 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
 
     return (
         <div>
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="block text-slate-200 font-medium mb-2">
                 {label} {required && <span className="text-danger-500">*</span>}
             </label>
 
@@ -120,16 +121,18 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <button
                     type="button"
                     onClick={() => setShowMap(!showMap)}
-                    className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg shadow-md shadow-primary-500/20 hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/30 transition-all text-sm"
                 >
-                    {showMap ? '📝 Enter Manually' : '🗺️ Pick on Map'}
+                    <IconMap className="h-4 w-4" />
+                    {showMap ? 'Enter Manually' : 'Pick on Map'}
                 </button>
                 <button
                     type="button"
                     onClick={getCurrentLocation}
-                    className="px-4 py-2 bg-success-500 text-white rounded-lg hover:bg-success-600 transition-colors text-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-success-500 text-white rounded-lg shadow-md shadow-success-500/20 hover:bg-success-600 hover:shadow-lg hover:shadow-success-500/30 transition-all text-sm"
                 >
-                    📍 Use My Location
+                    <IconMapPin className="h-4 w-4" />
+                    Use My Location
                 </button>
             </div>
 
@@ -138,10 +141,11 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <div className="mb-3">
                     <div
                         id="location-map"
-                        className="w-full h-64 rounded-lg border-2 border-gray-300 shadow-md"
+                        className="w-full h-64 rounded-xl border border-white/15 overflow-hidden shadow-xl"
                     ></div>
-                    <p className="text-sm text-gray-600 mt-2">
-                        💡 Click anywhere on the map to set the location
+                    <p className="flex items-center gap-1.5 text-sm text-slate-400 mt-2">
+                        <IconInfo className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                        Click anywhere on the map to set the location
                     </p>
                 </div>
             ) : (
@@ -157,19 +161,20 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
 
             {/* Display Coordinates */}
             {position?.lat && position?.lng && (
-                <div className="mt-2 p-2 bg-success-50 border border-success-200 rounded text-sm">
-                    📍 Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
+                <div className="flex items-center gap-1.5 mt-2 p-2 bg-success-500/10 border border-success-400/30 text-success-300 rounded text-sm">
+                    <IconMapPin className="h-4 w-4 flex-shrink-0" />
+                    Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}
                 </div>
             )}
 
             {/* Error Message */}
             {error && (
-                <span className="text-danger-500 text-sm mt-1 block">
+                <span className="text-danger-400 text-sm mt-1 block">
                     {error}
                 </span>
             )}
 
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
                 Map works offline if cached. Coordinates are more accurate.
             </p>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { IconChevronRight } from './icons/Icons';
 
 const motivationalMessages = [
     {
@@ -92,29 +93,25 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
 
     return (
         <div
-            className="relative bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 shadow-lg border border-orange-100"
+            className="relative rounded-2xl border border-amber-400/20 bg-gradient-to-r from-amber-500/10 to-danger-500/10 backdrop-blur-md p-6 shadow-xl"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
             {/* Navigation Arrows */}
             <button
                 onClick={handlePrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 hover:scale-110"
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-slate-200 rounded-full p-2 shadow-md transition-all duration-200 hover:scale-110"
                 aria-label="Previous message"
             >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <IconChevronRight className="w-5 h-5 rotate-180" />
             </button>
 
             <button
                 onClick={handleNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 hover:scale-110"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-slate-200 rounded-full p-2 shadow-md transition-all duration-200 hover:scale-110"
                 aria-label="Next message"
             >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <IconChevronRight className="w-5 h-5" />
             </button>
 
             {/* Message Content */}
@@ -138,12 +135,12 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
                         </motion.div>
 
                         {/* Main Message */}
-                        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
+                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
                             {current.message}
                         </h3>
 
                         {/* Subtext */}
-                        <p className="text-gray-600 text-sm md:text-base">
+                        <p className="text-slate-300 text-sm md:text-base">
                             {current.subtext}
                         </p>
                     </motion.div>
@@ -156,8 +153,8 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                    ? 'w-8 bg-orange-500'
-                                    : 'w-2 bg-orange-200 hover:bg-orange-300'
+                                    ? 'w-8 bg-amber-400'
+                                    : 'w-2 bg-white/20 hover:bg-white/30'
                                 }`}
                             aria-label={`Go to message ${index + 1}`}
                         />
@@ -165,14 +162,14 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
                 </div>
 
                 {/* Counter */}
-                <div className="text-xs text-gray-500 mt-2">
+                <div className="text-xs text-slate-400 mt-2">
                     {currentIndex + 1} / {motivationalMessages.length}
                 </div>
             </div>
 
             {/* Pause indicator */}
             {isPaused && autoRotate && (
-                <div className="absolute top-2 right-2 text-xs text-gray-500 bg-white/80 px-2 py-1 rounded">
+                <div className="absolute top-2 right-2 text-xs text-slate-300 bg-white/10 px-2 py-1 rounded">
                     Paused
                 </div>
             )}
