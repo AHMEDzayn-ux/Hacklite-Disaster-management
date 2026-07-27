@@ -76,7 +76,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                             <span className="text-3xl">🎉</span>
                             <div className="flex-1">
                                 <p className="font-bold">
-                                    {formatDonorName(newDonation)} just donated ${parseFloat(newDonation.amount).toFixed(2)}!
+                                    {formatDonorName(newDonation)} {newDonation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(newDonation.amount).toFixed(2)}!
                                 </p>
                                 <p className="text-sm text-success-50">
                                     Thank you for your generosity! 🙏
@@ -136,7 +136,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                 {/* Right: Amount */}
                                 <div className="text-right">
                                     <div className="text-2xl font-bold text-success-400">
-                                        ${parseFloat(donation.amount).toFixed(2)}
+                                        {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toFixed(2)}
                                     </div>
                                     <div className="text-xs text-slate-500 uppercase">
                                         {donation.currency || 'USD'}
@@ -173,7 +173,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                     </span>
                                     <span>donated</span>
                                     <span className="font-bold text-amber-300">
-                                        ${parseFloat(donation.amount).toFixed(2)}
+                                        {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toFixed(2)}
                                     </span>
                                     <span className="text-slate-300">•</span>
                                 </div>

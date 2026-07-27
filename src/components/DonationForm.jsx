@@ -169,7 +169,7 @@ function DonationForm({ onSuccess }) {
                             : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                             }`}
                     >
-                        <div className="text-2xl font-bold">${amount}</div>
+                        <div className="text-2xl font-bold">{getCurrencySymbol()}{amount}</div>
                     </button>
                 ))}
             </div>
@@ -180,7 +180,7 @@ function DonationForm({ onSuccess }) {
                     Or enter custom amount
                 </label>
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">{getCurrencySymbol()}</span>
                     <input
                         type="text"
                         value={customAmount}

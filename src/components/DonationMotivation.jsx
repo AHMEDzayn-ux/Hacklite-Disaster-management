@@ -5,7 +5,7 @@ import { IconChevronRight } from './icons/Icons';
 const motivationalMessages = [
     {
         icon: '💝',
-        message: 'Every dollar brings hope to a family in need',
+        message: 'Every rupee brings hope to a family in need',
         subtext: 'Your generosity makes a difference'
     },
     {
@@ -25,17 +25,17 @@ const motivationalMessages = [
     },
     {
         icon: '🏠',
-        message: '$25 provides emergency supplies for one family',
+        message: 'Rs.2500 provides emergency supplies for one family',
         subtext: 'See the direct impact of your contribution'
     },
     {
         icon: '🍲',
-        message: '$50 feeds a family for a week',
+        message: 'Rs.500 feeds a family for a week',
         subtext: 'Nourishment brings strength and hope'
     },
     {
         icon: '⛺',
-        message: '$100 sets up a temporary shelter',
+        message: 'Rs.1000 sets up a temporary shelter',
         subtext: 'Safety and security for those displaced'
     },
     {
