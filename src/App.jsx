@@ -39,14 +39,16 @@ const CampRequestForm = lazy(() => import('./components/CampRequestForm'));
 const AdminCommandDashboard = lazy(() => import('./pages/AdminCommandDashboard'));
 const AdminInventoryOverview = lazy(() => import('./pages/AdminInventoryOverview'));
 const CampInventory = lazy(() => import('./pages/CampInventory'));
+const CampAdminLogin = lazy(() => import('./pages/CampAdminLogin'));
+const CampAdminInventory = lazy(() => import('./pages/CampAdminInventory'));
 
 // Loading fallback component
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-slate-950">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        <p className="mt-4 text-slate-400">Loading...</p>
       </div>
     </div>
   );
@@ -55,7 +57,7 @@ function PageLoader() {
 function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-950">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Landing - Role Selection (No Navbar) - Eager loaded */}
@@ -89,6 +91,12 @@ function App() {
 
             {/* Camp Inventory - public, code-gated (no login, no Navbar - mobile field tool) */}
             <Route path="/camp-inventory" element={<CampInventory />} />
+
+            {/* Camp Admin - logged-in user scoped to one camp (add/distribute stock).
+                The login is public; the inventory page requires auth and self-guards
+                to camp_admin, and the edge function enforces the camp scope. */}
+            <Route path="/camp-admin/login" element={<CampAdminLogin />} />
+            <Route path="/camp-admin/inventory" element={<ProtectedRoute><CampAdminInventory /></ProtectedRoute>} />
 
             {/* Admin Routes - Authentication required ONLY for these */}
             <Route path="/admin/login" element={<AdminLogin />} />

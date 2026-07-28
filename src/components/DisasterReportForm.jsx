@@ -5,6 +5,19 @@ import LocationPicker from './LocationPicker';
 import LiteModeBanner from './shared/LiteModeBanner';
 import { useConnectionQuality } from '../utils/connectionQuality';
 import { isOnline, queueOfflineSubmission } from '../utils/offlineManager';
+import {
+    IconSiren,
+    IconCamera,
+    IconCheck,
+    IconLifeBuoy,
+    IconFirstAid,
+    IconHome,
+    IconUtensils,
+    IconDroplet,
+    IconUsers,
+    IconArrowRight,
+    IconFlask,
+} from './icons/Icons';
 
 function DisasterReportForm() {
     const { register, handleSubmit, formState: { errors }, reset, control, watch, setValue } = useForm();
@@ -108,15 +121,20 @@ function DisasterReportForm() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="mx-auto max-w-3xl">
             <div className="card">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    🚨 Report Disaster
-                </h2>
+                <div className="mb-6 flex items-center gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
+                        <IconSiren className="h-6 w-6" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">
+                        Report Disaster
+                    </h2>
+                </div>
 
                 {submitSuccess && (
                     <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
-                        <span className="text-2xl">✅</span>
+                        <IconCheck className="h-6 w-6 flex-shrink-0" />
                         <div>
                             <p className="font-bold text-lg">Report Submitted Successfully!</p>
                             <p className="text-sm text-success-100">Your disaster report has been recorded.</p>
@@ -129,13 +147,13 @@ function DisasterReportForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {/* Disaster Information */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Disaster Information
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Disaster Type <span className="text-danger-500">*</span>
                                 </label>
                                 <select
@@ -161,7 +179,7 @@ function DisasterReportForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Severity Level <span className="text-danger-500">*</span>
                                 </label>
                                 <select
@@ -188,13 +206,14 @@ function DisasterReportForm() {
                         submission to fail on a real 2G connection. */}
                     {!liteMode && (
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
-                                📸 Photo Evidence (Optional)
+                            <h3 className="flex items-center gap-2 text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                                <IconCamera className="h-5 w-5 text-primary-300" />
+                                Photo Evidence (Optional)
                             </h3>
 
                             <div className="flex flex-col md:flex-row gap-4 items-start">
                                 <div className="flex-1">
-                                    <label className="block text-gray-700 font-medium mb-2">
+                                    <label className="block text-slate-300 font-semibold mb-2">
                                         Upload Photo
                                     </label>
                                     <input
@@ -204,7 +223,7 @@ function DisasterReportForm() {
                                         onChange={handlePhotoChange}
                                         className="input-field"
                                     />
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-slate-500 mt-1">
                                         Photo helps assess the situation (max 5MB)
                                     </p>
                                 </div>
@@ -214,7 +233,7 @@ function DisasterReportForm() {
                                         <img
                                             src={photoPreview}
                                             alt="Preview"
-                                            className="w-32 h-32 object-cover rounded-lg border-2 border-primary-300 shadow-md"
+                                            className="w-32 h-32 object-cover rounded-lg border-2 border-primary-400/50 shadow-md"
                                         />
                                     </div>
                                 )}
@@ -224,13 +243,13 @@ function DisasterReportForm() {
 
                     {/* Impact Assessment */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Impact Assessment
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     People Affected (Estimate)
                                 </label>
                                 <select
@@ -246,7 +265,7 @@ function DisasterReportForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Casualties/Injuries
                                 </label>
                                 <select
@@ -262,33 +281,39 @@ function DisasterReportForm() {
                         </div>
 
                         <div className="mt-4">
-                            <label className="block text-gray-700 font-medium mb-2">
+                            <label className="block text-slate-300 font-semibold mb-2">
                                 Immediate Needs (Check all that apply)
                             </label>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                <label className="flex items-center gap-2">
-                                    <input type="checkbox" {...register('needs.rescue')} className="w-4 h-4" />
-                                    <span className="text-sm">🆘 Rescue</span>
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                    <input type="checkbox" {...register('needs.rescue')} className="h-4 w-4 accent-danger-500" />
+                                    <IconLifeBuoy className="h-4 w-4 text-slate-400" />
+                                    <span className="text-sm text-slate-200">Rescue</span>
                                 </label>
-                                <label className="flex items-center gap-2">
-                                    <input type="checkbox" {...register('needs.medical')} className="w-4 h-4" />
-                                    <span className="text-sm">🏥 Medical</span>
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                    <input type="checkbox" {...register('needs.medical')} className="h-4 w-4 accent-danger-500" />
+                                    <IconFirstAid className="h-4 w-4 text-slate-400" />
+                                    <span className="text-sm text-slate-200">Medical</span>
                                 </label>
-                                <label className="flex items-center gap-2">
-                                    <input type="checkbox" {...register('needs.shelter')} className="w-4 h-4" />
-                                    <span className="text-sm">🏠 Shelter</span>
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                    <input type="checkbox" {...register('needs.shelter')} className="h-4 w-4 accent-danger-500" />
+                                    <IconHome className="h-4 w-4 text-slate-400" />
+                                    <span className="text-sm text-slate-200">Shelter</span>
                                 </label>
-                                <label className="flex items-center gap-2">
-                                    <input type="checkbox" {...register('needs.food')} className="w-4 h-4" />
-                                    <span className="text-sm">🍚 Food</span>
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                    <input type="checkbox" {...register('needs.food')} className="h-4 w-4 accent-danger-500" />
+                                    <IconUtensils className="h-4 w-4 text-slate-400" />
+                                    <span className="text-sm text-slate-200">Food</span>
                                 </label>
-                                <label className="flex items-center gap-2">
-                                    <input type="checkbox" {...register('needs.water')} className="w-4 h-4" />
-                                    <span className="text-sm">💧 Water</span>
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                    <input type="checkbox" {...register('needs.water')} className="h-4 w-4 accent-danger-500" />
+                                    <IconDroplet className="h-4 w-4 text-slate-400" />
+                                    <span className="text-sm text-slate-200">Water</span>
                                 </label>
-                                <label className="flex items-center gap-2">
-                                    <input type="checkbox" {...register('needs.evacuation')} className="w-4 h-4" />
-                                    <span className="text-sm">🚶 Evacuation</span>
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                    <input type="checkbox" {...register('needs.evacuation')} className="h-4 w-4 accent-danger-500" />
+                                    <IconUsers className="h-4 w-4 text-slate-400" />
+                                    <span className="text-sm text-slate-200">Evacuation</span>
                                 </label>
                             </div>
                         </div>
@@ -296,7 +321,7 @@ function DisasterReportForm() {
 
                     {/* Location */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Location
                         </h3>
 
@@ -319,7 +344,7 @@ function DisasterReportForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Date & Time Occurred
                                 </label>
                                 <input
@@ -330,7 +355,7 @@ function DisasterReportForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Affected Area Size
                                 </label>
                                 <select
@@ -348,13 +373,13 @@ function DisasterReportForm() {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Your Contact
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Your Name <span className="text-danger-500">*</span>
                                 </label>
                                 <input
@@ -372,7 +397,7 @@ function DisasterReportForm() {
                             </div>
 
                             <div>
-                                <label className="block text-gray-700 font-medium mb-2">
+                                <label className="block text-slate-300 font-semibold mb-2">
                                     Phone Number <span className="text-danger-500">*</span>
                                 </label>
                                 <input
@@ -398,11 +423,11 @@ function DisasterReportForm() {
 
                     {/* Description - Moved to bottom */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Description
                         </h3>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">
+                            <label className="block text-slate-300 font-semibold mb-2">
                                 Description <span className="text-danger-500">*</span>
                             </label>
                             <textarea
@@ -427,16 +452,22 @@ function DisasterReportForm() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                         >
-                            {isSubmitting ? 'Submitting...' : '📤 Submit Disaster Report'}
+                            {isSubmitting ? 'Submitting...' : (
+                                <>
+                                    Submit Disaster Report
+                                    <IconArrowRight className="h-4 w-4" />
+                                </>
+                            )}
                         </button>
                         <button
                             type="button"
                             onClick={autofillTestData}
-                            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                            className="px-6 py-2 bg-primary-500/80 text-white rounded-lg hover:bg-primary-500 transition-colors inline-flex items-center justify-center gap-2"
                         >
-                            🧪 Test Autofill
+                            <IconFlask className="h-4 w-4" />
+                            Test Autofill
                         </button>
                         <button
                             type="button"
@@ -444,14 +475,14 @@ function DisasterReportForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="px-6 py-2 border border-white/20 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
                         >
                             Clear
                         </button>
                     </div>
 
-                    <p className="text-sm text-gray-600 text-center">
-                        <span className="text-danger-500">*</span> Required fields | ✓ Works offline
+                    <p className="text-sm text-slate-400 text-center">
+                        <span className="text-danger-500">*</span> Required fields | <IconCheck className="inline h-3.5 w-3.5 -mt-0.5 text-success-400" /> Works offline
                     </p>
                 </form>
             </div>

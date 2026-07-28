@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchCampInventoryLevels, recordInventoryTransaction, INVENTORY_CATEGORIES } from '../services/inventoryService';
 import { supabase } from '../config/supabase';
+import { IconGrid } from '../components/icons/Icons';
 
 /**
  * Camp Inventory (public, code-gated)
@@ -129,31 +130,41 @@ function CampInventory() {
 
     if (!unlocked) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-                <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-1 text-center">📦 Camp Inventory</h1>
-                    <p className="text-sm text-gray-500 text-center mb-6">Enter the camp ID and access code given by your coordinator.</p>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center px-4">
+                <div
+                    className="absolute inset-0 pointer-events-none opacity-10"
+                    style={{
+                        backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                        backgroundSize: '28px 28px',
+                    }}
+                ></div>
+                <div className="relative z-10 w-full max-w-sm card">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
+                        <IconGrid className="h-6 w-6" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-white mb-1 text-center">Camp Inventory</h1>
+                    <p className="text-sm text-slate-400 text-center mb-6">Enter the camp ID and access code given by your coordinator.</p>
                     <form onSubmit={handleUnlock} className="space-y-4">
                         <input
                             type="text"
                             placeholder="Camp ID"
                             value={campId}
                             onChange={(e) => setCampId(e.target.value)}
-                            className="w-full text-lg px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-600 focus:outline-none"
+                            className="input-field text-lg py-3"
                         />
                         <input
                             type="text"
                             placeholder="Access Code"
                             value={accessCode}
                             onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                            className="w-full text-lg tracking-widest px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-600 focus:outline-none uppercase"
+                            className="input-field text-lg py-3 tracking-widest uppercase"
                             maxLength={6}
                         />
-                        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+                        {error && <p className="text-danger-400 text-sm text-center">{error}</p>}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold text-lg py-4 rounded-xl transition-colors"
+                            className="w-full btn-primary text-lg py-3 disabled:opacity-50"
                         >
                             {loading ? 'Checking...' : 'Unlock'}
                         </button>
@@ -164,49 +175,60 @@ function CampInventory() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
-            <header className="bg-blue-600 text-white px-4 py-4 sticky top-0 z-10 shadow-md">
-                <h1 className="text-lg font-bold">📦 {unlocked.campName} Inventory</h1>
-                <button onClick={() => setUnlocked(null)} className="text-xs text-blue-100 underline">Switch camp</button>
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans pb-24">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            <header className="relative z-10 bg-slate-900/80 border-b border-white/10 backdrop-blur-md text-white px-4 py-4 sticky top-0 shadow-md">
+                <h1 className="text-lg font-bold flex items-center gap-2">
+                    <IconGrid className="h-5 w-5 text-primary-300" />
+                    {unlocked.campName} Inventory
+                </h1>
+                <button onClick={() => setUnlocked(null)} className="text-xs text-primary-300 hover:text-primary-200 underline">Switch camp</button>
             </header>
 
-            <div className="p-4">
+            <div className="relative z-10 mx-auto max-w-2xl p-4">
                 <input
                     type="text"
                     placeholder="Your name (optional)"
                     value={recordedByName}
                     onChange={(e) => setRecordedByName(e.target.value)}
-                    className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="input-field mb-4 text-sm"
                 />
 
-                {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
-                {loading && <p className="text-center text-gray-500">Loading...</p>}
+                {error && <div className="mb-4 p-3 bg-danger-500/10 border border-danger-400/20 rounded-lg text-danger-300 text-sm">{error}</div>}
+                {loading && <p className="text-center text-slate-400">Loading...</p>}
 
                 <div className="space-y-3">
                     {sortedLevels.map((item) => {
                         const low = isLowStock(item.item_name, item.quantity_on_hand);
                         return (
-                            <div key={`${item.item_name}-${item.category}`} className={`bg-white rounded-xl shadow p-4 border-l-4 ${low ? 'border-red-500' : 'border-green-500'}`}>
+                            <div key={`${item.item_name}-${item.category}`} className={`card p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
-                                        <div className="font-bold text-gray-800">{item.item_name}</div>
-                                        <div className="text-xs text-gray-500">{CATEGORY_LABELS[item.category] || item.category}</div>
+                                        <div className="font-bold text-white">{item.item_name}</div>
+                                        <div className="text-xs text-slate-400">{CATEGORY_LABELS[item.category] || item.category}</div>
                                     </div>
-                                    <div className={`text-2xl font-extrabold ${low ? 'text-red-600' : 'text-gray-800'}`}>
-                                        {item.quantity_on_hand} <span className="text-sm font-normal">{item.unit}</span>
+                                    <div className={`text-2xl font-extrabold ${low ? 'text-danger-400' : 'text-white'}`}>
+                                        {item.quantity_on_hand} <span className="text-sm font-normal text-slate-400">{item.unit}</span>
                                     </div>
                                 </div>
-                                {low && <div className="text-xs text-red-600 font-semibold mb-2">⚠ Below threshold ({thresholds[item.item_name]})</div>}
+                                {low && <div className="text-xs text-danger-400 font-semibold mb-2">⚠ Below threshold ({thresholds[item.item_name]})</div>}
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => openAction(item.item_name, item.category, 'received')}
-                                        className="flex-1 bg-green-100 hover:bg-green-200 text-green-800 font-bold py-3 rounded-lg text-lg"
+                                        className="flex-1 bg-success-500/15 hover:bg-success-500/25 text-success-300 font-bold py-3 rounded-lg text-lg transition-colors"
                                     >
                                         + Add Stock
                                     </button>
                                     <button
                                         onClick={() => openAction(item.item_name, item.category, 'distributed')}
-                                        className="flex-1 bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold py-3 rounded-lg text-lg"
+                                        className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold py-3 rounded-lg text-lg transition-colors"
                                     >
                                         − Distribute
                                     </button>
@@ -215,25 +237,25 @@ function CampInventory() {
                         );
                     })}
                     {!loading && sortedLevels.length === 0 && (
-                        <p className="text-center text-gray-500 py-8">No items tracked yet. Add one below.</p>
+                        <p className="text-center text-slate-400 py-8">No items tracked yet. Add one below.</p>
                     )}
                 </div>
 
                 {/* Add a new item type */}
-                <div className="mt-6 bg-white rounded-xl shadow p-4">
-                    <h3 className="font-bold text-gray-800 mb-3">➕ Add New Item</h3>
+                <div className="mt-6 card p-4">
+                    <h3 className="font-bold text-white mb-3">➕ Add New Item</h3>
                     <form onSubmit={submitNewItem} className="space-y-3">
                         <input
                             type="text"
                             placeholder="Item name (e.g. Rice, Bottled Water)"
                             value={newItemName}
                             onChange={(e) => setNewItemName(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            className="input-field text-lg py-3"
                         />
                         <select
                             value={newItemCategory}
                             onChange={(e) => setNewItemCategory(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            className="input-field text-lg py-3"
                         >
                             {INVENTORY_CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>)}
                         </select>
@@ -243,12 +265,12 @@ function CampInventory() {
                             value={quantity}
                             onChange={(e) => setQuantity(e.target.value)}
                             min="1"
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg"
+                            className="input-field text-lg py-3"
                         />
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-3 rounded-lg"
+                            className="w-full btn-primary py-3 disabled:opacity-50"
                         >
                             {submitting ? 'Saving...' : 'Add Item'}
                         </button>
@@ -259,8 +281,8 @@ function CampInventory() {
             {/* Quantity modal for existing items */}
             {actionItem && (
                 <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-20 p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-                        <h3 className="text-xl font-bold mb-1">
+                    <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+                        <h3 className="text-xl font-bold text-white mb-1">
                             {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                         </h3>
                         <form onSubmit={submitAction} className="space-y-4 mt-4">
@@ -271,18 +293,18 @@ function CampInventory() {
                                 value={quantity}
                                 onChange={(e) => setQuantity(e.target.value)}
                                 min="1"
-                                className="w-full text-2xl text-center px-4 py-4 border-2 border-gray-300 rounded-xl"
+                                className="input-field w-full text-2xl text-center py-4"
                             />
                             <input
                                 type="text"
                                 placeholder="Note (optional)"
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                                className="input-field text-sm"
                             />
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Cancel</button>
-                                <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold disabled:bg-gray-300">
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-white hover:bg-white/10 py-3 rounded-xl font-bold transition-colors">Cancel</button>
+                                <button type="submit" disabled={submitting} className="flex-1 btn-primary rounded-xl disabled:opacity-50">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>
                             </div>

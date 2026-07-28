@@ -1,102 +1,112 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { IconSiren, IconPhone, IconUserSearch, IconTent, IconPawPrint } from '../components/icons/Icons';
 
 function NotFound() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 flex items-center justify-center px-4">
-            <div className="text-center max-w-2xl">
-                {/* 404 Animation */}
-                <div className="mb-8">
-                    <h1 className="text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '28px 28px',
+                }}
+            ></div>
+
+            <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+                <div className="max-w-2xl text-center">
+                    <h1 className="mb-4 text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-danger-500 via-fuchsia-500 to-purple-500 sm:text-9xl">
                         404
                     </h1>
-                </div>
 
-                {/* Icon */}
-                <div className="text-6xl mb-6">
-                    🔍
-                </div>
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/20 text-primary-300">
+                        <IconSiren className="h-8 w-8" />
+                    </div>
 
-                {/* Message */}
-                <div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
                         Page Not Found
                     </h2>
-                    <p className="text-lg text-gray-600 mb-8">
+                    <p className="mb-8 text-lg text-slate-300">
                         Oops! The page you're looking for doesn't exist or has been moved.
                     </p>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link
-                        to="/"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-                    >
-                        🏠 Go Home
-                    </Link>
-                    <Link
-                        to="/emergency"
-                        className="bg-white text-gray-800 px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-2 border-gray-200"
-                    >
-                        🚨 Emergency Contacts
-                    </Link>
-                </div>
-
-                {/* Helpful Links */}
-                <div className="mt-12 bg-white rounded-xl shadow-md p-6">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                        Quick Links
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                    <div className="flex flex-col justify-center gap-4 sm:flex-row">
                         <Link
-                            to="/missing-persons"
-                            className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                            to="/"
+                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-8 py-3 font-bold text-white shadow-lg shadow-danger-500/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-danger-500/40"
                         >
-                            <span className="text-2xl">📋</span>
-                            <div>
-                                <p className="font-semibold text-gray-800">Missing Persons</p>
-                                <p className="text-sm text-gray-600">View reports</p>
-                            </div>
+                            Go Home
                         </Link>
                         <Link
-                            to="/disasters"
-                            className="flex items-center gap-3 p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                            to="/emergency"
+                            className="rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                         >
-                            <span className="text-2xl">⚠️</span>
-                            <div>
-                                <p className="font-semibold text-gray-800">Disaster Reports</p>
-                                <p className="text-sm text-gray-600">Check alerts</p>
-                            </div>
-                        </Link>
-                        <Link
-                            to="/camps"
-                            className="flex items-center gap-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                        >
-                            <span className="text-2xl">⛺</span>
-                            <div>
-                                <p className="font-semibold text-gray-800">Relief Camps</p>
-                                <p className="text-sm text-gray-600">Find shelter</p>
-                            </div>
-                        </Link>
-                        <Link
-                            to="/animal-rescue"
-                            className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
-                        >
-                            <span className="text-2xl">🐕</span>
-                            <div>
-                                <p className="font-semibold text-gray-800">Animal Rescue</p>
-                                <p className="text-sm text-gray-600">Report animals</p>
-                            </div>
+                            Emergency Contacts
                         </Link>
                     </div>
-                </div>
 
-                {/* Emergency Note */}
-                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-800 font-semibold">
-                        🚨 In case of emergency, call 117 (Disaster Management Centre)
-                    </p>
+                    <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-left backdrop-blur-md">
+                        <h3 className="mb-4 text-xl font-bold text-white">
+                            Quick Links
+                        </h3>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Link
+                                to="/missing-persons"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                            >
+                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-fuchsia-500/20 text-fuchsia-300">
+                                    <IconUserSearch className="h-5 w-5" />
+                                </span>
+                                <div>
+                                    <p className="font-semibold text-white">Missing Persons</p>
+                                    <p className="text-sm text-slate-400">View reports</p>
+                                </div>
+                            </Link>
+                            <Link
+                                to="/disasters"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                            >
+                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-danger-500/20 text-danger-300">
+                                    <IconSiren className="h-5 w-5" />
+                                </span>
+                                <div>
+                                    <p className="font-semibold text-white">Disaster Reports</p>
+                                    <p className="text-sm text-slate-400">Check alerts</p>
+                                </div>
+                            </Link>
+                            <Link
+                                to="/camps"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                            >
+                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300">
+                                    <IconTent className="h-5 w-5" />
+                                </span>
+                                <div>
+                                    <p className="font-semibold text-white">Relief Camps</p>
+                                    <p className="text-sm text-slate-400">Find shelter</p>
+                                </div>
+                            </Link>
+                            <Link
+                                to="/animal-rescue"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                            >
+                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
+                                    <IconPawPrint className="h-5 w-5" />
+                                </span>
+                                <div>
+                                    <p className="font-semibold text-white">Animal Rescue</p>
+                                    <p className="text-sm text-slate-400">Report animals</p>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex items-center justify-center gap-3 rounded-xl border border-danger-400/30 bg-danger-500/10 p-4">
+                        <IconPhone className="h-5 w-5 flex-shrink-0 text-danger-300" />
+                        <p className="font-semibold text-danger-200">
+                            In case of emergency, call 117 (Disaster Management Centre)
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
