@@ -114,7 +114,40 @@ Inventory tracking is opt-in per camp. For each active camp you want volunteers 
 5. **Donations work**: visit `/donations`, submit a test donation with Stripe test card `4242 4242 4242 4242`, confirm a `donations` row appears as `pending` then flips to `succeeded` (requires the webhook to be reachable - use `stripe listen --forward-to <url>` for local testing, per `DONATION_SETUP.md`).
 6. **Volunteers work**: register at `/volunteers`, then trigger the Volunteer Assignment Agent and confirm a `volunteer_assignments` row appears if there's a matching active incident.
 
+## 8. Call Recording Transcription setup
+
+Adds `call-transcription-agent`: staff/volunteers upload local call recordings (Sinhala/Tamil/English, code-switching supported) at `/admin/call-reports`. The audio is transcribed by Gemini, and the resulting transcript is run through the **same extraction module `sms-report` uses for SMS text** (`_shared/reportExtraction.ts`) - a transcript is just treated as another incoming message, so there's one prompt/schema/insert path shared by both channels instead of two that could drift apart. Either way the result lands directly in `disasters`/`missing_persons`/`animal_rescues`.
+
+1. **Migrations**: `20260724000000_add_call_recordings.sql` (the `call_recordings` table + `reported_via_call`/`call_recording_id` columns) and `20260724000001_add_call_gateway_columns.sql` (`ingestion_source`/`device_id`/`device_location`/`recorded_at`, for the Tasker gateway path in §9) - both included in the `supabase db push` from step 1.
+2. **Storage bucket**: create a **private** bucket named `call-recordings` (Supabase Dashboard → Storage → New bucket, "Public" toggled OFF - recordings may contain caller PII, so they're only readable via the service-role key from the edge function, never a public URL).
+3. **Secrets**: no new secrets - reuses `GEMINI_API_KEY` and `AGENT_CRON_SECRET` from step 2.
+4. **Deploy**: same `--no-verify-jwt` reasoning as the other agents (it accepts either an admin JWT from the upload UI or the cron secret from the sweep):
+   ```bash
+   supabase functions deploy call-transcription-agent --no-verify-jwt
+   ```
+5. **Cron sweep**: already added as a step in `.github/workflows/ai-agents-schedule.yml`. This is only a safety net - the upload UI invokes the function directly per-recording for near-real-time results, so the 2-hourly cadence only matters for recovering anything left `pending`/stuck `processing`.
+6. **Verify**: upload a short test recording at `/admin/call-reports`, confirm its status moves `pending` → `processing` → `completed` within roughly the length of the call, and that a new row appears in the matching report table with `reported_via_call = true`.
+
+Also note: `sms-report/index.ts` itself was refactored in this round to call into `_shared/reportExtraction.ts` and `_shared/geocode.ts` instead of keeping its own private copies of the prompt/insert logic. Behavior is unchanged except one deliberate tightening that now applies to **both** channels: the extraction prompt no longer tells Gemini to invent a placeholder age (previously "estimate 30") when a missing person's age isn't stated - it now returns `null`, with `age || 30` kept only as a last-resort fallback in the insert function in case the `age` column is `NOT NULL`, not because the AI guessed it.
+
+## 9. Call Recording Gateway (Tasker/MacroDroid auto-ingestion)
+
+Adds `receive-call-recording`: instead of a staff member manually uploading each recording, a **dedicated intake phone** can auto-push every call recording the moment its native dialer finishes saving it - no custom Android app, same "off-the-shelf app + webhook" shape as the SMS gateway.
+
+1. **Pick the intake phone by its dialer, not by installing a recorder app**: Android increasingly blocks third-party call-recording apps (Play Store policy since 2022; stock Android/Pixel has no path at all). Choose a device whose **native dialer** has built-in call recording (e.g. Xiaomi/Redmi/POCO's MIUI dialer, or a Samsung/Oppo/Vivo model sold in a region where it's enabled) - these save every call automatically to a fixed folder with no extra permissions battle.
+   **Flag this to whoever runs the intake line**: call-recording consent laws vary by jurisdiction - an emergency line should almost certainly disclose that calls may be recorded. That's a policy decision, not something this code can enforce, so don't skip it.
+2. **Migration**: `20260724000001_add_call_gateway_columns.sql` (already covered in §8, step 1).
+3. **Secrets**: none new - reuses `AGENT_CRON_SECRET` from step 2. The gateway phone authenticates the same way the GitHub Actions cron does (`x-agent-cron-secret` header), since Tasker can set a static header trivially but can't easily compute an HMAC signature the way the SMS gateway app does.
+4. **Deploy**:
+   ```bash
+   supabase functions deploy receive-call-recording --no-verify-jwt
+   ```
+5. **Configure Tasker (or MacroDroid) on the intake phone**:
+   - **Trigger**: "new file added" on the dialer's call-recording folder (path is brand-specific, e.g. MIUI: `/storage/emulated/0/MIUI/sound_recorder/call_rec/`) - confirm the exact path by placing a test call first and checking where the file lands.
+   - **Action**: HTTP Request → `POST https://<project-ref>.supabase.co/functions/v1/receive-call-recording`, `Content-Type: multipart/form-data`, header `x-agent-cron-secret: <AGENT_CRON_SECRET>`, form fields: `audio` (the file), `timestamp` (call time), `device_id` (a name for this phone), `phone_number`/`location` if available.
+6. **Verify**: place a real test call to the intake number, confirm Tasker's HTTP action fires and returns `{"success": true, "report_id": "..."}`, confirm a `call_recordings` row appears with `ingestion_source = 'gateway_device'`, and that it flows through exactly like a manual upload (`pending` → `processing` → `completed`, new row in the matching report table).
+
 ## What was NOT changed
 
 - Docker/DigitalOcean/CI-CD for hosting was explicitly scoped out of this round (see the plan) - the frontend still deploys via the existing AWS Amplify pipeline (`amplify.yml`), unchanged.
-- Voice call intelligence and the original proposal's XGBoost-based ML forecasting remain future phases, not built here.
+- The original proposal's XGBoost-based ML forecasting remains a future phase, not built here.

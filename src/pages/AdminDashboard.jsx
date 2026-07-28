@@ -41,6 +41,12 @@ const COLOR_STYLES = {
         text: 'group-hover:text-rose-300',
         cta: 'text-rose-300',
     },
+    teal: {
+        bar: 'from-teal-500 to-cyan-400',
+        badge: 'bg-teal-500/15 text-teal-300',
+        text: 'group-hover:text-teal-300',
+        cta: 'text-teal-300',
+    },
 };
 
 const ACTION_CARDS = [
@@ -95,6 +101,15 @@ const ACTION_CARDS = [
         title: 'All Records',
         desc: 'View and delete any system records',
         cta: 'Manage Records',
+    },
+    {
+        to: '/admin/call-reports',
+        icon: null,
+        emoji: '📞',
+        color: 'teal',
+        title: 'Call Reports',
+        desc: 'Upload call recordings for AI transcription',
+        cta: 'Upload Recording',
     },
 ];
 
