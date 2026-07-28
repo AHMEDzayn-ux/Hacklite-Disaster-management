@@ -34,6 +34,7 @@ const AdminRegisterCamp = lazy(() => import('./pages/AdminRegisterCamp'));
 const AdminManageCamps = lazy(() => import('./pages/AdminManageCamps'));
 const AdminEditCamp = lazy(() => import('./pages/AdminEditCamp'));
 const AdminRecords = lazy(() => import('./pages/AdminRecords'));
+const AdminCallReports = lazy(() => import('./pages/AdminCallReports'));
 const CampRequestForm = lazy(() => import('./components/CampRequestForm'));
 const AdminCommandDashboard = lazy(() => import('./pages/AdminCommandDashboard'));
 const AdminInventoryOverview = lazy(() => import('./pages/AdminInventoryOverview'));
@@ -97,6 +98,7 @@ function App() {
             <Route path="/admin/manage-camps" element={<ProtectedRoute><AdminManageCamps /></ProtectedRoute>} />
             <Route path="/admin/edit-camp/:id" element={<ProtectedRoute><AdminEditCamp /></ProtectedRoute>} />
             <Route path="/admin/records" element={<ProtectedRoute><AdminRecords /></ProtectedRoute>} />
+            <Route path="/admin/call-reports" element={<ProtectedRoute><AdminCallReports /></ProtectedRoute>} />
             <Route path="/admin/command" element={<ProtectedRoute><AdminCommandDashboard /></ProtectedRoute>} />
             <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventoryOverview /></ProtectedRoute>} />
 

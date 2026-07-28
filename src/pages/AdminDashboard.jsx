@@ -178,6 +178,22 @@ function AdminDashboard() {
                             </span>
                         </div>
                     </Link>
+
+                    {/* Call Reports */}
+                    <Link to="/admin/call-reports" className="block group">
+                        <div className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all border-l-4 border-teal-500 h-full">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="text-3xl">📞</div>
+                                <h3 className="text-lg font-bold text-gray-800">Call Reports</h3>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-3">
+                                Upload call recordings for AI transcription
+                            </p>
+                            <span className="text-teal-600 font-medium text-sm group-hover:underline">
+                                Upload Recording →
+                            </span>
+                        </div>
+                    </Link>
                 </div>
             </main>
         </div>
