@@ -155,8 +155,8 @@ function AdminDashboard() {
 
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div
@@ -172,7 +172,7 @@ function AdminDashboard() {
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-4">
-                            <Link to="/" className="text-slate-400 hover:text-white transition-colors text-sm">
+                            <Link to="/" className="text-slate-400 hover:text-white text-sm">
                                 ← Home
                             </Link>
                             <h1 className="flex items-center gap-2 text-xl font-bold text-white">
@@ -184,7 +184,7 @@ function AdminDashboard() {
                             <span className="text-sm text-slate-400">{user.email}</span>
                             <button
                                 onClick={handleLogout}
-                                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-slate-200 transition-colors"
+                                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-slate-200"
                             >
                                 Logout
                             </button>
@@ -226,17 +226,17 @@ function AdminDashboard() {
 
                 {/* Action Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {ACTION_CARDS.map(({ to, icon: Icon, emoji, color, title, desc, cta }, i) => {
+                    {ACTION_CARDS.map(({ to, icon: Icon, emoji, color, title, desc, cta }) => {
                         const styles = COLOR_STYLES[color];
                         return (
-                            <Link key={to} to={to} className="block group animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
-                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08]">
+                            <Link key={to} to={to} className="block group">
+                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-5 hover:border-white/25 hover:bg-white/[0.08]">
                                     <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${styles.bar}`}></div>
                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${styles.badge}`}>
+                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${styles.badge}`}>
                                             {Icon ? <Icon className="h-6 w-6" /> : <span className="text-2xl leading-none">{emoji}</span>}
                                         </div>
-                                        <h3 className={`text-lg font-bold text-white transition-colors ${styles.text}`}>{title}</h3>
+                                        <h3 className={`text-lg font-bold text-white ${styles.text}`}>{title}</h3>
                                     </div>
                                     <p className="text-slate-300 text-sm mb-3">
                                         {desc}

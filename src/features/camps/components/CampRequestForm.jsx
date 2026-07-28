@@ -163,7 +163,7 @@ function CampRequestForm() {
                         </button>
                         <button
                             onClick={() => navigate('/respond')}
-                            className="w-full px-4 py-2 border border-white/20 bg-white/10 text-white hover:bg-white/20 rounded-lg transition-colors"
+                            className="w-full px-4 py-2 border border-white/20 bg-white/10 text-white hover:bg-white/20 rounded-lg"
                         >
                             Back to Dashboard
                         </button>
@@ -188,7 +188,7 @@ function CampRequestForm() {
                 <div className="mb-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
+                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2"
                     >
                         ← Back
                     </button>
@@ -371,7 +371,7 @@ function CampRequestForm() {
                                         key={facility}
                                         type="button"
                                         onClick={() => handleFacilityToggle(facility)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.facilities_needed.includes(facility)
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${formData.facilities_needed.includes(facility)
                                             ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
                                             : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}

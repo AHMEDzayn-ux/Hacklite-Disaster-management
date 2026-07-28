@@ -93,9 +93,9 @@ function ReportDashboard() {
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-fuchsia-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
-                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-amber-500/10 rounded-full blur-3xl animate-blob [animation-delay:4s]"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-fuchsia-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-amber-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div
@@ -107,14 +107,14 @@ function ReportDashboard() {
             ></div>
 
             {/* Cinematic disaster-response banner */}
-            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56 animate-fade-in-up">
+            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
             <div className="relative z-10 mx-auto -mt-12 max-w-[1600px] px-8 pb-14 sm:px-12 lg:px-16">
-                <div className="mb-12 flex items-center gap-5 animate-fade-in-up">
+                <div className="mb-12 flex items-center gap-5">
                     <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
                         <IconSiren className="h-8 w-8" />
                     </div>
@@ -129,24 +129,24 @@ function ReportDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {REPORT_OPTIONS.map(({ to, icon: Icon, color, title, desc, cta }, i) => {
+                    {REPORT_OPTIONS.map(({ to, icon: Icon, color, title, desc, cta }) => {
                         const styles = COLOR_STYLES[color];
                         return (
-                            <Link key={to} to={to} className="group animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
-                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08]">
+                            <Link key={to} to={to} className="group">
+                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-md hover:border-white/25 hover:bg-white/[0.08]">
                                     <div className={`absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b ${styles.bar}`}></div>
                                     <div className="flex items-start gap-5">
-                                        <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl text-white shadow-lg transition-transform duration-300 group-hover:scale-110 ${styles.badge}`}>
+                                        <div className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl text-white shadow-lg ${styles.badge}`}>
                                             <Icon className="h-8 w-8" />
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className={`mb-2 text-xl font-bold text-white transition-colors ${styles.text}`}>
+                                            <h3 className={`mb-2 text-xl font-bold text-white ${styles.text}`}>
                                                 {title}
                                             </h3>
                                             <p className="mb-4 text-base leading-snug text-slate-300">
                                                 {desc}
                                             </p>
-                                            <span className={`inline-flex items-center gap-1.5 text-base font-semibold transition-transform duration-300 group-hover:translate-x-1 ${styles.cta}`}>
+                                            <span className={`inline-flex items-center gap-1.5 text-base font-semibold ${styles.cta}`}>
                                                 {cta}
                                                 <IconArrowRight className="h-4 w-4" />
                                             </span>
@@ -159,7 +159,7 @@ function ReportDashboard() {
                 </div>
 
                 {/* Important Notice */}
-                <div className="mt-10 flex items-start gap-5 rounded-2xl border border-primary-400/20 bg-primary-500/10 p-7 backdrop-blur-md animate-fade-in-up [animation-delay:300ms]">
+                <div className="mt-10 flex items-start gap-5 rounded-2xl border border-primary-400/20 bg-primary-500/10 p-7 backdrop-blur-md">
                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
                         <IconCloud className="h-6 w-6" />
                     </div>
@@ -172,7 +172,7 @@ function ReportDashboard() {
                 </div>
 
                 {/* SMS Alternative */}
-                <div className="mt-6 flex items-start gap-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-7 backdrop-blur-md animate-fade-in-up [animation-delay:360ms]">
+                <div className="mt-6 flex items-start gap-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-7 backdrop-blur-md">
                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300">
                         <IconMessageSquare className="h-6 w-6" />
                     </div>

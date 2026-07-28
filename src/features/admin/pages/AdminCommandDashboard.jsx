@@ -157,8 +157,8 @@ function AdminCommandDashboard() {
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div
@@ -170,16 +170,16 @@ function AdminCommandDashboard() {
             ></div>
 
             {/* Cinematic command-center banner */}
-            <div className="relative z-10 h-28 w-full overflow-hidden sm:h-36 animate-fade-in-up">
+            <div className="relative z-10 h-28 w-full overflow-hidden sm:h-36">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
-            <header className="relative z-10 border-b border-white/10 bg-white/[0.03] backdrop-blur-md animate-fade-in-up">
+            <header className="relative z-10 border-b border-white/10 bg-white/[0.03] backdrop-blur-md">
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-4">
-                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm">← Dashboard</Link>
+                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm">← Dashboard</Link>
                         <h1 className="flex items-center gap-2 text-xl font-bold text-white">
                             <IconSiren className="h-5 w-5 text-danger-400" />
                             Emergency Command Dashboard
@@ -188,7 +188,7 @@ function AdminCommandDashboard() {
                     <button
                         onClick={runFullPipeline}
                         disabled={running}
-                        className="group px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 hover:-translate-y-0.5 disabled:from-slate-600 disabled:to-slate-600 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 rounded-lg text-sm font-semibold text-white flex items-center gap-2 shadow-md shadow-primary-500/25 transition-all duration-300"
+                        className="group px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:from-slate-600 disabled:to-slate-600 disabled:cursor-not-allowed disabled:shadow-none disabled: rounded-lg text-sm font-semibold text-white flex items-center gap-2 shadow-md shadow-primary-500/25"
                     >
                         {running ? (
                             <>
@@ -197,7 +197,7 @@ function AdminCommandDashboard() {
                             </>
                         ) : (
                             <>
-                                <IconBolt className="h-4 w-4 transition-transform duration-300 group-hover:scale-125" />
+                                <IconBolt className="h-4 w-4" />
                                 Run AI Analysis
                             </>
                         )}
@@ -213,7 +213,7 @@ function AdminCommandDashboard() {
 
             <main className="relative z-10 mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Map: heatmap + camp markers + route polylines */}
-                <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl animate-fade-in-up [animation-delay:60ms]" style={{ height: '600px' }}>
+                <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl" style={{ height: '600px' }}>
                     <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }}>
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -251,7 +251,7 @@ function AdminCommandDashboard() {
                 </div>
 
                 {/* Side panel */}
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1 animate-fade-in-up [animation-delay:120ms]">
+                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
                     {/* Agent run status */}
                     <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                         <h3 className="flex items-center gap-1.5 font-bold text-white mb-2 text-sm"><IconClock className="h-4 w-4 text-primary-300" />Agent Status</h3>
@@ -280,7 +280,7 @@ function AdminCommandDashboard() {
                                         <p className="text-slate-500 italic mt-1">{plan.solver_metadata.recommendation_text}</p>
                                     )}
                                     <div className="flex gap-2 mt-2">
-                                        <button onClick={() => setReviewPlan(plan)} className="flex-1 bg-primary-600 hover:bg-primary-500 hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary-500/30 text-white rounded-lg py-1.5 font-semibold transition-all duration-200">Review & Decide</button>
+                                        <button onClick={() => setReviewPlan(plan)} className="flex-1 bg-primary-600 hover:bg-primary-500 hover:shadow-md hover:shadow-primary-500/30 text-white rounded-lg py-1.5 font-semibold">Review & Decide</button>
                                     </div>
                                 </div>
                             ))}
@@ -309,7 +309,7 @@ function AdminCommandDashboard() {
                                         {plan.status === 'delivered' && plan.received_by_name && (
                                             <p className="text-success-400 mt-1">✓ Received by {plan.received_by_name}</p>
                                         )}
-                                        <button onClick={() => setShipmentPlan(plan)} className="w-full mt-2 bg-primary-600 hover:bg-primary-500 hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary-500/30 text-white rounded-lg py-1.5 font-semibold transition-all duration-200">
+                                        <button onClick={() => setShipmentPlan(plan)} className="w-full mt-2 bg-primary-600 hover:bg-primary-500 hover:shadow-md hover:shadow-primary-500/30 text-white rounded-lg py-1.5 font-semibold">
                                             {plan.status === 'approved' ? 'Mark as Dispatched' : 'Confirm Delivery'}
                                         </button>
                                     </div>
@@ -326,7 +326,7 @@ function AdminCommandDashboard() {
                                 <Link
                                     key={item.id}
                                     to={`/disasters-list/${item.disaster_id}`}
-                                    className="block border border-white/10 bg-white/5 hover:bg-white/10 rounded-lg p-2 text-xs transition-colors"
+                                    className="block border border-white/10 bg-white/5 hover:bg-white/10 rounded-lg p-2 text-xs"
                                 >
                                     <div className="flex justify-between items-center">
                                         <span className="font-medium text-white">#{item.rank} {item.disasters?.disaster_type}</span>
@@ -358,7 +358,7 @@ function AdminCommandDashboard() {
                         </div>
                     </div>
 
-                    <Link to="/admin/inventory" className="block rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 hover:border-white/25 hover:bg-white/[0.08] transition-all text-sm font-semibold text-primary-300">
+                    <Link to="/admin/inventory" className="block rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 hover:border-white/25 hover:bg-white/[0.08] text-sm font-semibold text-primary-300">
                         📦 View Full Inventory Overview →
                     </Link>
                 </div>

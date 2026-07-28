@@ -155,7 +155,7 @@ function CampDetail() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
+                                className={`flex-1 px-4 py-3 text-sm font-medium ${activeTab === tab.id
                                     ? 'bg-primary-500/15 text-primary-300 border-b-2 border-primary-400'
                                     : 'text-slate-400 hover:bg-white/5'
                                     }`}
@@ -197,7 +197,7 @@ function CampDetail() {
                                         {camp.status === 'Active' && (
                                             <button
                                                 onClick={() => setShowOccupancyDialog(true)}
-                                                className="w-full rounded-lg border border-white/20 bg-white/5 py-2.5 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                                                className="w-full rounded-lg border border-white/20 bg-white/5 py-2.5 px-4 text-sm font-semibold text-white hover:bg-white/10"
                                             >
                                                 Update Occupancy
                                             </button>
@@ -568,7 +568,7 @@ function CampDetail() {
                                 <button onClick={handleUpdateOccupancy} className="btn-primary flex-1">Update</button>
                                 <button
                                     onClick={() => setShowOccupancyDialog(false)}
-                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
                                 >
                                     Cancel
                                 </button>

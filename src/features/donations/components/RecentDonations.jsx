@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useDonationStore } from '@/store/supabaseStore';
 import { IconHeart } from '@/components/icons/Icons';
 
@@ -63,28 +62,21 @@ function RecentDonations({ limit = 10, showTicker = true }) {
     return (
         <div className="space-y-4">
             {/* New Donation Toast */}
-            <AnimatePresence>
-                {newDonation && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -50, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                        className="rounded-lg border border-success-400/30 bg-success-500 text-white p-4 shadow-xl shadow-success-500/30"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="text-3xl">🎉</span>
-                            <div className="flex-1">
-                                <p className="font-bold">
-                                    {formatDonorName(newDonation)} {newDonation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(newDonation.amount).toFixed(2)}!
-                                </p>
-                                <p className="text-sm text-success-50">
-                                    Thank you for your generosity! 🙏
-                                </p>
-                            </div>
+            {newDonation && (
+                <div className="rounded-lg border border-success-400/30 bg-success-500 text-white p-4 shadow-xl shadow-success-500/30">
+                    <div className="flex items-center gap-3">
+                        <span className="text-3xl">🎉</span>
+                        <div className="flex-1">
+                            <p className="font-bold">
+                                {formatDonorName(newDonation)} {newDonation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(newDonation.amount).toFixed(2)}!
+                            </p>
+                            <p className="text-sm text-success-50">
+                                Thank you for your generosity! 🙏
+                            </p>
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    </div>
+                </div>
+            )}
 
             {/* Recent Donations List */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl">
@@ -96,14 +88,8 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                 </div>
 
                 <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
-                    {recentDonations.map((donation, index) => (
-                        <motion.div
-                            key={donation.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="p-4 hover:bg-white/[0.08] transition-colors duration-200"
-                        >
+                    {recentDonations.map((donation) => (
+                        <div key={donation.id} className="p-4">
                             <div className="flex items-start justify-between gap-4">
                                 {/* Left: Donor Info */}
                                 <div className="flex-1">
@@ -142,7 +128,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 

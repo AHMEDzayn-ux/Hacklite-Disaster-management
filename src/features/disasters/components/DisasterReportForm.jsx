@@ -28,7 +28,7 @@ function DisasterReportForm() {
     const [photoPreview, setPhotoPreview] = useState(null);
     const { isSlow: liteMode } = useConnectionQuality();
 
-    const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
+    const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg== ';
 
     const autofillTestData = () => {
         setValue('disasterType', 'flood');
@@ -132,7 +132,7 @@ function DisasterReportForm() {
                 </div>
 
                 {submitSuccess && (
-                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
+                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
                         <IconCheck className="h-6 w-6 flex-shrink-0" />
                         <div>
                             <p className="font-bold text-lg">Report Submitted Successfully!</p>
@@ -284,32 +284,32 @@ function DisasterReportForm() {
                                 Immediate Needs (Check all that apply)
                             </label>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer hover:bg-white/10">
                                     <input type="checkbox" {...register('needs.rescue')} className="h-4 w-4 accent-danger-500" />
                                     <IconLifeBuoy className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm text-slate-200">Rescue</span>
                                 </label>
-                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer hover:bg-white/10">
                                     <input type="checkbox" {...register('needs.medical')} className="h-4 w-4 accent-danger-500" />
                                     <IconFirstAid className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm text-slate-200">Medical</span>
                                 </label>
-                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer hover:bg-white/10">
                                     <input type="checkbox" {...register('needs.shelter')} className="h-4 w-4 accent-danger-500" />
                                     <IconHome className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm text-slate-200">Shelter</span>
                                 </label>
-                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer hover:bg-white/10">
                                     <input type="checkbox" {...register('needs.food')} className="h-4 w-4 accent-danger-500" />
                                     <IconUtensils className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm text-slate-200">Food</span>
                                 </label>
-                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer hover:bg-white/10">
                                     <input type="checkbox" {...register('needs.water')} className="h-4 w-4 accent-danger-500" />
                                     <IconDroplet className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm text-slate-200">Water</span>
                                 </label>
-                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer transition-colors hover:bg-white/10">
+                                <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 cursor-pointer hover:bg-white/10">
                                     <input type="checkbox" {...register('needs.evacuation')} className="h-4 w-4 accent-danger-500" />
                                     <IconUsers className="h-4 w-4 text-slate-400" />
                                     <span className="text-sm text-slate-200">Evacuation</span>
@@ -463,7 +463,7 @@ function DisasterReportForm() {
                         <button
                             type="button"
                             onClick={autofillTestData}
-                            className="px-6 py-2 bg-primary-500/80 text-white rounded-lg hover:bg-primary-500 transition-colors inline-flex items-center justify-center gap-2"
+                            className="px-6 py-2 bg-primary-500/80 text-white rounded-lg hover:bg-primary-500 inline-flex items-center justify-center gap-2"
                         >
                             <IconFlask className="h-4 w-4" />
                             Test Autofill
@@ -474,7 +474,7 @@ function DisasterReportForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 border border-white/20 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                            className="px-6 py-2 border border-white/20 bg-white/10 text-white rounded-lg hover:bg-white/20"
                         >
                             Clear
                         </button>

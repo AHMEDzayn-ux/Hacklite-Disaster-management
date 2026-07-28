@@ -33,13 +33,13 @@ function NotFound() {
                     <div className="flex flex-col justify-center gap-4 sm:flex-row">
                         <Link
                             to="/"
-                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-8 py-3 font-bold text-white shadow-lg shadow-danger-500/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-danger-500/40"
+                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-8 py-3 font-bold text-white shadow-lg shadow-danger-500/30 hover:shadow-xl hover:shadow-danger-500/40"
                         >
                             Go Home
                         </Link>
                         <Link
                             to="/emergency"
-                            className="rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
+                            className="rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white backdrop-blur-md hover:bg-white/20"
                         >
                             Emergency Contacts
                         </Link>
@@ -52,7 +52,7 @@ function NotFound() {
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <Link
                                 to="/missing-persons"
-                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10"
                             >
                                 <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-fuchsia-500/20 text-fuchsia-300">
                                     <IconUserSearch className="h-5 w-5" />
@@ -64,7 +64,7 @@ function NotFound() {
                             </Link>
                             <Link
                                 to="/disasters"
-                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10"
                             >
                                 <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-danger-500/20 text-danger-300">
                                     <IconSiren className="h-5 w-5" />
@@ -76,7 +76,7 @@ function NotFound() {
                             </Link>
                             <Link
                                 to="/camps"
-                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10"
                             >
                                 <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300">
                                     <IconTent className="h-5 w-5" />
@@ -88,7 +88,7 @@ function NotFound() {
                             </Link>
                             <Link
                                 to="/animal-rescue"
-                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 hover:bg-white/10"
                             >
                                 <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
                                     <IconPawPrint className="h-5 w-5" />

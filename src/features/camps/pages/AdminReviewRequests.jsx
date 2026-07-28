@@ -201,7 +201,7 @@ function AdminReviewRequests() {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 {/* Header */}
                 <div className="mb-6 flex items-center gap-4">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm font-medium">
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
@@ -221,7 +221,7 @@ function AdminReviewRequests() {
                         <button
                             key={status}
                             onClick={() => setFilter(status)}
-                            className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${filter === status
+                            className={`px-4 py-2 rounded-lg font-medium capitalize ${filter === status
                                 ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                 : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                 }`}
@@ -361,7 +361,7 @@ function AdminReviewRequests() {
                                                 setDeleteModal({ isOpen: true, request });
                                             }}
                                             disabled={isDeleting}
-                                            className="px-3 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+                                            className="px-3 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm font-medium disabled:opacity-50 cursor-pointer"
                                         >
                                             🗑️ Delete Request
                                         </button>
@@ -393,7 +393,7 @@ function AdminReviewRequests() {
                                         setRejectModal({ isOpen: false, request: null });
                                         setRejectionReason('');
                                     }}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
                                 >
                                     Cancel
                                 </button>

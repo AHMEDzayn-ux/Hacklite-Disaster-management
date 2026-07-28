@@ -222,7 +222,7 @@ function AdminRegisterCamp() {
                 <div className="mb-6">
                     <Link
                         to={fromRequest ? '/admin/review-requests' : '/admin/dashboard'}
-                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit"
+                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 w-fit"
                     >
                         ← {fromRequest ? 'Back to Requests' : 'Dashboard'}
                     </Link>
@@ -534,7 +534,7 @@ function AdminRegisterCamp() {
                                         key={facility}
                                         type="button"
                                         onClick={() => handleArrayToggle('facilities', facility)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.facilities.includes(facility)
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${formData.facilities.includes(facility)
                                             ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
                                             : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}
@@ -557,7 +557,7 @@ function AdminRegisterCamp() {
                                         key={need}
                                         type="button"
                                         onClick={() => handleArrayToggle('needs', need)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.needs.includes(need)
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${formData.needs.includes(need)
                                             ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
                                             : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}
@@ -633,7 +633,7 @@ function AdminRegisterCamp() {
                             <button
                                 type="button"
                                 onClick={() => navigate(fromRequest ? '/admin/review-requests' : '/admin/dashboard')}
-                                className="flex-1 px-6 py-3 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium transition-colors"
+                                className="flex-1 px-6 py-3 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium"
                             >
                                 Cancel
                             </button>
@@ -686,13 +686,13 @@ function AdminRegisterCamp() {
                         <div className="mt-5 flex gap-3">
                             <button
                                 onClick={() => navigator.clipboard?.writeText(`Email: ${campAdminResult.email}\nPassword: ${campAdminResult.password}`)}
-                                className="flex-1 rounded-lg border border-white/20 bg-white/5 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+                                className="flex-1 rounded-lg border border-white/20 bg-white/5 py-3 font-semibold text-white hover:bg-white/10"
                             >
                                 Copy
                             </button>
                             <button
                                 onClick={() => { const next = campAdminResult.next; setCampAdminResult(null); navigate(next); }}
-                                className="flex-1 rounded-lg bg-primary-600 py-3 font-semibold text-white transition-colors hover:bg-primary-700"
+                                className="flex-1 rounded-lg bg-primary-600 py-3 font-semibold text-white hover:bg-primary-700"
                             >
                                 Done
                             </button>

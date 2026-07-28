@@ -191,7 +191,7 @@ function MissingPersonsList({ role = 'responder' }) {
                     <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
                         <button
                             onClick={() => setViewMode('cards')}
-                            className={`flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-lg transition-colors ${viewMode === 'cards'
+                            className={`flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-lg ${viewMode === 'cards'
                                 ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                 : 'text-slate-300 hover:bg-white/10'
                                 }`}
@@ -201,7 +201,7 @@ function MissingPersonsList({ role = 'responder' }) {
                         </button>
                         <button
                             onClick={() => setViewMode('map')}
-                            className={`flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-lg transition-colors ${viewMode === 'map'
+                            className={`flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-lg ${viewMode === 'map'
                                 ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                 : 'text-slate-300 hover:bg-white/10'
                                 }`}
@@ -242,7 +242,7 @@ function MissingPersonsList({ role = 'responder' }) {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setStatusFilter('all')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'all'
+                                className={`px-4 py-2 rounded-lg font-medium ${statusFilter === 'all'
                                     ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
@@ -251,7 +251,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             </button>
                             <button
                                 onClick={() => setStatusFilter('active')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'active'
+                                className={`px-4 py-2 rounded-lg font-medium ${statusFilter === 'active'
                                     ? 'bg-danger-500 text-white shadow-md shadow-danger-500/30'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
@@ -260,7 +260,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             </button>
                             <button
                                 onClick={() => setStatusFilter('found')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'found'
+                                className={`px-4 py-2 rounded-lg font-medium ${statusFilter === 'found'
                                     ? 'bg-success-500 text-white shadow-md shadow-success-500/30'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
@@ -275,7 +275,7 @@ function MissingPersonsList({ role = 'responder' }) {
                 {viewMode === 'cards' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredPersons.map((person) => (
-                            <div key={person.id} className="card hover:border-white/25 hover:bg-white/[0.08] transition-all duration-300">
+                            <div key={person.id} className="card hover:border-white/25 hover:bg-white/[0.08]">
                                 <div className="flex gap-4">
                                     {/* Photo */}
                                     {person.photo && (
@@ -340,14 +340,14 @@ function MissingPersonsList({ role = 'responder' }) {
                                                 : `/missing-persons/${person.id}`;
                                             navigate(detailPath);
                                         }}
-                                        className="flex-1 bg-primary-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+                                        className="flex-1 bg-primary-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-600"
                                     >
                                         View Details
                                     </button>
                                     {(person.contactNumber || person.contact_number) && (
                                         <a
                                             href={`tel:${person.contactNumber || person.contact_number}`}
-                                            className="flex items-center gap-1.5 px-3 py-2 border border-white/15 bg-white/5 text-slate-200 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors"
+                                            className="flex items-center gap-1.5 px-3 py-2 border border-white/15 bg-white/5 text-slate-200 rounded-lg text-sm font-medium hover:bg-white/10"
                                         >
                                             <IconPhone className="h-3.5 w-3.5" />
                                             Call
@@ -480,7 +480,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                                                     : `/missing-persons/${person.id}`;
                                                                 navigate(detailPath);
                                                             }}
-                                                            className="w-full bg-primary-500 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-primary-600 transition-colors"
+                                                            className="w-full bg-primary-500 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-primary-600"
                                                         >
                                                             View Details
                                                         </button>

@@ -196,7 +196,7 @@ function CampsList() {
                             <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
                                 <button
                                     onClick={() => setViewMode('map')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map'
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'map'
                                         ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                         : 'text-slate-300 hover:bg-white/10'
                                         }`}
@@ -206,7 +206,7 @@ function CampsList() {
                                 </button>
                                 <button
                                     onClick={() => setViewMode('cards')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'cards'
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'cards'
                                         ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                         : 'text-slate-300 hover:bg-white/10'
                                         }`}
@@ -324,7 +324,7 @@ function CampsList() {
                                             <div
                                                 key={camp.id}
                                                 onClick={() => handleCampClick(camp)}
-                                                className="card p-3 hover:border-white/25 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+                                                className="card p-3 hover:border-white/25 hover:bg-white/[0.08] cursor-pointer"
                                             >
                                                 {/* Header */}
                                                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -390,7 +390,7 @@ function CampsList() {
                                                 )}
 
                                                 {/* View Button */}
-                                                <button className="w-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium py-1.5 rounded-lg transition-colors">
+                                                <button className="w-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium py-1.5 rounded-lg">
                                                     View Details →
                                                 </button>
                                             </div>

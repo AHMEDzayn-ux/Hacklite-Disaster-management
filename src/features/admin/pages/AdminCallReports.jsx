@@ -161,7 +161,7 @@ function AdminCallReports() {
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <Link to="/admin/dashboard" className="text-gray-400 hover:text-white transition-colors">
+                            <Link to="/admin/dashboard" className="text-gray-400 hover:text-white">
                                 ← Dashboard
                             </Link>
                             <h1 className="text-xl font-bold">📞 Call Reports</h1>
@@ -226,7 +226,7 @@ function AdminCallReports() {
                     <button
                         type="submit"
                         disabled={uploading}
-                        className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                        className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg disabled:opacity-50"
                     >
                         {uploading ? 'Uploading…' : 'Upload & Transcribe'}
                     </button>

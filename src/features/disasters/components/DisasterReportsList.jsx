@@ -210,7 +210,7 @@ function DisasterReportsList({ role = 'responder' }) {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setViewMode('cards')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === 'cards'
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${viewMode === 'cards'
                                     ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
@@ -220,7 +220,7 @@ function DisasterReportsList({ role = 'responder' }) {
                             </button>
                             <button
                                 onClick={() => setViewMode('map')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === 'map'
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${viewMode === 'map'
                                     ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
@@ -287,7 +287,7 @@ function DisasterReportsList({ role = 'responder' }) {
                                     setSeverityFilter('all');
                                     setDistrictFilter('all');
                                 }}
-                                className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                                className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium rounded-lg flex items-center justify-center gap-2"
                             >
                                 <IconX className="h-3.5 w-3.5" />
                                 Clear Filters
@@ -310,7 +310,7 @@ function DisasterReportsList({ role = 'responder' }) {
                                 <div
                                     key={disaster.id}
                                     onClick={() => handleDisasterClick(disaster)}
-                                    className="card hover:border-white/25 hover:bg-white/[0.08] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+                                    className="card hover:border-white/25 hover:bg-white/[0.08] cursor-pointer"
                                 >
                                     {disaster.photo && (
                                         <div className="relative mb-4">

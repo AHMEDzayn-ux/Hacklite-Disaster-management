@@ -112,7 +112,7 @@ function Volunteers() {
                                 <p className="mt-1 text-slate-300">Manage your availability and assignments</p>
                             </div>
                         </div>
-                        <button onClick={handleForget} className="flex-shrink-0 text-xs text-slate-400 underline hover:text-white transition-colors">
+                        <button onClick={handleForget} className="flex-shrink-0 text-xs text-slate-400 underline hover:text-white">
                             Not you? Switch volunteer
                         </button>
                     </div>
@@ -135,7 +135,7 @@ function Volunteers() {
                                 <button
                                     key={status}
                                     onClick={() => handleAvailability(status)}
-                                    className="flex-1 capitalize py-2 rounded-lg border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 transition-colors"
+                                    className="flex-1 capitalize py-2 rounded-lg border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10"
                                 >
                                     {status}
                                 </button>
@@ -167,14 +167,14 @@ function Volunteers() {
                                         <div className="flex gap-2 mt-2">
                                             <button
                                                 onClick={() => handleAssignmentResponse(a.id, 'accepted')}
-                                                className="flex-1 flex items-center justify-center gap-1.5 bg-success-600 hover:bg-success-500 text-white rounded py-1.5 text-sm font-medium transition-colors"
+                                                className="flex-1 flex items-center justify-center gap-1.5 bg-success-600 hover:bg-success-500 text-white rounded py-1.5 text-sm font-medium"
                                             >
                                                 <IconCheck className="h-3.5 w-3.5" />
                                                 Accept
                                             </button>
                                             <button
                                                 onClick={() => handleAssignmentResponse(a.id, 'declined')}
-                                                className="flex-1 flex items-center justify-center gap-1.5 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 rounded py-1.5 text-sm font-medium transition-colors"
+                                                className="flex-1 flex items-center justify-center gap-1.5 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 rounded py-1.5 text-sm font-medium"
                                             >
                                                 <IconX className="h-3.5 w-3.5" />
                                                 Decline
@@ -201,7 +201,7 @@ function Volunteers() {
             ></div>
 
             {/* Cinematic community banner */}
-            <div className="relative z-10 h-32 w-full overflow-hidden sm:h-40 animate-fade-in-up">
+            <div className="relative z-10 h-32 w-full overflow-hidden sm:h-40">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
@@ -246,7 +246,7 @@ function Volunteers() {
                             {VOLUNTEER_SKILLS.map(skill => (
                                 <label
                                     key={skill}
-                                    className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer text-sm transition-colors ${skills.includes(skill)
+                                    className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer text-sm ${skills.includes(skill)
                                         ? 'bg-primary-500/15 border-primary-400/40 text-primary-200'
                                         : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
                                         }`}

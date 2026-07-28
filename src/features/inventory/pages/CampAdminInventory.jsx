@@ -164,7 +164,7 @@ function CampAdminInventory() {
                         <p className="text-xs text-slate-400">Camp Admin</p>
                     </div>
                 </div>
-                <button onClick={() => { signOut(); navigate('/'); }} className="text-xs text-slate-400 hover:text-white underline transition-colors">
+                <button onClick={() => { signOut(); navigate('/'); }} className="text-xs text-slate-400 hover:text-white underline">
                     Sign out
                 </button>
             </header>
@@ -191,13 +191,13 @@ function CampAdminInventory() {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => openAction(item, 'received')}
-                                        className="flex-1 bg-success-500/15 hover:bg-success-500/25 border border-success-400/20 text-success-300 font-bold py-3 rounded-lg transition-colors"
+                                        className="flex-1 bg-success-500/15 hover:bg-success-500/25 border border-success-400/20 text-success-300 font-bold py-3 rounded-lg"
                                     >
                                         + Add Stock
                                     </button>
                                     <button
                                         onClick={() => openAction(item, 'distributed')}
-                                        className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/20 text-amber-300 font-bold py-3 rounded-lg transition-colors"
+                                        className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/20 text-amber-300 font-bold py-3 rounded-lg"
                                     >
                                         − Distribute
                                     </button>
@@ -248,7 +248,7 @@ function CampAdminInventory() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white font-bold py-3 rounded-lg shadow-md shadow-primary-500/25 transition-all"
+                            className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white font-bold py-3 rounded-lg shadow-md shadow-primary-500/25"
                         >
                             {submitting ? 'Saving...' : 'Add Item'}
                         </button>
@@ -282,8 +282,8 @@ function CampAdminInventory() {
                             />
                             {error && <p className="text-danger-400 text-sm">{error}</p>}
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
-                                <button type="submit" disabled={submitting} className="flex-1 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white py-3 rounded-xl font-bold transition-all">
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold">Cancel</button>
+                                <button type="submit" disabled={submitting} className="flex-1 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white py-3 rounded-xl font-bold">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>
                             </div>

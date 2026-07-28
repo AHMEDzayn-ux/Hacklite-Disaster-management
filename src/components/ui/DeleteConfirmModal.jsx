@@ -82,14 +82,14 @@ function DeleteConfirmModal({
                     <button
                         onClick={handleClose}
                         disabled={isProcessing}
-                        className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium transition-colors disabled:opacity-50"
+                        className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleConfirm}
                         disabled={!canConfirm || isProcessing}
-                        className="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {isProcessing ? (
                             <>

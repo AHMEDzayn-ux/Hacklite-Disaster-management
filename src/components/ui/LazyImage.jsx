@@ -62,7 +62,7 @@ function LazyImage({
             {/* Skeleton placeholder - shows while loading */}
             {!isLoaded && (
                 <div
-                    className={`absolute inset-0 bg-white/10 animate-pulse flex items-center justify-center ${placeholderClassName}`}
+                    className={`absolute inset-0 bg-white/10 flex items-center justify-center ${placeholderClassName}`}
                 >
                     <svg
                         className="w-10 h-10 text-slate-500"
@@ -85,7 +85,7 @@ function LazyImage({
                 <img
                     src={src}
                     alt={alt}
-                    className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    className={`w-full h-full object-cover ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                     onLoad={handleLoad}
                     onError={handleError}
                     loading="lazy"

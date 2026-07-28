@@ -65,19 +65,19 @@ class ErrorBoundary extends React.Component {
                         <div className="space-y-3">
                             <button
                                 onClick={this.handleReset}
-                                className="w-full bg-gradient-to-r from-primary-600 to-primary-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transition-all"
+                                className="w-full bg-gradient-to-r from-primary-600 to-primary-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40"
                             >
                                 Reload Page
                             </button>
                             <button
                                 onClick={() => window.history.back()}
-                                className="w-full border border-white/20 bg-white/10 text-white px-6 py-3 rounded-lg font-medium hover:bg-white/20 transition-colors"
+                                className="w-full border border-white/20 bg-white/10 text-white px-6 py-3 rounded-lg font-medium hover:bg-white/20"
                             >
                                 Go Back
                             </button>
                             <button
                                 onClick={() => window.location.href = '/'}
-                                className="w-full text-primary-300 px-6 py-3 rounded-lg font-medium hover:bg-primary-500/10 transition-colors"
+                                className="w-full text-primary-300 px-6 py-3 rounded-lg font-medium hover:bg-primary-500/10"
                             >
                                 Return to Home
                             </button>

@@ -56,8 +56,8 @@ function CampAdminLogin() {
             </div>
 
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-amber-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-amber-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div
@@ -68,11 +68,11 @@ function CampAdminLogin() {
                 }}
             ></div>
 
-            <div className="relative z-10 max-w-md w-full animate-fade-in-up">
+            <div className="relative z-10 max-w-md w-full">
                 {/* Back to Home */}
                 <button
                     onClick={() => navigate('/')}
-                    className="text-slate-400 hover:text-white mb-8 flex items-center gap-2 transition-colors"
+                    className="text-slate-400 hover:text-white mb-8 flex items-center gap-2"
                 >
                     ← Back to Home
                 </button>
@@ -80,7 +80,7 @@ function CampAdminLogin() {
                 <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-2xl p-8">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-300 transition-transform duration-300 hover:scale-110">
+                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-300">
                             <IconTent className="h-8 w-8" />
                         </div>
                         <h1 className="text-2xl font-bold text-white">Camp Admin Portal</h1>
@@ -121,7 +121,7 @@ function CampAdminLogin() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-lg hover:shadow-amber-500/40 text-white font-bold py-3 px-4 rounded-lg shadow-md shadow-amber-500/25 transition-all disabled:opacity-50"
+                            className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-lg hover:shadow-amber-500/40 text-white font-bold py-3 px-4 rounded-lg shadow-md shadow-amber-500/25 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>

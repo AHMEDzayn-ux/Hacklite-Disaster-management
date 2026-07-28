@@ -10,7 +10,7 @@ function BulkTestData() {
     const [result, setResult] = useState(null);
 
     const handleGenerateAll = async () => {
-        if (!confirm('⚠️ This will create 140 test records in your database. Continue?')) return;
+        if (!confirm('⚠️ This will create 140 test records in your database. Continue? ')) return;
 
         setLoading(true);
         setResult(null);
@@ -62,7 +62,7 @@ function BulkTestData() {
                 <div className="mb-8">
                     <button
                         onClick={() => navigate('/')}
-                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors text-sm font-medium"
+                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 text-sm font-medium"
                     >
                         ← Back to Home
                     </button>

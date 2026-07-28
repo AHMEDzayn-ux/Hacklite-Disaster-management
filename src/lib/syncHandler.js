@@ -160,22 +160,18 @@ export const startAutoSync = () => {
 const showSyncNotification = (message, type = 'success') => {
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `fixed top-20 right-4 z-[9999] p-4 rounded-lg shadow-lg max-w-sm transition-all transform ${
+    notification.className = `fixed top-20 right-4 z-[9999] p-4 rounded-lg shadow-lg max-w-sm ${
         type === 'success' ? 'bg-success-500 text-white' :
         type === 'warning' ? 'bg-warning-500 text-white' :
         'bg-primary-500 text-white'
     }`;
     notification.textContent = message;
-    notification.style.animation = 'slideInRight 0.3s ease-out';
 
     document.body.appendChild(notification);
 
-    // Remove after 5 seconds
+    // Remove after 5 seconds (shown/hidden instantly - no slide animation)
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-in';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
+        notification.remove();
     }, 5000);
 };
 
@@ -194,29 +190,3 @@ export const registerBackgroundSync = async () => {
     }
 };
 
-// Add CSS animations for notifications
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);

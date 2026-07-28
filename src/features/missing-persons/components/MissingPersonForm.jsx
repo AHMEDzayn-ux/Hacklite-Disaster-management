@@ -17,7 +17,7 @@ function MissingPersonForm() {
     const { isSlow: liteMode } = useConnectionQuality();
 
     // Sample test photo (1x1 red pixel PNG)
-    const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
+    const testPhotoDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg== ';
 
     const autofillTestData = () => {
         setValue('name', 'John Silva');
@@ -118,7 +118,7 @@ function MissingPersonForm() {
                 {liteMode && <LiteModeBanner photoHidden={false} />}
 
                 {submitSuccess && (
-                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
+                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
                         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
                             <IconCheck className="h-5 w-5" />
                         </span>
@@ -378,7 +378,7 @@ function MissingPersonForm() {
                         <button
                             type="button"
                             onClick={autofillTestData}
-                            className="px-6 py-2 rounded-lg bg-primary-500/80 text-white hover:bg-primary-500 transition-colors"
+                            className="px-6 py-2 rounded-lg bg-primary-500/80 text-white hover:bg-primary-500"
                         >
                             Test Autofill
                         </button>
@@ -388,7 +388,7 @@ function MissingPersonForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors"
+                            className="px-6 py-2 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20"
                         >
                             Clear
                         </button>

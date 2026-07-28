@@ -222,13 +222,13 @@ function CampInventory() {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => openAction(item.item_name, item.category, 'received')}
-                                        className="flex-1 bg-success-500/15 hover:bg-success-500/25 text-success-300 font-bold py-3 rounded-lg text-lg transition-colors"
+                                        className="flex-1 bg-success-500/15 hover:bg-success-500/25 text-success-300 font-bold py-3 rounded-lg text-lg"
                                     >
                                         + Add Stock
                                     </button>
                                     <button
                                         onClick={() => openAction(item.item_name, item.category, 'distributed')}
-                                        className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold py-3 rounded-lg text-lg transition-colors"
+                                        className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold py-3 rounded-lg text-lg"
                                     >
                                         − Distribute
                                     </button>
@@ -303,7 +303,7 @@ function CampInventory() {
                                 className="input-field text-sm"
                             />
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-white hover:bg-white/10 py-3 rounded-xl font-bold transition-colors">Cancel</button>
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-white hover:bg-white/10 py-3 rounded-xl font-bold">Cancel</button>
                                 <button type="submit" disabled={submitting} className="flex-1 btn-primary rounded-xl disabled:opacity-50">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>

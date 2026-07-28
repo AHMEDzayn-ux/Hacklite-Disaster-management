@@ -211,7 +211,7 @@ function AdminRecords() {
                 {/* Header */}
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm font-medium">
                             ← Dashboard
                         </Link>
                         <div className="flex items-center gap-4">
@@ -252,7 +252,7 @@ function AdminRecords() {
                                     setSelectedTable(tableName);
                                     setSearchTerm('');
                                 }}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedTable === tableName
+                                className={`px-4 py-2 rounded-lg font-medium ${selectedTable === tableName
                                     ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
@@ -281,7 +281,7 @@ function AdminRecords() {
                         </span>
                         <button
                             onClick={fetchRecords}
-                            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors text-sm font-medium"
+                            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium"
                         >
                             🔄 Refresh
                         </button>
@@ -334,14 +334,14 @@ function AdminRecords() {
                                                 <div className="flex gap-2 justify-end">
                                                     <button
                                                         onClick={() => setDetailModal({ isOpen: true, record })}
-                                                        className="px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors"
+                                                        className="px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium"
                                                     >
                                                         👁️ View
                                                     </button>
                                                     <button
                                                         onClick={() => setDeleteModal({ isOpen: true, record })}
                                                         disabled={isDeleting}
-                                                        className="px-3 py-1.5 bg-danger-600 hover:bg-danger-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                                                        className="px-3 py-1.5 bg-danger-600 hover:bg-danger-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
                                                     >
                                                         🗑️ Delete
                                                     </button>
@@ -382,7 +382,7 @@ function AdminRecords() {
                                 </div>
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
-                                    className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                    className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/10"
                                 >
                                     <IconX className="h-5 w-5" />
                                 </button>
@@ -568,7 +568,7 @@ function AdminRecords() {
                             <div className="sticky bottom-0 bg-slate-900 px-6 py-4 border-t border-white/10 flex gap-3 justify-end">
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
                                 >
                                     Close
                                 </button>
@@ -577,7 +577,7 @@ function AdminRecords() {
                                         setDetailModal({ isOpen: false, record: null });
                                         setDeleteModal({ isOpen: true, record: detailModal.record });
                                     }}
-                                    className="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                                    className="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-lg flex items-center gap-2"
                                 >
                                     🗑️ Delete This Record
                                 </button>

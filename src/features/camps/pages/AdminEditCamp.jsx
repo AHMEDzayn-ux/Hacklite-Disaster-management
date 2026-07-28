@@ -304,7 +304,7 @@ function AdminEditCamp() {
             <div className="relative z-10 max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="mb-6">
-                    <Link to="/admin/manage-camps" className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit">
+                    <Link to="/admin/manage-camps" className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 w-fit">
                         ← Back to Camps
                     </Link>
                     <div className="flex items-center gap-4">
@@ -563,7 +563,7 @@ function AdminEditCamp() {
                             <h3 className="text-lg font-bold text-white mb-4">Facilities Available</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {FACILITY_OPTIONS.map(facility => (
-                                    <label key={facility.value} className="flex items-center gap-2 p-2 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 text-slate-300 transition-colors">
+                                    <label key={facility.value} className="flex items-center gap-2 p-2 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 text-slate-300">
                                         <input
                                             type="checkbox"
                                             name={`facility_${facility.value}`}
@@ -584,7 +584,7 @@ function AdminEditCamp() {
                             <p className="text-sm text-slate-400 mb-4">Select items that the camp urgently requires</p>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {NEEDS_OPTIONS.map(need => (
-                                    <label key={need} className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${formData.needs.includes(need) ? 'bg-amber-500/15 border-amber-400/30 text-amber-200' : 'border-white/10 text-slate-300 hover:bg-white/5'
+                                    <label key={need} className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer ${formData.needs.includes(need) ? 'bg-amber-500/15 border-amber-400/30 text-amber-200' : 'border-white/10 text-slate-300 hover:bg-white/5'
                                         }`}>
                                         <input
                                             type="checkbox"
@@ -614,7 +614,7 @@ function AdminEditCamp() {
                                     type="button"
                                     onClick={handleRegenerateCode}
                                     disabled={regeneratingCode}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg disabled:opacity-50"
                                 >
                                     {regeneratingCode ? 'Generating...' : camp.inventory_access_code ? 'Regenerate Code' : 'Generate Code'}
                                 </button>
@@ -656,7 +656,7 @@ function AdminEditCamp() {
                         <div className="pt-6 border-t border-white/10 flex gap-4 justify-end">
                             <Link
                                 to="/admin/manage-camps"
-                                className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                                className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
                             >
                                 Cancel
                             </Link>

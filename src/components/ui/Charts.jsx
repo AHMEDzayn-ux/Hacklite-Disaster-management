@@ -100,10 +100,10 @@ export function VBars({ data, height = 128 }) {
                 {data.map((d, i) => (
                     <div key={i} className="flex-1 flex items-end justify-center h-full relative group">
                         <div
-                            className="w-full rounded-t-sm transition-all"
+                            className="w-full rounded-t-sm"
                             style={{ height: `${(d.value / max) * 100}%`, minHeight: d.value > 0 ? 3 : 0, background: d.color || CHART_COLORS[0] }}
                         />
-                        <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">{d.value}</span>
+                        <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-slate-200 opacity-0 group-hover:opacity-100">{d.value}</span>
                     </div>
                 ))}
             </div>
@@ -126,7 +126,7 @@ export function HBars({ data, max, valueSuffix = '', labelWidth = 92 }) {
                 <div key={i} className="flex items-center gap-2">
                     <span className="text-xs text-slate-300 truncate flex-shrink-0" style={{ width: labelWidth }} title={d.label}>{d.label}</span>
                     <div className="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${(d.value / m) * 100}%`, background: d.color || CHART_COLORS[0] }} />
+                        <div className="h-full rounded-full" style={{ width: `${(d.value / m) * 100}%`, background: d.color || CHART_COLORS[0] }} />
                     </div>
                     <span className="w-9 text-xs font-semibold text-slate-300 text-right flex-shrink-0">{d.value}{valueSuffix}</span>
                 </div>

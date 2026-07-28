@@ -121,7 +121,7 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <button
                     type="button"
                     onClick={() => setShowMap(!showMap)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg shadow-md shadow-primary-500/20 hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/30 transition-all text-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg shadow-md shadow-primary-500/20 hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/30 text-sm"
                 >
                     <IconMap className="h-4 w-4" />
                     {showMap ? 'Enter Manually' : 'Pick on Map'}
@@ -129,7 +129,7 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <button
                     type="button"
                     onClick={getCurrentLocation}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-success-500 text-white rounded-lg shadow-md shadow-success-500/20 hover:bg-success-600 hover:shadow-lg hover:shadow-success-500/30 transition-all text-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-success-500 text-white rounded-lg shadow-md shadow-success-500/20 hover:bg-success-600 hover:shadow-lg hover:shadow-success-500/30 text-sm"
                 >
                     <IconMapPin className="h-4 w-4" />
                     Use My Location

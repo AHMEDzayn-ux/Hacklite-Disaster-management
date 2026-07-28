@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import { motion } from 'framer-motion';
 import DonationForm from '@/features/donations/components/DonationForm';
 import DonationCounter from '@/features/donations/components/DonationCounter';
 import RecentDonations from '@/features/donations/components/RecentDonations';
@@ -37,18 +36,14 @@ function Donations() {
             ></div>
 
             {/* Cinematic community banner */}
-            <div className="relative z-10 h-32 w-full overflow-hidden sm:h-40 animate-fade-in-up">
+            <div className="relative z-10 h-32 w-full overflow-hidden sm:h-40">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
             <div className="relative z-10 mx-auto -mt-8 max-w-[1600px] px-6 pb-10 sm:px-10">
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-center sm:text-left"
-                >
+                <div className="mb-8 flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-center sm:text-left">
                     <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
                         <IconHeart className="h-7 w-7" />
                     </div>
@@ -58,7 +53,7 @@ function Donations() {
                             Every donation is recorded in a public, auditable ledger. Payments are processed securely via Stripe.
                         </p>
                     </div>
-                </motion.div>
+                </div>
 
                 <div className="max-w-md mx-auto mb-8">
                     <DonationCounter />

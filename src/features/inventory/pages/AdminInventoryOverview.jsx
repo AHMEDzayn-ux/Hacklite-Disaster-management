@@ -190,7 +190,7 @@ function AdminInventoryOverview() {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 {/* Header */}
                 <div className="mb-6 flex items-center gap-4">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm font-medium">
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
@@ -208,21 +208,21 @@ function AdminInventoryOverview() {
                     <div className="flex gap-2">
                         <button
                             onClick={() => setFilter('all')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === 'all'? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                         >
                             All Items ({levels.length})
                         </button>
                         <button
                             onClick={() => setFilter('low')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'low' ? 'bg-danger-600 text-white shadow-md shadow-danger-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === 'low'? 'bg-danger-600 text-white shadow-md shadow-danger-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                         >
                             ⚠ Low Stock ({lowStockCount})
                         </button>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => setAll(true)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10 transition-colors">Expand all</button>
-                        <button onClick={() => setAll(false)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10 transition-colors">Collapse all</button>
-                        <button onClick={load} className="px-4 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10 transition-colors">🔄 Refresh</button>
+                        <button onClick={() => setAll(true)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10">Expand all</button>
+                        <button onClick={() => setAll(false)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10">Collapse all</button>
+                        <button onClick={load} className="px-4 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10">🔄 Refresh</button>
                     </div>
                 </div>
 
@@ -259,9 +259,9 @@ function ProvinceSection({ province, expanded, onToggle }) {
         <section className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden">
             <button
                 onClick={() => onToggle(province.name)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${isEmpty ? 'text-slate-500' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${isEmpty ? 'text-slate-500' : ''}`}
             >
-                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 ${isOpen ? 'rotate-90' : ''}`} />
                 <h2 className={`font-bold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{province.name}</h2>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {province.lowCount > 0 && (
@@ -302,12 +302,12 @@ function DistrictSection({ province, district, expanded, onToggle }) {
             <button
                 onClick={() => !isEmpty && onToggle(key)}
                 disabled={isEmpty}
-                className={`w-full flex items-center gap-3 pl-8 pr-4 py-2.5 text-left transition-colors ${isEmpty ? 'cursor-default' : 'hover:bg-white/5'}`}
+                className={`w-full flex items-center gap-3 pl-8 pr-4 py-2.5 text-left ${isEmpty ? 'cursor-default' : 'hover:bg-white/5'}`}
             >
                 {isEmpty ? (
                     <span className="w-3.5 flex-shrink-0" />
                 ) : (
-                    <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                    <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-500 ${isOpen ? 'rotate-90' : ''}`} />
                 )}
                 <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{district.name}</h3>
                 <span className="ml-auto flex items-center gap-3 text-xs">

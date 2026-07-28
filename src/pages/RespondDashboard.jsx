@@ -190,7 +190,7 @@ const KIND_META = {
 
 function Card({ title, icon: Icon, right, children, className = '' }) {
     return (
-        <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 transition-colors duration-300 hover:border-white/20 ${className}`}>
+        <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 hover:border-white/20 ${className}`}>
             {(title || right) && (
                 <div className="flex items-center justify-between mb-3 gap-2">
                     {title && (
@@ -221,12 +221,12 @@ function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor =
         <button
             type="button"
             onClick={onClick}
-            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full transition-all duration-300 ${onClick ? 'hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
+            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
         >
             <div className="flex items-start justify-between gap-2">
                 <p className={`text-3xl font-extrabold leading-none ${accent}`}>{value}</p>
                 {Icon && (
-                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${ICON_BADGE[iconColor]}`}>
+                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${ICON_BADGE[iconColor]}`}>
                         <Icon className="h-5 w-5" />
                     </span>
                 )}
@@ -280,13 +280,13 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     return (
         <div className="space-y-3">
             {/* Global filter bar */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20 animate-fade-in-up">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
                 <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
                     {Object.keys(RANGE_CONF).map(r => (
                         <button
                             key={r}
                             onClick={() => setRange(r)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
                         >
                             {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
                         </button>
@@ -295,7 +295,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                 <select
                     value={district}
                     onChange={e => setDistrict(e.target.value)}
-                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
+                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50"
                 >
                     <option value="all" className="bg-slate-900 text-white">All districts</option>
                     {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
@@ -305,7 +305,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                         <button
                             key={s.key}
                             onClick={() => setView(s.key)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
                         >
                             <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
                         </button>
@@ -329,7 +329,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
     return (
         <div className="space-y-3">
             {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-fade-in-up">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
                 <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
                 <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
@@ -339,7 +339,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
             </div>
 
             {/* AI operational summary */}
-            <Card icon={IconInfo} title="AI Operational Summary" className="animate-fade-in-up" right={<span className="text-[10px] text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
+            <Card icon={IconInfo} title="AI Operational Summary" right={<span className="text-[10px] text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
                 <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
                 {A.summary.chips.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -354,14 +354,13 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
             <Card
                 icon={IconMap}
                 title="Live Incident Map"
-                className="animate-fade-in-up [animation-delay:80ms]"
                 right={
                     <div className="flex flex-wrap gap-1">
                         {['disaster', 'missing', 'animal', 'camp'].map(k => (
                             <button
                                 key={k}
                                 onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
                                 style={layers[k] ? { background: KIND_META[k].color, boxShadow: `0 6px 18px -4px ${KIND_META[k].color}99` } : undefined}
                             >
                                 <span className="text-base leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
@@ -369,7 +368,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                         ))}
                         <button
                             onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
-                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
                         >
                             <span className="text-base leading-none">🔥</span> Heat
                         </button>
@@ -415,7 +414,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {/* Needs attention */}
-                <Card icon={IconBolt} title="Needs Immediate Attention" className="animate-fade-in-up [animation-delay:140ms]">
+                <Card icon={IconBolt} title="Needs Immediate Attention">
                     {A.urgentFeed.length === 0 ? (
                         <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
                     ) : (
@@ -437,7 +436,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 </Card>
 
                 {/* Live activity timeline */}
-                <Card icon={IconClock} title="Live Activity Timeline" className="animate-fade-in-up [animation-delay:180ms]">
+                <Card icon={IconClock} title="Live Activity Timeline">
                     {A.timeline.length === 0 ? (
                         <p className="text-sm text-slate-500 py-6 text-center">No recent activity.</p>
                     ) : (
@@ -969,9 +968,9 @@ function RespondDashboard() {
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
-                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob [animation-delay:4s]"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div
@@ -983,14 +982,14 @@ function RespondDashboard() {
             ></div>
 
             {/* Cinematic command-center banner */}
-            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56 animate-fade-in-up">
+            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
             <div className="relative z-10 mx-auto -mt-12 max-w-[1800px] px-4 pb-6 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-6 animate-fade-in-up">
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
                             <IconLifeBuoy className="h-6 w-6" />
@@ -999,7 +998,7 @@ function RespondDashboard() {
                             <div className="flex items-center gap-2.5">
                                 <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">Responder Operations Center</h1>
                                 <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75"></span>
+                                    <span className="absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
                                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success-500"></span>
                                 </span>
                             </div>
@@ -1007,25 +1006,25 @@ function RespondDashboard() {
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
-                            <IconUsers className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Volunteer
+                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
+                            <IconUsers className="h-4 w-4" /> Volunteer
                         </Link>
-                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-purple-500/40">
-                            <IconHeart className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Donate
+                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40">
+                            <IconHeart className="h-4 w-4" /> Donate
                         </Link>
-                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
-                            <IconTent className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Request Camp
+                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
+                            <IconTent className="h-4 w-4" /> Request Camp
                         </Link>
                     </div>
                 </div>
 
                 {/* Top-level tabs */}
-                <div className="flex flex-wrap gap-2 mb-6 animate-fade-in-up [animation-delay:40ms]">
+                <div className="flex flex-wrap gap-2 mb-6">
                     {TABS.map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:text-white'}`}
                         >
                             <tab.icon className="h-4 w-4" />
                             {tab.label}

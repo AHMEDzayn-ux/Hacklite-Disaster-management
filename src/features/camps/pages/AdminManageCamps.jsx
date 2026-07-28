@@ -158,7 +158,7 @@ function AdminManageCamps() {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 {/* Top bar */}
                 <div className="mb-6 flex items-center justify-between">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm font-medium">
                         ← Dashboard
                     </Link>
                     {adminStatus.role === 'super_admin' && (
@@ -210,7 +210,7 @@ function AdminManageCamps() {
                                 <button
                                     key={status}
                                     onClick={() => setFilter(status)}
-                                    className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${filter === status
+                                    className={`px-4 py-2 rounded-lg font-medium capitalize ${filter === status
                                         ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
                                         : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                         }`}
@@ -264,7 +264,7 @@ function AdminManageCamps() {
                 ) : (
                     <div className="grid gap-4">
                         {filteredCamps.map((camp) => (
-                            <div key={camp.id} className="card hover:border-white/25 hover:bg-white/[0.08] transition-all duration-300">
+                            <div key={camp.id} className="card hover:border-white/25 hover:bg-white/[0.08]">
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-2">
@@ -310,7 +310,7 @@ function AdminManageCamps() {
                                     <div className="flex gap-2 flex-wrap">
                                         <Link
                                             to={`/camps/${camp.id}`}
-                                            className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                            className="px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium"
                                         >
                                             View Details
                                         </Link>
@@ -319,7 +319,7 @@ function AdminManageCamps() {
                                         {adminStatus.isAdmin && (
                                             <Link
                                                 to={`/admin/edit-camp/${camp.id}`}
-                                                className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
+                                                className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white rounded-lg text-sm font-medium flex items-center gap-1"
                                                 title="Edit camp details"
                                             >
                                                 ✏️ Edit
@@ -331,7 +331,7 @@ function AdminManageCamps() {
                                             <button
                                                 onClick={() => setCloseModal({ isOpen: true, camp })}
                                                 disabled={isClosing}
-                                                className="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
+                                                className="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-1"
                                                 title="Mark camp as closed"
                                             >
                                                 <IconX className="h-3.5 w-3.5" />
@@ -374,7 +374,7 @@ function AdminManageCamps() {
                                 <button
                                     onClick={() => setCloseModal({ isOpen: false, camp: null })}
                                     disabled={isClosing}
-                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>

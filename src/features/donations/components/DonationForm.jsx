@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { supabase } from '@/lib/supabase';
 
@@ -150,11 +149,7 @@ function DonationForm({ onSuccess }) {
     };
 
     const renderStep1 = () => (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-        >
+        <div>
             <h3 className="text-xl font-bold text-white mb-4">Choose Your Impact</h3>
 
             {/* Preset Amounts */}
@@ -164,7 +159,7 @@ function DonationForm({ onSuccess }) {
                         key={amount}
                         type="button"
                         onClick={() => handleAmountSelect(amount)}
-                        className={`p-4 rounded-lg border transition-all duration-200 ${selectedAmount === amount && !customAmount
+                        className={`p-4 rounded-lg border ${selectedAmount === amount && !customAmount
                             ? 'bg-success-600 text-white border-success-500 shadow-md shadow-success-500/30 scale-105'
                             : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                             }`}
@@ -209,19 +204,15 @@ function DonationForm({ onSuccess }) {
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={!getFinalAmount() || getFinalAmount() < 1}
-                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg"
             >
                 Continue to Your Information
             </button>
-        </motion.div>
+        </div>
     );
 
     const renderStep2 = () => (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-        >
+        <div>
             <h3 className="text-xl font-bold text-white mb-4">Your Information</h3>
 
             {/* Anonymous Checkbox */}
@@ -309,27 +300,23 @@ function DonationForm({ onSuccess }) {
                 <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 font-semibold py-3 rounded-lg transition-colors duration-200"
+                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 font-semibold py-3 rounded-lg"
                 >
                     Back
                 </button>
                 <button
                     type="button"
                     onClick={() => setStep(3)}
-                    className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+                    className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 rounded-lg"
                 >
                     Continue to Payment
                 </button>
             </div>
-        </motion.div>
+        </div>
     );
 
     const renderStep3 = () => (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-        >
+        <div>
             <h3 className="text-xl font-bold text-white mb-4">Payment Details</h3>
 
             {/* Amount Summary */}
@@ -350,7 +337,7 @@ function DonationForm({ onSuccess }) {
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
                     Card Information *
                 </label>
-                <div className="p-4 rounded-lg border border-white/15 bg-white/5 focus-within:border-primary-400/50 transition-colors">
+                <div className="p-4 rounded-lg border border-white/15 bg-white/5 focus-within:border-primary-400/50">
                     <CardElement
                         options={{
                             style: {
@@ -395,14 +382,14 @@ function DonationForm({ onSuccess }) {
                     type="button"
                     onClick={() => setStep(2)}
                     disabled={isProcessing}
-                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed font-semibold py-3 rounded-lg transition-colors duration-200"
+                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed font-semibold py-3 rounded-lg"
                 >
                     Back
                 </button>
                 <button
                     type="submit"
                     disabled={isProcessing || !stripe}
-                    className="flex-1 bg-gradient-to-r from-success-600 to-success-500 hover:shadow-lg hover:shadow-success-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none text-white font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                    className="flex-1 bg-gradient-to-r from-success-600 to-success-500 hover:shadow-lg hover:shadow-success-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <>
@@ -419,7 +406,7 @@ function DonationForm({ onSuccess }) {
                     )}
                 </button>
             </div>
-        </motion.div>
+        </div>
     );
 
     return (
