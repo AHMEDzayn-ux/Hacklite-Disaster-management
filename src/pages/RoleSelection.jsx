@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '../assets/home.png';
+import heroImage from '@/assets/home.png';
 import {
     IconSiren,
     IconShieldLock,
@@ -15,7 +15,7 @@ import {
     IconUsers,
     IconGlobe,
     IconTent,
-} from '../components/icons/Icons';
+} from '@/components/icons/Icons';
 
 const REPORT_ITEMS = [
     'Report missing persons',

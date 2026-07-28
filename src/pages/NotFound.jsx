@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { IconSiren, IconPhone, IconUserSearch, IconTent, IconPawPrint } from '../components/icons/Icons';
+import { IconSiren, IconPhone, IconUserSearch, IconTent, IconPawPrint } from '@/components/icons/Icons';
 
 function NotFound() {
     return (

@@ -4,4 +4,4 @@ export {
     useDisasterStore,
     useAnimalRescueStore,
     useCampStore
-} from './supabaseStore';
+} from '@/store/supabaseStore';

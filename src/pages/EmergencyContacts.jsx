@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconPhone, IconShieldCheck } from '../components/icons/Icons';
+import { IconPhone, IconShieldCheck } from '@/components/icons/Icons';
 
 function EmergencyContacts() {
     const [expandedDistrict, setExpandedDistrict] = useState(null);

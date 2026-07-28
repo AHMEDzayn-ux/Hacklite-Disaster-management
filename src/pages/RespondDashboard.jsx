@@ -2,16 +2,16 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../utils/leafletIconFix';
-import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '../utils/leafletIconFix';
-import HeatmapLayer from '../components/shared/HeatmapLayer';
-import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '../components/shared/Charts';
-import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '../store';
-import { defaultMapConfig, districtBounds, allDistricts } from '../utils/mapConfig';
-import DisasterReportsList from '../components/DisasterReportsList';
-import MissingPersonsList from '../components/MissingPersonsList';
-import AnimalRescueList from '../components/AnimalRescueList';
-import CampsList from '../components/CampsList';
+import '@/lib/leafletIconFix';
+import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '@/lib/leafletIconFix';
+import HeatmapLayer from '@/components/map/HeatmapLayer';
+import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
+import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
+import { defaultMapConfig, districtBounds, allDistricts } from '@/lib/mapConfig';
+import DisasterReportsList from '@/features/disasters/components/DisasterReportsList';
+import MissingPersonsList from '@/features/missing-persons/components/MissingPersonsList';
+import AnimalRescueList from '@/features/animal-rescue/components/AnimalRescueList';
+import CampsList from '@/features/camps/components/CampsList';
 import {
     IconLifeBuoy,
     IconGrid,
@@ -28,8 +28,8 @@ import {
     IconClock,
     IconCheck,
     IconHeart,
-} from '../components/icons/Icons';
-import heroImage from '../assets/blue.png';
+} from '@/components/icons/Icons';
+import heroImage from '@/assets/blue.png';
 
 /**
  * Responder Dashboard — AI-assisted Emergency Operations Center

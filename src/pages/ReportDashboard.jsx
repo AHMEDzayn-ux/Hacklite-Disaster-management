@@ -9,8 +9,8 @@ import {
     IconCloud,
     IconMessageSquare,
     IconArrowRight,
-} from '../components/icons/Icons';
-import heroImage from '../assets/red.png';
+} from '@/components/icons/Icons';
+import heroImage from '@/assets/red.png';
 
 const REPORT_OPTIONS = [
     {

@@ -2,9 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
-import App from './App.jsx'
-import ErrorBoundary from './components/ErrorBoundary.jsx'
-import { startAutoSync } from './utils/syncHandler.js'
+import App from '@/app/App'
+import ErrorBoundary from '@/components/ui/ErrorBoundary'
+import { startAutoSync } from '@/lib/syncHandler'
 
 // No mock data initialization - using Supabase real-time data
 
