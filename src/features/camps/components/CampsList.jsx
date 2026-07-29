@@ -168,9 +168,9 @@ function CampsList() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-10 sm:px-10">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
                 {/* Header with Stats and Controls */}
-                <div className="card mb-6">
+                <div className="card mb-3 p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         {/* Title & Stats */}
                         <div className="flex items-center gap-4">

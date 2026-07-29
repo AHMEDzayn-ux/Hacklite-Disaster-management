@@ -982,49 +982,49 @@ function RespondDashboard() {
             ></div>
 
             {/* Cinematic command-center banner */}
-            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56">
+            <div className="relative z-10 h-16 w-full overflow-hidden sm:h-20 lg:h-24">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
-            <div className="relative z-10 mx-auto -mt-12 max-w-[1800px] px-4 pb-6 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
-                            <IconLifeBuoy className="h-6 w-6" />
+            <div className="relative z-10 mx-auto -mt-5 max-w-[1800px] px-4 pb-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
+                            <IconLifeBuoy className="h-5 w-5" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2.5">
-                                <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">Responder Operations Center</h1>
+                                <h1 className="text-xl md:text-2xl font-black text-white leading-tight">Responder Operations Center</h1>
                                 <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
                                     <span className="absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
                                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success-500"></span>
                                 </span>
                             </div>
-                            <p className="text-slate-300 text-sm mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
+                            <p className="text-slate-300 text-xs mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
+                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
                             <IconUsers className="h-4 w-4" /> Volunteer
                         </Link>
-                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40">
+                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40">
                             <IconHeart className="h-4 w-4" /> Donate
                         </Link>
-                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
+                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
                             <IconTent className="h-4 w-4" /> Request Camp
                         </Link>
                     </div>
                 </div>
 
                 {/* Top-level tabs */}
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="flex flex-wrap gap-2 mb-3">
                     {TABS.map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:text-white'}`}
                         >
                             <tab.icon className="h-4 w-4" />
                             {tab.label}

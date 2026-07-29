@@ -187,19 +187,19 @@ function AdminInventoryOverview() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-6">
                 {/* Header */}
-                <div className="mb-6 flex items-center gap-4">
+                <div className="mb-3 flex items-center gap-3">
                     <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm font-medium">
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white text-2xl shadow-lg shadow-primary-500/30">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white text-2xl shadow-lg shadow-primary-500/30">
                             📦
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-white md:text-4xl">Inventory Overview</h1>
-                            <p className="mt-1 text-slate-300 text-sm">Stock levels across all relief camps</p>
+                            <h1 className="text-xl font-black text-white md:text-2xl">Inventory Overview</h1>
+                            <p className="mt-0.5 text-slate-300 text-xs">Stock levels across all relief camps</p>
                         </div>
                     </div>
                 </div>

@@ -45,7 +45,7 @@ function Navbar({ userType = 'reporter' }) {
 
     return (
         <nav className="sticky top-0 z-50 border-b border-white/10 shadow-lg shadow-black/30 backdrop-blur-xl">
-            <div className={`h-1 bg-gradient-to-r ${isReporter ? 'from-danger-500 via-orange-400 to-danger-600' : 'from-success-500 via-primary-400 to-success-600'}`}></div>
+            <div className={`h-0.5 bg-gradient-to-r ${isReporter ? 'from-danger-500 via-orange-400 to-danger-600' : 'from-success-500 via-primary-400 to-success-600'}`}></div>
 
             {/* Faint atmospheric background */}
             <div className="absolute inset-0 overflow-hidden">
@@ -54,21 +54,21 @@ function Navbar({ userType = 'reporter' }) {
             </div>
 
             <div className="relative w-full px-4 sm:px-6 lg:px-10">
-                <div className="flex h-24 items-center">
+                <div className="flex h-14 items-center">
                     {/* Logo */}
-                    <Link to="/" className="group flex flex-shrink-0 items-center gap-3 hover:opacity-90">
-                        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg ${isReporter ? 'bg-danger-500 shadow-danger-500/30' : 'bg-success-500 shadow-success-500/30'}`}>
-                            <Icon className="h-7 w-7" />
+                    <Link to="/" className="group flex flex-shrink-0 items-center gap-2 hover:opacity-90">
+                        <div className={`flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-lg ${isReporter ? 'bg-danger-500 shadow-danger-500/30' : 'bg-success-500 shadow-success-500/30'}`}>
+                            <Icon className="h-5 w-5" />
                         </div>
                         <div className="hidden flex-col leading-tight sm:flex">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Sri Lanka</span>
-                            <span className="text-2xl font-extrabold text-white">Disaster Management</span>
+                            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Sri Lanka</span>
+                            <span className="text-base font-extrabold text-white">Disaster Management</span>
                         </div>
-                        <span className="text-xl font-extrabold text-white sm:hidden">DM SL</span>
+                        <span className="text-lg font-extrabold text-white sm:hidden">DM SL</span>
                     </Link>
 
                     {/* Desktop menu and switcher - Right aligned */}
-                    <div className="ml-auto hidden items-center gap-2 lg:flex">
+                    <div className="ml-auto hidden items-center gap-1 lg:flex">
                         {navLinks.map((link) => {
                             const LinkIcon = link.icon;
                             const active = isActive(link.path);
@@ -76,7 +76,7 @@ function Navbar({ userType = 'reporter' }) {
                                 <Link
                                     key={link.path}
                                     to={link.path}
-                                    className={`group relative flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-3 text-base font-semibold ${active
+                                    className={`group relative flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold ${active
                                         ? isReporter
                                             ? 'bg-danger-500/15 text-danger-300 shadow-inner'
                                             : 'bg-success-500/15 text-success-300 shadow-inner'
@@ -95,16 +95,16 @@ function Navbar({ userType = 'reporter' }) {
                         {/* Mode Switcher */}
                         <Link
                             to={isReporter ? '/respond' : '/report'}
-                            className={`group ml-3 flex items-center gap-2 rounded-full border border-white bg-white px-6 py-3 text-base font-bold text-slate-900 shadow-md ${isReporter ? 'hover:bg-success-600' : 'hover:bg-danger-600'} hover:text-white hover:shadow-lg`}
+                            className={`group ml-2 flex items-center gap-2 rounded-full border border-white bg-white px-4 py-1.5 text-sm font-bold text-slate-900 shadow-md ${isReporter ? 'hover:bg-success-600' : 'hover:bg-danger-600'} hover:text-white hover:shadow-lg`}
                         >
                             {isReporter ? (
                                 <>
-                                    <IconLifeBuoy className="h-5 w-5" />
+                                    <IconLifeBuoy className="h-4 w-4" />
                                     <span>Respond Mode</span>
                                 </>
                             ) : (
                                 <>
-                                    <IconMegaphone className="h-5 w-5" />
+                                    <IconMegaphone className="h-4 w-4" />
                                     <span>Report Mode</span>
                                 </>
                             )}
@@ -114,10 +114,10 @@ function Navbar({ userType = 'reporter' }) {
                     {/* Mobile menu button */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="ml-auto rounded-lg p-2 text-white hover:bg-white/10 focus:outline-none lg:hidden"
+                        className="ml-auto rounded-lg p-1.5 text-white hover:bg-white/10 focus:outline-none lg:hidden"
                         aria-label="Toggle menu"
                     >
-                        <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isOpen ? (
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             ) : (
@@ -129,7 +129,7 @@ function Navbar({ userType = 'reporter' }) {
 
                 {/* Mobile menu */}
                 {isOpen && (
-                    <div className="space-y-1.5 border-t border-white/10 py-4 lg:hidden">
+                    <div className="max-h-[70vh] space-y-1 overflow-y-auto border-t border-white/10 py-2 lg:hidden">
                         {navLinks.map((link) => {
                             const LinkIcon = link.icon;
                             return (
@@ -137,7 +137,7 @@ function Navbar({ userType = 'reporter' }) {
                                     key={link.path}
                                     to={link.path}
                                     onClick={() => setIsOpen(false)}
-                                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold ${isActive(link.path)
+                                    className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold ${isActive(link.path)
                                         ? isReporter
                                             ? 'bg-danger-500/15 text-danger-300'
                                             : 'bg-success-500/15 text-success-300'
@@ -151,11 +151,11 @@ function Navbar({ userType = 'reporter' }) {
                         })}
 
                         {/* Mobile Mode Switcher */}
-                        <div className="mt-3 border-t border-white/10 pt-3">
+                        <div className="mt-2 border-t border-white/10 pt-2">
                             <Link
                                 to={isReporter ? '/respond' : '/report'}
                                 onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-base font-bold text-slate-900 hover:bg-white/90"
+                                className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-900 hover:bg-white/90"
                             >
                                 {isReporter ? (
                                     <>

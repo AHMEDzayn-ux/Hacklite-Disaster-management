@@ -190,18 +190,18 @@ function DisasterReportsList({ role = 'responder' }) {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-10 sm:px-10">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-center gap-5">
-                            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
-                                <IconSiren className="h-7 w-7" />
+                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
+                                <IconSiren className="h-5 w-5" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-black text-white md:text-4xl">
+                                <h1 className="text-xl font-black text-white md:text-2xl">
                                     {role === 'responder' ? 'Disaster Response Operations' : 'Disaster Reports'}
                                 </h1>
-                                <p className="mt-1 text-slate-300">
+                                <p className="mt-0.5 text-sm text-slate-300">
                                     {activeCount} ongoing disasters &middot; {criticalCount} critical severity &middot; {resolvedCount} resolved cases
                                 </p>
                             </div>
@@ -233,7 +233,7 @@ function DisasterReportsList({ role = 'responder' }) {
                 </div>
 
                 {/* Filters */}
-                <div className="card mb-6">
+                <div className="card mb-3 p-4">
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">Search</label>

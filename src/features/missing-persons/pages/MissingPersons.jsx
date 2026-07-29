@@ -13,14 +13,14 @@ function MissingPersons() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-8 py-14 sm:px-12 lg:px-16">
-                <div className="mb-10 flex flex-col items-center gap-4 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/30">
-                        <IconUserSearch className="h-7 w-7" />
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 lg:px-12">
+                <div className="mb-3 flex flex-col items-center gap-2 text-center">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/30">
+                        <IconUserSearch className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-black text-white">Missing Persons</h1>
-                        <p className="mt-2 text-lg text-slate-300">
+                        <h1 className="text-xl md:text-2xl font-black text-white">Missing Persons</h1>
+                        <p className="mt-0.5 text-sm text-slate-300">
                             Report missing persons to help locate them during disasters
                         </p>
                     </div>

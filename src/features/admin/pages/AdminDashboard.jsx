@@ -169,7 +169,7 @@ function AdminDashboard() {
 
             {/* Top nav */}
             <header className="relative z-10 border-b border-white/10 bg-white/[0.03] backdrop-blur-md">
-                <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
+                <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-4">
                             <Link to="/" className="text-slate-400 hover:text-white text-sm">
@@ -194,16 +194,16 @@ function AdminDashboard() {
             </header>
 
             {/* Main Content */}
-            <main className="relative z-10 mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8">
+            <main className="relative z-10 mx-auto max-w-[1800px] px-4 py-4 sm:px-6 lg:px-8">
                 {/* Header & Stats Row */}
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-                            <IconShieldLock className="h-6 w-6" />
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                            <IconShieldLock className="h-5 w-5" />
                         </div>
                         <div>
-                            <h2 className="text-3xl md:text-4xl font-black text-white">Admin Dashboard</h2>
-                            <p className="text-slate-300 text-sm mt-1">Manage camps, records, and system data</p>
+                            <h2 className="text-xl md:text-2xl font-black text-white">Admin Dashboard</h2>
+                            <p className="text-slate-300 text-xs mt-0.5">Manage camps, records, and system data</p>
                         </div>
                     </div>
 

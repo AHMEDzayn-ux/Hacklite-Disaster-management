@@ -12,7 +12,7 @@ function AnimalRescue() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-8 py-14 sm:px-12 lg:px-16">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 lg:px-12">
                 <AnimalRescueForm />
             </div>
         </div>

@@ -105,13 +105,13 @@ function CampDetail() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-6">
 
                 {/* Header Section */}
-                <div className="card mb-6">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="card mb-3 p-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <div>
-                            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
                                 {getCampTypeIcon(camp.type)} {camp.name || camp.camp_name || 'Unnamed Camp'}
                             </h1>
                             <div className="flex flex-wrap gap-2 mt-2 text-sm text-slate-400">

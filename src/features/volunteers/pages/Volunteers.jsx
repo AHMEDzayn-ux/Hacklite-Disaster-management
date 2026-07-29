@@ -101,15 +101,15 @@ function Volunteers() {
                     }}
                 ></div>
 
-                <div className="relative z-10 mx-auto max-w-2xl px-6 py-10 sm:px-10">
-                    <div className="mb-8 flex items-center justify-between gap-5">
+                <div className="relative z-10 mx-auto max-w-2xl px-4 py-4 sm:px-8">
+                    <div className="mb-3 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-5">
-                            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-                                <IconUsers className="h-7 w-7" />
+                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                                <IconUsers className="h-5 w-5" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-black text-white md:text-4xl">Welcome, {saved.name}</h1>
-                                <p className="mt-1 text-slate-300">Manage your availability and assignments</p>
+                                <h1 className="text-xl font-black text-white md:text-2xl">Welcome, {saved.name}</h1>
+                                <p className="mt-0.5 text-sm text-slate-300">Manage your availability and assignments</p>
                             </div>
                         </div>
                         <button onClick={handleForget} className="flex-shrink-0 text-xs text-slate-400 underline hover:text-white">
@@ -201,20 +201,20 @@ function Volunteers() {
             ></div>
 
             {/* Cinematic community banner */}
-            <div className="relative z-10 h-32 w-full overflow-hidden sm:h-40">
+            <div className="relative z-10 h-16 w-full overflow-hidden sm:h-20">
                 <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
             </div>
 
-            <div className="relative z-10 mx-auto -mt-8 max-w-2xl px-6 pb-10 sm:px-10">
-                <div className="mb-8 flex items-center gap-5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-                        <IconUsers className="h-7 w-7" />
+            <div className="relative z-10 mx-auto -mt-4 max-w-2xl px-4 pb-4 sm:px-8">
+                <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                        <IconUsers className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-white md:text-4xl">Volunteer Registration</h1>
-                        <p className="mt-1 text-slate-300">
+                        <h1 className="text-xl font-black text-white md:text-2xl">Volunteer Registration</h1>
+                        <p className="mt-0.5 text-sm text-slate-300">
                             Register once - no password needed. The AI assignment matcher will propose the nearest task that fits your skills, and you can accept or decline.
                         </p>
                     </div>

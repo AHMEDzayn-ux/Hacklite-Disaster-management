@@ -12,7 +12,7 @@ function DisasterReports() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-4xl px-6 py-14 sm:px-10 lg:px-12">
+            <div className="relative z-10 mx-auto max-w-4xl px-4 py-4 sm:px-8 lg:px-10">
                 <DisasterReportForm />
             </div>
         </div>
