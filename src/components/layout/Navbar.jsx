@@ -13,6 +13,8 @@ import {
     IconTent,
     IconUsers,
     IconHeart,
+    IconMenu,
+    IconX,
     IconSun,
     IconMoon,
     IconBell,
@@ -39,6 +41,7 @@ const responderLinks = [
 ];
 
 function Navbar({ userType = 'reporter' }) {
+    const [isOpen, setIsOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const location = useLocation();
@@ -54,13 +57,11 @@ function Navbar({ userType = 'reporter' }) {
 
     return (
         <nav className="sticky top-0 z-50 border-b border-white/10 bg-white/95 backdrop-blur-sm dark:bg-slate-950/95">
-            <div className={`h-0.5 bg-gradient-to-r ${isReporter ? 'from-danger-500 via-orange-400 to-danger-600' : 'from-success-500 via-primary-400 to-success-600'}`}></div>
-
-            <div className="relative w-full px-4 sm:px-6 lg:px-10">
+            <div className="w-full px-4 sm:px-6 lg:px-10">
                 <div className="flex h-16 items-center">
                     {/* Logo */}
                     <Link to="/" className="group flex flex-shrink-0 items-center gap-3 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 rounded-lg">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg transition-transform duration-200 group-hover:scale-105 ${isReporter ? 'bg-danger-500 shadow-danger-500/30' : 'bg-success-500 shadow-success-500/30'}`}>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white transition-transform duration-200 group-hover:scale-105 dark:bg-white/10 dark:text-slate-300">
                             <Icon className="h-5 w-5" />
                         </div>
                         <div className="hidden flex-col leading-tight sm:flex">
@@ -70,27 +71,20 @@ function Navbar({ userType = 'reporter' }) {
                         <span className="text-lg font-extrabold text-slate-900 dark:text-white sm:hidden">DM SL</span>
                     </Link>
 
-                    {/* Nav links */}
-                    <div className="ml-auto flex items-center gap-0.5 overflow-x-auto">
+                    {/* Desktop nav links */}
+                    <div className="ml-auto hidden items-center gap-0.5 xl:flex">
                         {navLinks.map((link) => {
-                            const LinkIcon = link.icon;
                             const active = isActive(link.path);
                             return (
                                 <Link
                                     key={link.path}
                                     to={link.path}
-                                    className={`group relative flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 ${active
-                                        ? isReporter
-                                            ? 'bg-danger-50 text-danger-700 shadow-inner dark:bg-danger-500/15 dark:text-danger-300'
-                                            : 'bg-success-50 text-success-700 shadow-inner dark:bg-success-500/15 dark:text-success-300'
+                                    className={`group relative flex items-center whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 ${active
+                                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300'
                                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white'
                                         }`}
                                 >
-                                    <LinkIcon className="h-5 w-5 flex-shrink-0" />
                                     {link.label}
-                                    <span
-                                        className={`absolute -bottom-0.5 left-4 right-4 h-0.5 rounded-full origin-left ${active ? 'scale-x-100' : 'scale-x-0'} ${isReporter ? 'bg-danger-400' : 'bg-success-400'}`}
-                                    ></span>
                                 </Link>
                             );
                         })}
@@ -98,16 +92,14 @@ function Navbar({ userType = 'reporter' }) {
                         {/* Mode Switcher */}
                         <Link
                             to={isReporter ? '/respond' : '/report'}
-                            className={`group ml-1.5 flex items-center gap-1.5 rounded-full border border-slate-900 bg-slate-900 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 dark:border-white dark:bg-white dark:text-slate-900 ${isReporter ? 'hover:bg-success-600 hover:border-success-600 dark:hover:bg-success-500 dark:hover:text-white' : 'hover:bg-danger-600 hover:border-danger-600 dark:hover:bg-danger-500 dark:hover:text-white'}`}
+                            className="group ml-1.5 flex items-center gap-1.5 rounded-full border border-slate-900 bg-slate-900 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-colors duration-200 hover:bg-primary-600 hover:border-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 dark:border-white dark:bg-white dark:text-slate-900"
                         >
                             {isReporter ? (
                                 <>
-                                    <IconLifeBuoy className="h-4 w-4" />
                                     <span>Respond Mode</span>
                                 </>
                             ) : (
                                 <>
-                                    <IconMegaphone className="h-4 w-4" />
                                     <span>Report Mode</span>
                                 </>
                             )}
@@ -184,7 +176,70 @@ function Navbar({ userType = 'reporter' }) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Mobile menu button */}
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="ml-auto rounded-lg p-2 text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 dark:text-white dark:hover:bg-white/10 xl:hidden"
+                        aria-label="Toggle menu"
+                        aria-expanded={isOpen}
+                    >
+                        {isOpen ? <IconX className="h-6 w-6" /> : <IconMenu className="h-6 w-6" />}
+                    </button>
                 </div>
+
+                {/* Mobile menu */}
+                {isOpen && (
+                    <div className="space-y-1.5 border-t border-slate-200 py-4 dark:border-white/10 xl:hidden">
+                        {navLinks.map((link) => {
+                            return (
+                                <Link
+                                    key={link.path}
+                                    to={link.path}
+                                    onClick={() => setIsOpen(false)}
+                                    className={`flex items-center rounded-xl px-4 py-3 text-base font-semibold transition-colors ${isActive(link.path)
+                                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300'
+                                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10'
+                                        }`}
+                                >
+                                    {link.label}
+                                </Link>
+                            );
+                        })}
+
+                        <Link
+                            to={isReporter ? '/respond' : '/report'}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white dark:bg-white dark:text-slate-900"
+                        >
+                            {isReporter ? 'Respond Mode' : 'Report Mode'}
+                        </Link>
+
+                        <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-3 dark:border-white/10">
+                            <button
+                                type="button"
+                                onClick={toggleTheme}
+                                className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+                            >
+                                {theme === 'dark' ? <IconSun className="h-4 w-4" /> : <IconMoon className="h-4 w-4" />}
+                                {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+                            </button>
+                            {user ? (
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsOpen(false); signOut(); }}
+                                    className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+                                >
+                                    <IconLogOut className="h-4 w-4" /> Sign out
+                                </button>
+                            ) : (
+                                <Link to="/admin/login" onClick={() => setIsOpen(false)} className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                                    Admin sign in
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </nav>
     );
