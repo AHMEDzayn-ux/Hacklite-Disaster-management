@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconPhone, IconShieldCheck } from '@/components/icons/Icons';
+import { IconShieldCheck } from '@/components/icons/Icons';
 
 function EmergencyContacts() {
     const [expandedDistrict, setExpandedDistrict] = useState(null);
@@ -51,13 +51,6 @@ function EmergencyContacts() {
     return (
         <div className="page-shell px-4 py-4 font-sans sm:px-8 lg:px-12">
             <div className="mx-auto max-w-[1600px]">
-                <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
-                        <IconPhone className="h-5 w-5" />
-                    </div>
-                    <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white md:text-2xl">Emergency Contacts</h1>
-                </div>
-
                 {/* National Hotlines */}
                 <div className="mb-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
                     <h2 className="mb-2 text-base font-bold text-slate-900 dark:text-white">National Emergency Hotlines</h2>

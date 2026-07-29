@@ -10,7 +10,7 @@ import MapResizeFix from '@/components/map/MapResizeFix';
 import MapFrame from '@/components/map/MapFrame';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
-import { IconSiren, IconSearch, IconGrid, IconMap, IconMapPin, IconUsers, IconX, IconInfo } from '@/components/icons/Icons';
+import { IconSearch, IconGrid, IconMap, IconMapPin, IconUsers, IconX, IconInfo } from '@/components/icons/Icons';
 
 // Custom marker icons for different statuses
 const activeIcon = redIcon;
@@ -195,19 +195,9 @@ function DisasterReportsList({ role = 'responder' }) {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex items-center gap-5">
-                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
-                                <IconSiren className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">
-                                    {role === 'responder' ? 'Disaster Response Operations' : 'Disaster Reports'}
-                                </h1>
-                                <p className="mt-0.5 text-sm text-slate-300">
-                                    {activeCount} ongoing disasters &middot; {criticalCount} critical severity &middot; {resolvedCount} resolved cases
-                                </p>
-                            </div>
-                        </div>
+                        <p className="text-sm text-slate-300">
+                            {activeCount} ongoing disasters &middot; {criticalCount} critical severity &middot; {resolvedCount} resolved cases
+                        </p>
 
                         <div className="flex gap-2">
                             <button

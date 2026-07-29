@@ -223,19 +223,9 @@ function AnimalRescueList({ role = 'responder' }) {
                 {/* Header with view toggle */}
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex items-center gap-5">
-                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-                                <IconPawPrint className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">
-                                    {role === 'responder' ? 'Animal Rescue Operations' : 'Animal Rescue Reports'}
-                                </h1>
-                                <p className="mt-0.5 text-sm text-slate-300">
-                                    {activeCount} need{activeCount !== 1 ? '' : 's'} rescue &middot; {rescuedCount} rescue{rescuedCount !== 1 ? 's' : ''} completed
-                                </p>
-                            </div>
-                        </div>
+                        <p className="text-sm text-slate-300">
+                            {activeCount} need{activeCount !== 1 ? '' : 's'} rescue &middot; {rescuedCount} rescue{rescuedCount !== 1 ? 's' : ''} completed
+                        </p>
 
                         {/* View Toggle */}
                         <div className="flex gap-2">

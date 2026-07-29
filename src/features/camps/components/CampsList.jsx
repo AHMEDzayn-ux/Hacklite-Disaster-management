@@ -174,23 +174,15 @@ function CampsList() {
                 {/* Header with Stats and Controls */}
                 <div className="card mb-3 p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        {/* Title & Stats */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                                <IconTent className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-slate-900 dark:text-white">Relief Camps</h1>
-                                <div className="hidden sm:flex items-center gap-3 text-sm mt-1">
-                                    <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
-                                        {activeCount} Active
-                                    </span>
-                                    <span className="flex items-center gap-1 text-slate-400">
-                                        <IconUsers className="h-3.5 w-3.5" />
-                                        {totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()} sheltered
-                                    </span>
-                                </div>
-                            </div>
+                        {/* Stats */}
+                        <div className="flex items-center gap-3 text-sm">
+                            <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
+                                {activeCount} Active
+                            </span>
+                            <span className="flex items-center gap-1 text-slate-400">
+                                <IconUsers className="h-3.5 w-3.5" />
+                                {totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()} sheltered
+                            </span>
                         </div>
 
                         {/* View Toggle */}

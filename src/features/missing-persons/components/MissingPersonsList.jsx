@@ -10,7 +10,7 @@ import MapResizeFix from '@/components/map/MapResizeFix';
 import MapFrame from '@/components/map/MapFrame';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
-import { IconUserSearch, IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconPhone, IconInfo, IconCheck } from '@/components/icons/Icons';
+import { IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconPhone, IconInfo, IconCheck } from '@/components/icons/Icons';
 
 // Custom marker icons for different statuses
 const activeIcon = redIcon;
@@ -177,17 +177,6 @@ function MissingPersonsList({ role = 'responder' }) {
             ></div>
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
-                {/* Header */}
-                <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/30">
-                        <IconUserSearch className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">Missing Persons</h1>
-                        <p className="mt-0.5 text-sm text-slate-300">Reported missing persons in Sri Lanka</p>
-                    </div>
-                </div>
-
                 {/* View Mode Toggle */}
                 <div className="mb-3 flex justify-center">
                     <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
