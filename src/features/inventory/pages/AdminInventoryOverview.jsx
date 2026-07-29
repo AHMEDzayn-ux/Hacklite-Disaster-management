@@ -171,14 +171,14 @@ function AdminInventoryOverview() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -190,7 +190,7 @@ function AdminInventoryOverview() {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-6">
                 {/* Header */}
                 <div className="mb-3 flex items-center gap-3">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white text-sm font-medium">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
@@ -198,7 +198,7 @@ function AdminInventoryOverview() {
                             📦
                         </div>
                         <div>
-                            <h1 className="text-xl font-black text-white md:text-2xl">Inventory Overview</h1>
+                            <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">Inventory Overview</h1>
                             <p className="mt-0.5 text-slate-300 text-xs">Stock levels across all relief camps</p>
                         </div>
                     </div>
@@ -261,8 +261,8 @@ function ProvinceSection({ province, expanded, onToggle }) {
                 onClick={() => onToggle(province.name)}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${isEmpty ? 'text-slate-500' : ''}`}
             >
-                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 ${isOpen ? 'rotate-90' : ''}`} />
-                <h2 className={`font-bold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{province.name}</h2>
+                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                <h2 className={`font-bold ${isEmpty ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>{province.name}</h2>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {province.lowCount > 0 && (
                         <span className="px-2 py-1 rounded-full bg-danger-500/15 text-danger-300 font-semibold">
@@ -309,7 +309,7 @@ function DistrictSection({ province, district, expanded, onToggle }) {
                 ) : (
                     <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-500 ${isOpen ? 'rotate-90' : ''}`} />
                 )}
-                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{district.name}</h3>
+                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>{district.name}</h3>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {district.lowCount > 0 && (
                         <span className="text-danger-400 font-semibold">⚠ {district.lowCount} low</span>
@@ -333,7 +333,7 @@ function CampBlock({ camp }) {
     return (
         <div className="rounded-lg border border-white/10 overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2 bg-white/[0.03] border-b border-white/10">
-                <span className="text-sm font-semibold text-white">{camp.name || camp.id.slice(0, 8)}</span>
+                <span className="text-sm font-semibold text-slate-900 dark:text-white">{camp.name || camp.id.slice(0, 8)}</span>
                 {camp.lowCount > 0 && (
                     <span className="text-xs text-danger-400 font-semibold">⚠ {camp.lowCount} low</span>
                 )}

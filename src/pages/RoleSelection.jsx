@@ -41,10 +41,10 @@ function RoleSelection() {
     const navigate = useNavigate();
 
     return (
-        <div className="relative h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="relative h-screen overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
             {/* Subtle dot-grid overlay */}
             <div
-                className="absolute inset-0 pointer-events-none opacity-10"
+                className="absolute inset-0 pointer-events-none opacity-[0.08]"
                 style={{
                     backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
                     backgroundSize: '28px 28px',
@@ -55,7 +55,7 @@ function RoleSelection() {
             <div className="absolute top-4 right-4 z-20 flex items-center gap-2 lg:top-6 lg:right-8">
                 <button
                     onClick={() => navigate('/camp-admin/login')}
-                    className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 backdrop-blur-md hover:border-white/50 hover:bg-white/20 hover:text-white"
+                    className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-slate-700 backdrop-blur-md transition-colors duration-150 hover:border-white/50 hover:bg-white/20 hover:text-slate-900 dark:text-white/85 dark:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                     <IconTent className="h-3.5 w-3.5" />
                     <span>Camp Admin</span>
@@ -82,7 +82,7 @@ function RoleSelection() {
                     </div>
 
                     <h1
-                        className="mb-2 flex flex-col items-start gap-0.5 text-3xl font-black leading-[1.1] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)] sm:text-4xl lg:text-5xl"
+                        className="mb-2 flex flex-col items-start gap-0.5 text-3xl font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white dark:drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)] sm:text-4xl lg:text-5xl"
                     >
                         <span className="flex items-center gap-3 pb-0.5">
                             <IconSiren className="h-7 w-7 flex-shrink-0 text-danger-400 lg:h-9 lg:w-9" />
@@ -94,7 +94,7 @@ function RoleSelection() {
                     </h1>
 
                     <p
-                        className="mb-1.5 text-lg font-semibold text-white md:text-xl"
+                        className="mb-1.5 text-lg font-semibold text-slate-900 dark:text-white md:text-xl"
                     >
                         Sri Lanka Emergency Response Platform
                     </p>
@@ -109,7 +109,7 @@ function RoleSelection() {
                         {/* Reporter/Victim Card */}
                         <div
                             onClick={() => navigate('/report')}
-                            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-slate-950/50 p-4 shadow-xl backdrop-blur-md hover:border-danger-400/60 hover:bg-slate-950/70"
+                            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl backdrop-blur-md transition-[border-color,transform,background-color] duration-200 hover:-translate-y-0.5 hover:border-danger-400/60 hover:bg-slate-50 p-4 dark:bg-slate-950/50 dark:hover:bg-slate-950/70"
                         >
                             <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-danger-500 to-orange-400"></div>
 
@@ -119,19 +119,19 @@ function RoleSelection() {
                                         <IconMegaphone className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-bold text-white">Report Emergency</h2>
-                                        <p className="mt-0.5 text-sm leading-snug text-slate-300">
+                                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Report Emergency</h2>
+                                        <p className="mt-0.5 text-sm leading-snug text-slate-600 dark:text-slate-300">
                                             I need to report a missing person, disaster, or request help
                                         </p>
                                     </div>
                                 </div>
-                                <span className="mt-2 flex text-white/30 group-hover:text-danger-400">
+                                <span className="mt-2 flex text-slate-300 dark:text-white/30 group-hover:text-danger-400">
                                     <IconChevronRight className="h-5 w-5 -mr-2.5" />
                                     <IconChevronRight className="h-5 w-5" />
                                 </span>
                             </div>
 
-                            <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                            <div className="mt-3 grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
                                 {REPORT_ITEMS.map((item) => (
                                     <div key={item} className="flex items-center gap-2 text-xs text-slate-200">
                                         <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/20 text-danger-400">
@@ -153,7 +153,7 @@ function RoleSelection() {
                         {/* Responder/Helper Card */}
                         <div
                             onClick={() => navigate('/respond')}
-                            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-slate-950/50 p-4 shadow-xl backdrop-blur-md hover:border-success-400/60 hover:bg-slate-950/70"
+                            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl backdrop-blur-md transition-[border-color,transform,background-color] duration-200 hover:-translate-y-0.5 hover:border-success-400/60 hover:bg-slate-50 p-4 dark:bg-slate-950/50 dark:hover:bg-slate-950/70"
                         >
                             <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-success-500 to-primary-400"></div>
 
@@ -163,19 +163,19 @@ function RoleSelection() {
                                         <IconLifeBuoy className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-bold text-white">Respond &amp; Help</h2>
-                                        <p className="mt-0.5 text-sm leading-snug text-slate-300">
+                                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Respond &amp; Help</h2>
+                                        <p className="mt-0.5 text-sm leading-snug text-slate-600 dark:text-slate-300">
                                             I want to help, volunteer, or coordinate rescue efforts
                                         </p>
                                     </div>
                                 </div>
-                                <span className="mt-2 flex text-white/30 group-hover:text-success-400">
+                                <span className="mt-2 flex text-slate-300 dark:text-white/30 group-hover:text-success-400">
                                     <IconChevronRight className="h-5 w-5 -mr-2.5" />
                                     <IconChevronRight className="h-5 w-5" />
                                 </span>
                             </div>
 
-                            <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                            <div className="mt-3 grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
                                 {RESPOND_ITEMS.map((item) => (
                                     <div key={item} className="flex items-center gap-2 text-xs text-slate-200">
                                         <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-success-500/20 text-success-400">
@@ -197,14 +197,16 @@ function RoleSelection() {
 
                     {/* Hotline bar */}
                     <div
-                        className="mt-3 flex items-center gap-3 rounded-2xl border border-white/15 bg-slate-950/60 px-4 py-2 backdrop-blur-md"
+                        className="mt-3 flex items-center gap-3 rounded-2xl border border-white/15 bg-white/80 px-4 py-2 backdrop-blur-md dark:bg-slate-950/60"
                     >
                         <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/15">
                             <IconPhone className="h-4 w-4 text-danger-400" />
                         </span>
-                        <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary-100">Emergency Hotline</p>
-                            <p className="text-xl font-extrabold text-white md:text-2xl">119 | 117</p>
+                        <div className="flex flex-1 items-center justify-between gap-4">
+                            <div>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide text-primary-700 dark:text-primary-100">Emergency Hotline</p>
+                                <p className="text-xl font-extrabold text-slate-900 dark:text-white md:text-2xl">119 | 117</p>
+                            </div>
                         </div>
                     </div>
 
@@ -218,9 +220,9 @@ function RoleSelection() {
                                 <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/15 text-primary-200">
                                     <Icon className="h-4 w-4" />
                              </span>
-                                <div>
-                                    <p className="text-xs font-semibold text-white">{title}</p>
-                                    <p className="mt-0.5 text-[11px] leading-snug text-slate-300">{desc}</p>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-semibold text-slate-900 dark:text-white">{title}</p>
+                                    <p className="mt-0.5 truncate text-[11px] leading-snug text-slate-500 dark:text-slate-300">{desc}</p>
                                 </div>
                             </div>
                         ))}

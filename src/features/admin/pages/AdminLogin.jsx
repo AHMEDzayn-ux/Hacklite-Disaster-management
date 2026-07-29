@@ -49,11 +49,12 @@ function AdminLogin() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
+        <div className="page-shell flex items-center justify-center px-4 font-sans">
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>
+
 
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
@@ -67,19 +68,20 @@ function AdminLogin() {
                 {/* Back to Home */}
                 <button
                     onClick={() => navigate('/')}
-                    className="text-slate-400 hover:text-white mb-8 flex items-center gap-2"
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-5 flex items-center gap-2 text-sm transition-colors"
                 >
                     ← Back to Home
                 </button>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-2xl p-8">
                     {/* Header */}
-                    <div className="text-center mb-8">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/20 text-primary-300">
-                            <IconShieldLock className="h-8 w-8" />
+                    <div className="text-center mb-6">
+                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-slate-300 ring-1 ring-inset ring-white/10">
+                            <IconShieldLock className="h-6 w-6" />
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Admin Portal</h1>
-                        <p className="text-slate-400 mt-2">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Admin Portal</h1>
+                        <p className="text-slate-400 text-sm mt-1">
+
                             Camp Management & Verification
                         </p>
                     </div>

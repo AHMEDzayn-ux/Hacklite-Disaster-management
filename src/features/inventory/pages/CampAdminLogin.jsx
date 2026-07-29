@@ -57,12 +57,8 @@ function CampAdminLogin() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
-            <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-amber-500/10 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
-            </div>
-
+        <div className="page-shell flex items-center justify-center px-4 font-sans">
+            {/* Static colour glow - CSS gradient only, no image/filter/animation */}
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -75,7 +71,7 @@ function CampAdminLogin() {
                 {/* Back to Home */}
                 <button
                     onClick={() => navigate('/')}
-                    className="text-slate-400 hover:text-white mb-8 flex items-center gap-2"
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-5 flex items-center gap-2 text-sm transition-colors"
                 >
                     ← Back to Home
                 </button>
@@ -86,7 +82,7 @@ function CampAdminLogin() {
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-300">
                             <IconTent className="h-8 w-8" />
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Camp Admin Portal</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Camp Admin Portal</h1>
                         <p className="text-slate-400 mt-2">Manage your camp's inventory</p>
                     </div>
 

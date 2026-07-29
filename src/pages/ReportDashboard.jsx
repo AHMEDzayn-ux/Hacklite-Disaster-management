@@ -89,7 +89,7 @@ const COLOR_STYLES = {
 
 function ReportDashboard() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
@@ -111,7 +111,7 @@ function ReportDashboard() {
                         <IconSiren className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black tracking-tight text-white md:text-3xl">
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white md:text-3xl">
                             Report Emergency
                         </h1>
                         <p className="mt-0.5 text-sm text-slate-300 md:text-base">
@@ -125,14 +125,14 @@ function ReportDashboard() {
                         const styles = COLOR_STYLES[color];
                         return (
                             <Link key={to} to={to} className="group">
-                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md hover:border-white/25 hover:bg-white/[0.08]">
+                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.08]">
                                     <div className={`absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b ${styles.bar}`}></div>
                                     <div className="flex items-start gap-3">
-                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-white shadow-lg ${styles.badge}`}>
+                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-white shadow-lg transition-transform duration-200 group-hover:scale-105 ${styles.badge}`}>
                                             <Icon className="h-6 w-6" />
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className={`mb-1 text-base font-bold text-white ${styles.text}`}>
+                                            <h3 className={`mb-1 text-base font-bold text-slate-900 dark:text-white ${styles.text}`}>
                                                 {title}
                                             </h3>
                                             <p className="mb-2 text-sm leading-snug text-slate-300">
@@ -156,7 +156,7 @@ function ReportDashboard() {
                         <IconCloud className="h-5 w-5" />
                     </div>
                     <div>
-                        <h4 className="mb-0.5 text-sm font-bold text-white">Works Offline</h4>
+                        <h4 className="mb-0.5 text-sm font-bold text-slate-900 dark:text-white">Works Offline</h4>
                         <p className="text-sm text-slate-300">
                             All forms work without internet. Your report will be saved and submitted automatically when connection is restored.
                         </p>
@@ -169,9 +169,9 @@ function ReportDashboard() {
                         <IconMessageSquare className="h-5 w-5" />
                     </div>
                     <div>
-                        <h4 className="mb-0.5 text-sm font-bold text-white">Can't Use App? Send SMS</h4>
+                        <h4 className="mb-0.5 text-sm font-bold text-slate-900 dark:text-white">Can't Use App? Send SMS</h4>
                         <p className="mb-1 text-sm text-slate-300">
-                            Text your report to: <span className="font-bold text-white">1234</span>
+                            Text your report to: <span className="font-bold text-slate-900 dark:text-white">1234</span>
                         </p>
                         <p className="text-xs text-slate-400">
                             Format: MISSING [Name] [Age] [Location] OR DISASTER [Type] [Location]

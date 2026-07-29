@@ -151,14 +151,14 @@ function CampAdminInventory() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans pb-24">
+        <div className="page-shell pb-24">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -173,11 +173,11 @@ function CampAdminInventory() {
                         <IconTent className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold text-white">{campName} Inventory</h1>
+                        <h1 className="text-lg font-bold text-slate-900 dark:text-white">{campName} Inventory</h1>
                         <p className="text-xs text-slate-400">Camp Admin</p>
                     </div>
                 </div>
-                <button onClick={() => { signOut(); navigate('/'); }} className="text-xs text-slate-400 hover:text-white underline">
+                <button onClick={() => { signOut(); navigate('/'); }} className="text-xs text-slate-400 hover:text-slate-900 dark:hover:text-white underline transition-colors">
                     Sign out
                 </button>
             </header>
@@ -193,7 +193,7 @@ function CampAdminInventory() {
                             <div key={`${item.item_name}-${item.category}-${item.unit}`} className={`rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
-                                        <div className="font-bold text-white">{item.item_name}</div>
+                                        <div className="font-bold text-slate-900 dark:text-white">{item.item_name}</div>
                                         <div className="text-xs text-slate-400">{CATEGORY_LABELS[item.category] || item.category}</div>
                                     </div>
                                     <div className={`text-2xl font-extrabold ${low ? 'text-danger-400' : 'text-white'}`}>
@@ -226,7 +226,7 @@ function CampAdminInventory() {
                 {/* Add a new item */}
                 <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-bold text-white">Add New Item</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white">Add New Item</h3>
                         <button
                             type="button"
                             onClick={autofillNewItem}
@@ -249,7 +249,7 @@ function CampAdminInventory() {
                                 onChange={(e) => setNewItemCategory(e.target.value)}
                                 className="input-field flex-1"
                             >
-                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>)}
+                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
                             </select>
                             <input
                                 type="text"
@@ -283,7 +283,7 @@ function CampAdminInventory() {
                 <div className="fixed inset-0 z-20 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                            <h3 className="text-xl font-bold text-white">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                 {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                             </h3>
                             <button
@@ -313,7 +313,7 @@ function CampAdminInventory() {
                             />
                             {error && <p className="text-danger-400 text-sm">{error}</p>}
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold">Cancel</button>
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-slate-900 dark:text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
                                 <button type="submit" disabled={submitting} className="flex-1 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white py-3 rounded-xl font-bold">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>

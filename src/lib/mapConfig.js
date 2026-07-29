@@ -44,6 +44,13 @@ export const defaultMapConfig = {
     maxBoundsViscosity: 1.0
 };
 
+// Tight coastline bounds for fitBounds() calls that want Sri Lanka to fill most
+// of the viewport (as opposed to maxBounds above, which is intentionally wider
+// so panning near the coast doesn't feel clipped). Real extremes: Point Pedro
+// (~9.84N) to Dondra Head (~5.92N), Kalpitiya (~79.65E) to Sangamankanda
+// (~81.88E).
+export const sriLankaFitBounds = [[5.9, 79.65], [9.85, 81.9]];
+
 // Shared marker cluster configuration
 export const clusterConfig = {
     chunkedLoading: true,

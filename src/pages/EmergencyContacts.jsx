@@ -49,18 +49,18 @@ function EmergencyContacts() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-4 font-sans sm:px-8 lg:px-12">
+        <div className="page-shell px-4 py-4 font-sans sm:px-8 lg:px-12">
             <div className="mx-auto max-w-[1600px]">
                 <div className="mb-3 flex items-center gap-3">
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
                         <IconPhone className="h-5 w-5" />
                     </div>
-                    <h1 className="text-xl font-black tracking-tight text-white md:text-2xl">Emergency Contacts</h1>
+                    <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white md:text-2xl">Emergency Contacts</h1>
                 </div>
 
                 {/* National Hotlines */}
                 <div className="mb-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
-                    <h2 className="mb-2 text-base font-bold text-white">National Emergency Hotlines</h2>
+                    <h2 className="mb-2 text-base font-bold text-slate-900 dark:text-white">National Emergency Hotlines</h2>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                         {nationalHotlines.map((hotline, index) => {
                             const color = hotline.type === 'emergency' ? 'danger' : hotline.type === 'military' ? 'primary' : 'success';
@@ -86,7 +86,7 @@ function EmergencyContacts() {
                 <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
                     <div className="mb-2 flex items-center gap-3">
                         <IconShieldCheck className="h-5 w-5 text-primary-300" />
-                        <h2 className="text-base font-bold text-white">District Disaster Management Centre Units</h2>
+                        <h2 className="text-base font-bold text-slate-900 dark:text-white">District Disaster Management Centre Units</h2>
                     </div>
                     <p className="mb-2 text-sm text-slate-400">Click on your district to view contact details</p>
 
@@ -104,8 +104,8 @@ function EmergencyContacts() {
                                 </button>
 
                                 {expandedDistrict === contact.district && (
-                                    <div className="mt-2 rounded-xl border border-primary-400/20 bg-primary-500/10 p-3 text-sm">
-                                        <p className="mb-2 font-semibold text-white">{contact.officer}</p>
+                                    <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm">
+                                        <p className="mb-2 font-semibold text-slate-900 dark:text-white">{contact.officer}</p>
                                         <div className="space-y-1">
                                             <a
                                                 href={`tel:${contact.mobile}`}

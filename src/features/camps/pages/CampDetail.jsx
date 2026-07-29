@@ -28,7 +28,7 @@ function CampDetail() {
     // Show loading while data is being fetched
     if (!isInitialized) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-12 text-center sm:px-6">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
                     <p className="text-slate-300">Loading...</p>
@@ -39,9 +39,9 @@ function CampDetail() {
 
     if (!camp) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-12 text-center sm:px-6">
-                    <h1 className="text-2xl font-bold text-white mb-4">Camp Not Found</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Camp Not Found</h1>
                     <button onClick={() => navigate(-1)} className="btn-primary">← Go Back</button>
                 </div>
             </div>
@@ -98,7 +98,7 @@ function CampDetail() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -113,7 +113,7 @@ function CampDetail() {
                 <div className="card mb-3 p-4">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <div>
-                            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+                            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                                 {getCampTypeIcon(camp.type)} {camp.name || camp.camp_name || 'Unnamed Camp'}
                             </h1>
                             <div className="flex flex-wrap gap-2 mt-2 text-sm text-slate-400">
@@ -176,12 +176,12 @@ function CampDetail() {
                             <div className="lg:col-span-1 space-y-6">
                                 {/* Capacity Card */}
                                 <div className="card">
-                                    <h3 className="text-lg font-semibold text-white mb-4">👥 Capacity Overview</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">👥 Capacity Overview</h3>
                                     <div className="space-y-4">
                                         <div>
                                             <div className="flex justify-between items-center mb-2">
                                                 <span className="text-sm text-slate-400">Current Occupancy</span>
-                                                <span className="text-lg font-bold text-white">
+                                                <span className="text-lg font-bold text-slate-900 dark:text-white">
                                                     {camp.current_occupancy || 0}/{camp.capacity || camp.total_capacity || 'N/A'}
                                                 </span>
                                             </div>
@@ -199,7 +199,7 @@ function CampDetail() {
                                         {camp.status === 'Active' && (
                                             <button
                                                 onClick={() => setShowOccupancyDialog(true)}
-                                                className="w-full rounded-lg border border-white/20 bg-white/5 py-2.5 px-4 text-sm font-semibold text-white hover:bg-white/10"
+                                                className="w-full rounded-lg border border-white/20 bg-white/5 py-2.5 px-4 text-sm font-semibold text-slate-900 dark:text-white transition-colors hover:bg-white/10"
                                             >
                                                 Update Occupancy
                                             </button>
@@ -209,15 +209,15 @@ function CampDetail() {
 
                                 {/* Contact Card */}
                                 <div className="card">
-                                    <h3 className="text-lg font-semibold text-white mb-4">📞 Contact Information</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">📞 Contact Information</h3>
                                     <div className="space-y-3">
                                         <div>
                                             <p className="text-xs text-slate-500 uppercase tracking-wide">Contact Person</p>
-                                            <p className="font-medium text-white">{camp.contact_person || camp.managed_by || 'N/A'}</p>
+                                            <p className="font-medium text-slate-900 dark:text-white">{camp.contact_person || camp.managed_by || 'N/A'}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 uppercase tracking-wide">Phone Number</p>
-                                            <p className="font-medium text-white">
+                                            <p className="font-medium text-slate-900 dark:text-white">
                                                 {camp.contact_number ? (
                                                     <a href={`tel:${camp.contact_number}`} className="text-primary-300 hover:underline">
                                                         {camp.contact_number}
@@ -228,7 +228,7 @@ function CampDetail() {
                                         {camp.contact_email && (
                                             <div>
                                                 <p className="text-xs text-slate-500 uppercase tracking-wide">Email</p>
-                                                <p className="font-medium text-white">
+                                                <p className="font-medium text-slate-900 dark:text-white">
                                                     <a href={`mailto:${camp.contact_email}`} className="text-primary-300 hover:underline">
                                                         {camp.contact_email}
                                                     </a>
@@ -259,7 +259,7 @@ function CampDetail() {
 
                                 {/* Quick Supply Status */}
                                 <div className="card">
-                                    <h3 className="text-lg font-semibold text-white mb-4">📦 Supply Status</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">📦 Supply Status</h3>
                                     {camp.supplies && Object.keys(camp.supplies).length > 0 ? (
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                             {Object.entries(camp.supplies).map(([key, supply]) => {
@@ -279,7 +279,7 @@ function CampDetail() {
 
                                 {/* Facilities Card - Moved to right column */}
                                 <div className="card">
-                                    <h3 className="text-lg font-semibold text-white mb-4">🏗️ Facilities</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">🏗️ Facilities</h3>
                                     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                                         {Object.entries(facilityIcons).slice(0, 6).map(([key, icon]) => (
                                             <div
@@ -295,38 +295,38 @@ function CampDetail() {
 
                                 {/* Special Needs */}
                                 {camp.special_needs && (
-                                    <div className="card bg-primary-500/10 border-primary-400/20">
-                                        <h3 className="text-lg font-semibold text-primary-300 mb-3">♿ Special Accommodations</h3>
+                                    <div className="card bg-white/[0.03] border-white/10">
+                                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">♿ Special Accommodations</h3>
                                         <p className="text-slate-300">{camp.special_needs}</p>
                                     </div>
                                 )}
 
                                 {/* Timeline */}
                                 <div className="card">
-                                    <h3 className="text-lg font-semibold text-white mb-4">📋 Timeline</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">📋 Timeline</h3>
                                     <div className="space-y-4">
                                         <div className="flex gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-sm">1</div>
+                                            <div className="w-10 h-10 rounded-full bg-white/10 text-slate-300 flex items-center justify-center font-bold text-sm">1</div>
                                             <div>
-                                                <p className="font-semibold text-white">Camp Created</p>
+                                                <p className="font-semibold text-slate-900 dark:text-white">Camp Created</p>
                                                 <p className="text-sm text-slate-400">{formatDate(camp.created_at || camp.openedDate)}</p>
                                                 {camp.disasterType && <p className="text-sm text-slate-500">Disaster: {camp.disasterType}</p>}
                                             </div>
                                         </div>
                                         {camp.updated_at && camp.updated_at !== camp.created_at && (
                                             <div className="flex gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">📝</div>
+                                                <div className="w-10 h-10 rounded-full bg-blue-500 text-slate-900 dark:text-white flex items-center justify-center font-bold text-sm">📝</div>
                                                 <div>
-                                                    <p className="font-semibold text-white">Last Updated</p>
+                                                    <p className="font-semibold text-slate-900 dark:text-white">Last Updated</p>
                                                     <p className="text-sm text-slate-400">{formatDate(camp.updated_at)}</p>
                                                 </div>
                                             </div>
                                         )}
                                         {(camp.closedDate || camp.status === 'Closed') && (
                                             <div className="flex gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-slate-500 text-white flex items-center justify-center font-bold">✓</div>
+                                                <div className="w-10 h-10 rounded-full bg-slate-500 text-slate-900 dark:text-white flex items-center justify-center font-bold">✓</div>
                                                 <div>
-                                                    <p className="font-semibold text-white">Camp Closed</p>
+                                                    <p className="font-semibold text-slate-900 dark:text-white">Camp Closed</p>
                                                     <p className="text-sm text-slate-400">{formatDate(camp.closedDate || camp.updated_at)}</p>
                                                 </div>
                                             </div>
@@ -341,34 +341,34 @@ function CampDetail() {
                     {activeTab === 'location' && (
                         <div className="lg:col-span-3 space-y-6">
                             <div className="card">
-                                <h3 className="text-lg font-semibold text-white mb-4">📍 Location Details</h3>
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">📍 Location Details</h3>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
                                         <div>
                                             <p className="text-xs text-slate-500 uppercase tracking-wide">Full Address</p>
-                                            <p className="font-medium text-white">{camp.address || camp.location?.address || 'N/A'}</p>
+                                            <p className="font-medium text-slate-900 dark:text-white">{camp.address || camp.location?.address || 'N/A'}</p>
                                         </div>
                                         {camp.village_area && (
                                             <div>
                                                 <p className="text-xs text-slate-500 uppercase tracking-wide">Village/Area</p>
-                                                <p className="font-medium text-white">{camp.village_area}</p>
+                                                <p className="font-medium text-slate-900 dark:text-white">{camp.village_area}</p>
                                             </div>
                                         )}
                                         {camp.nearby_landmark && (
                                             <div>
                                                 <p className="text-xs text-slate-500 uppercase tracking-wide">Nearby Landmark</p>
-                                                <p className="font-medium text-white">{camp.nearby_landmark}</p>
+                                                <p className="font-medium text-slate-900 dark:text-white">{camp.nearby_landmark}</p>
                                             </div>
                                         )}
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <p className="text-xs text-slate-500 uppercase tracking-wide">District</p>
-                                                <p className="font-medium text-white">{camp.district || 'N/A'}</p>
+                                                <p className="font-medium text-slate-900 dark:text-white">{camp.district || 'N/A'}</p>
                                             </div>
                                             {camp.ds_division && (
                                                 <div>
                                                     <p className="text-xs text-slate-500 uppercase tracking-wide">DS Division</p>
-                                                    <p className="font-medium text-white">{camp.ds_division}</p>
+                                                    <p className="font-medium text-slate-900 dark:text-white">{camp.ds_division}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -461,7 +461,7 @@ function CampDetail() {
                     {activeTab === 'details' && (
                         <div className="lg:col-span-3 space-y-6">
                             <div className="card">
-                                <h3 className="text-lg font-semibold text-white mb-4">📋 Complete Camp Information</h3>
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">📋 Complete Camp Information</h3>
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {/* Basic Info */}
                                     <div className="space-y-4">
@@ -523,7 +523,7 @@ function CampDetail() {
 
                             {/* Facilities Full List */}
                             <div className="card">
-                                <h3 className="text-lg font-semibold text-white mb-4">🏗️ All Facilities</h3>
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">🏗️ All Facilities</h3>
                                 <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                                     {Object.entries(facilityIcons).map(([key, icon]) => (
                                         <div
@@ -541,8 +541,8 @@ function CampDetail() {
 
                             {/* Special Needs */}
                             {camp.special_needs && (
-                                <div className="card bg-primary-500/10 border-primary-400/20">
-                                    <h3 className="text-lg font-semibold text-primary-300 mb-3">♿ Special Accommodations</h3>
+                                <div className="card bg-white/[0.03] border-white/10">
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">♿ Special Accommodations</h3>
                                     <p className="text-slate-300">{camp.special_needs}</p>
                                 </div>
                             )}
@@ -550,7 +550,7 @@ function CampDetail() {
                             {/* Notes */}
                             {(camp.notes || camp.additional_notes) && (
                                 <div className="card">
-                                    <h3 className="text-lg font-semibold text-white mb-4">📝 Notes</h3>
+                                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">📝 Notes</h3>
                                     <p className="text-slate-300 whitespace-pre-wrap">{camp.notes || camp.additional_notes}</p>
                                 </div>
                             )}
@@ -562,7 +562,7 @@ function CampDetail() {
                 {showOccupancyDialog && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                         <div className="bg-slate-900 border border-white/10 rounded-lg shadow-2xl max-w-md w-full p-6">
-                            <h3 className="text-xl font-bold text-white mb-4">Update Occupancy</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Update Occupancy</h3>
                             <p className="text-slate-300 mb-4">
                                 Current: {camp.current_occupancy || 0} / {camp.capacity || camp.total_capacity || 'N/A'} people
                             </p>
@@ -579,7 +579,7 @@ function CampDetail() {
                                 <button onClick={handleUpdateOccupancy} className="btn-primary flex-1">Update</button>
                                 <button
                                     onClick={() => setShowOccupancyDialog(false)}
-                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
+                                    className="px-6 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -597,7 +597,7 @@ function DataRow({ label, value, capitalize = false, mono = false }) {
     return (
         <div>
             <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
-            <p className={`font-medium text-white ${capitalize ? 'capitalize' : ''} ${mono ? 'font-mono text-sm' : ''}`}>
+            <p className={`font-medium text-slate-900 dark:text-white ${capitalize ? 'capitalize' : ''} ${mono ? 'font-mono text-sm' : ''}`}>
                 {value || 'N/A'}
             </p>
         </div>

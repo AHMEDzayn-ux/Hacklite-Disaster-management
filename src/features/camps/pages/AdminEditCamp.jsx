@@ -272,7 +272,7 @@ function AdminEditCamp() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
@@ -280,9 +280,9 @@ function AdminEditCamp() {
 
     if (!adminStatus.isAdmin) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="relative z-10 text-center">
-                    <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Access Denied</h1>
                     <p className="text-slate-400 mb-4">You need admin privileges to access this page.</p>
                     <Link to="/admin/dashboard" className="btn-primary">Return to Dashboard</Link>
                 </div>
@@ -292,7 +292,7 @@ function AdminEditCamp() {
 
     if (loading) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="relative z-10 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
                     <p className="text-slate-400">Loading camp data...</p>
@@ -303,9 +303,9 @@ function AdminEditCamp() {
 
     if (!camp) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="relative z-10 text-center">
-                    <h1 className="text-2xl font-bold text-white mb-4">Camp Not Found</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Camp Not Found</h1>
                     <Link to="/admin/manage-camps" className="btn-primary">Back to Camps</Link>
                 </div>
             </div>
@@ -313,7 +313,7 @@ function AdminEditCamp() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans py-8 px-4">
+        <div className="page-shell py-8 px-4">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -325,7 +325,7 @@ function AdminEditCamp() {
             <div className="relative z-10 max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="mb-6">
-                    <Link to="/admin/manage-camps" className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 w-fit">
+                    <Link to="/admin/manage-camps" className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit">
                         ← Back to Camps
                     </Link>
                     <div className="flex items-center justify-between gap-4">
@@ -334,7 +334,7 @@ function AdminEditCamp() {
                                 <IconTent className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-white">Edit Camp</h1>
+                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Edit Camp</h1>
                             </div>
                         </div>
                         <button
@@ -349,7 +349,7 @@ function AdminEditCamp() {
 
                 {/* Camp Info Header */}
                 <div className="card mb-6">
-                    <h2 className="text-2xl font-bold text-white">{camp.name || camp.camp_name}</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{camp.name || camp.camp_name}</h2>
                     <p className="text-slate-400 mt-1">
                         ID: <span className="font-mono text-sm text-slate-300">{camp.id}</span>
                     </p>
@@ -372,7 +372,7 @@ function AdminEditCamp() {
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {/* Basic Information */}
                         <section>
-                            <h3 className="text-lg font-bold text-white mb-4">Basic Information</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Basic Information</h3>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -395,9 +395,9 @@ function AdminEditCamp() {
                                         onChange={handleInputChange}
                                         className="input-field"
                                     >
-                                        <option value="">Select Type</option>
+                                        <option value="" className="text-slate-900">Select Type</option>
                                         {CAMP_TYPES.map(type => (
-                                            <option key={type.value} value={type.value}>{type.label}</option>
+                                            <option key={type.value} value={type.value} className="text-slate-900">{type.label}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -409,9 +409,9 @@ function AdminEditCamp() {
                                         onChange={handleInputChange}
                                         className="input-field"
                                     >
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                        <option value="Closed">Closed</option>
+                                        <option value="Active" className="text-slate-900">Active</option>
+                                        <option value="Inactive" className="text-slate-900">Inactive</option>
+                                        <option value="Closed" className="text-slate-900">Closed</option>
                                     </select>
                                 </div>
                                 <div>
@@ -422,9 +422,9 @@ function AdminEditCamp() {
                                         onChange={handleInputChange}
                                         className="input-field"
                                     >
-                                        <option value="">Select District</option>
+                                        <option value="" className="text-slate-900">Select District</option>
                                         {SRI_LANKA_DISTRICTS.map(district => (
-                                            <option key={district} value={district}>{district}</option>
+                                            <option key={district} value={district} className="text-slate-900">{district}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -444,7 +444,7 @@ function AdminEditCamp() {
 
                         {/* Capacity Section */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Capacity</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Capacity</h3>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">Total Capacity</label>
@@ -474,7 +474,7 @@ function AdminEditCamp() {
                                 <div className="mt-4">
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="text-slate-400">Occupancy</span>
-                                        <span className="font-medium text-white">
+                                        <span className="font-medium text-slate-900 dark:text-white">
                                             {Math.round((formData.current_occupancy / formData.capacity) * 100)}%
                                         </span>
                                     </div>
@@ -493,7 +493,7 @@ function AdminEditCamp() {
 
                         {/* Contact Information */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Contact Information</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Contact Information</h3>
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -536,7 +536,7 @@ function AdminEditCamp() {
 
                         {/* Location */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Location</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Location</h3>
                             <div className="grid md:grid-cols-2 gap-4 mb-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">Address</label>
@@ -590,7 +590,7 @@ function AdminEditCamp() {
 
                         {/* Facilities */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Facilities Available</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Facilities Available</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {FACILITY_OPTIONS.map(facility => (
                                     <label key={facility.value} className="flex items-center gap-2 p-2 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 text-slate-300">
@@ -610,7 +610,7 @@ function AdminEditCamp() {
 
                         {/* Current Needs */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Current Urgent Needs</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Current Urgent Needs</h3>
                             <p className="text-sm text-slate-400 mb-4">Select items that the camp urgently requires</p>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {NEEDS_OPTIONS.map(need => (
@@ -631,20 +631,20 @@ function AdminEditCamp() {
 
                         {/* Inventory Access Code */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-2">Inventory Access Code</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Inventory Access Code</h3>
                             <p className="text-sm text-slate-400 mb-4">
                                 Share this code with a volunteer so they can log camp inventory (received/distributed supplies) at
                                 <span className="font-mono text-slate-300"> /camp-inventory</span> without needing an account.
                             </p>
                             <div className="flex items-center gap-4">
-                                <div className="font-mono text-2xl tracking-widest bg-white/5 text-white px-4 py-2 rounded-lg border border-white/15">
+                                <div className="font-mono text-2xl tracking-widest bg-white/5 text-slate-900 dark:text-white px-4 py-2 rounded-lg border border-white/15">
                                     {camp.inventory_access_code || 'Not set'}
                                 </div>
                                 <button
                                     type="button"
                                     onClick={handleRegenerateCode}
                                     disabled={regeneratingCode}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg disabled:opacity-50"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     {regeneratingCode ? 'Generating...' : camp.inventory_access_code ? 'Regenerate Code' : 'Generate Code'}
                                 </button>
@@ -653,7 +653,7 @@ function AdminEditCamp() {
 
                         {/* Additional Information */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Additional Information</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Additional Information</h3>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -686,7 +686,7 @@ function AdminEditCamp() {
                         <div className="pt-6 border-t border-white/10 flex gap-4 justify-end">
                             <Link
                                 to="/admin/manage-camps"
-                                className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
+                                className="px-6 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
                             >
                                 Cancel
                             </Link>

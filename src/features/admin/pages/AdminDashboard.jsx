@@ -52,7 +52,6 @@ const ACTION_CARDS = [
     {
         to: '/admin/command',
         icon: IconSiren,
-        color: 'danger',
         title: 'Command Dashboard',
         desc: 'AI situation map, priority queue, resource allocation',
         cta: 'Open Dashboard',
@@ -61,7 +60,6 @@ const ACTION_CARDS = [
         to: '/admin/inventory',
         icon: null,
         emoji: '📦',
-        color: 'primary',
         title: 'Inventory',
         desc: 'Cross-camp stock levels and low-stock alerts',
         cta: 'View Inventory',
@@ -130,7 +128,7 @@ function AdminDashboard() {
 
     if (loading) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
@@ -141,7 +139,7 @@ function AdminDashboard() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell font-sans">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
@@ -161,10 +159,10 @@ function AdminDashboard() {
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-4">
-                            <Link to="/" className="text-slate-400 hover:text-white text-sm">
+                            <Link to="/" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm">
                                 ← Home
                             </Link>
-                            <h1 className="flex items-center gap-2 text-xl font-bold text-white">
+                            <h1 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                                 <IconShieldLock className="h-5 w-5 text-primary-400" />
                                 Admin Portal
                             </h1>
@@ -191,7 +189,7 @@ function AdminDashboard() {
                             <IconShieldLock className="h-5 w-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl md:text-2xl font-black text-white">Admin Dashboard</h2>
+                            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">Admin Dashboard</h2>
                             <p className="text-slate-300 text-xs mt-0.5">Manage camps, records, and system data</p>
                         </div>
                     </div>
@@ -215,22 +213,22 @@ function AdminDashboard() {
 
                 {/* Action Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {ACTION_CARDS.map(({ to, icon: Icon, emoji, color, title, desc, cta }) => {
+                    {ACTION_CARDS.map(({ to, icon: Icon, emoji, color, title, desc, cta }, i) => {
                         const styles = COLOR_STYLES[color];
                         return (
                             <Link key={to} to={to} className="block group">
-                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-5 hover:border-white/25 hover:bg-white/[0.08]">
+                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-5 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.08]">
                                     <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${styles.bar}`}></div>
                                     <div className="flex items-center gap-3 mb-3">
                                         <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${styles.badge}`}>
                                             {Icon ? <Icon className="h-6 w-6" /> : <span className="text-2xl leading-none">{emoji}</span>}
                                         </div>
-                                        <h3 className={`text-lg font-bold text-white ${styles.text}`}>{title}</h3>
+                                        <h3 className={`text-lg font-bold text-slate-900 dark:text-white ${styles.text}`}>{title}</h3>
                                     </div>
                                     <p className="text-slate-300 text-sm mb-3">
                                         {desc}
                                     </p>
-                                    <span className={`font-medium text-sm group-hover:underline ${styles.cta}`}>
+                                    <span className="font-medium text-sm text-primary-300 group-hover:underline">
                                         {cta} →
                                     </span>
                                 </div>

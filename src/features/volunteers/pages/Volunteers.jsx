@@ -100,7 +100,7 @@ function Volunteers() {
 
     if (saved) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div
                     className="absolute inset-0 pointer-events-none opacity-10"
                     style={{
@@ -116,11 +116,11 @@ function Volunteers() {
                                 <IconUsers className="h-5 w-5" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-black text-white md:text-2xl">Welcome, {saved.name}</h1>
+                                <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">Welcome, {saved.name}</h1>
                                 <p className="mt-0.5 text-sm text-slate-300">Manage your availability and assignments</p>
                             </div>
                         </div>
-                        <button onClick={handleForget} className="flex-shrink-0 text-xs text-slate-400 underline hover:text-white">
+                        <button onClick={handleForget} className="flex-shrink-0 text-xs text-slate-400 underline hover:text-slate-900 dark:hover:text-white transition-colors">
                             Not you? Switch volunteer
                         </button>
                     </div>
@@ -137,7 +137,7 @@ function Volunteers() {
                     )}
 
                     <div className="card mb-6">
-                        <h2 className="text-lg font-bold text-white mb-3">Your Availability</h2>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Your Availability</h2>
                         <div className="flex gap-2">
                             {['available', 'busy', 'offline'].map(status => (
                                 <button
@@ -152,7 +152,7 @@ function Volunteers() {
                     </div>
 
                     <div className="card">
-                        <h2 className="text-lg font-bold text-white mb-3">Your Assignments</h2>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Your Assignments</h2>
                         {assignments.length === 0 && (
                             <p className="text-slate-400 text-sm">No assignments yet. The volunteer-matching AI runs periodically and will propose a task here when one fits your skills and location.</p>
                         )}
@@ -160,7 +160,7 @@ function Volunteers() {
                             {assignments.map(a => (
                                 <div key={a.id} className="rounded-lg border border-white/10 bg-white/5 p-3">
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="font-semibold capitalize text-white">{a.task_type.replace('_', ' ')}</span>
+                                        <span className="font-semibold capitalize text-slate-900 dark:text-white">{a.task_type.replace('_', ' ')}</span>
                                         <span className={`text-xs px-2 py-1 rounded-full ${a.status === 'proposed' ? 'bg-amber-500/15 text-amber-300' : a.status === 'accepted' ? 'bg-success-500/15 text-success-300' : 'bg-white/10 text-slate-300'}`}>
                                             {a.status}
                                         </span>
@@ -199,7 +199,7 @@ function Volunteers() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -215,7 +215,7 @@ function Volunteers() {
                             <IconUsers className="h-5 w-5" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black text-white md:text-2xl">Volunteer Registration</h1>
+                            <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">Volunteer Registration</h1>
                             <p className="mt-0.5 text-sm text-slate-300">
                                 Register once - no password needed. The AI assignment matcher will propose the nearest task that fits your skills, and you can accept or decline.
                             </p>
@@ -270,8 +270,8 @@ function Volunteers() {
                     <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-2">District</label>
                         <select value={district} onChange={(e) => setDistrict(e.target.value)} className="input-field">
-                            <option value="">Select District</option>
-                            {SRI_LANKA_DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
+                            <option value="" className="text-slate-900">Select District</option>
+                            {SRI_LANKA_DISTRICTS.map(d => <option key={d} value={d} className="text-slate-900">{d}</option>)}
                         </select>
                     </div>
                     <div>

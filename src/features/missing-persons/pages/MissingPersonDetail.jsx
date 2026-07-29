@@ -65,7 +65,7 @@ function MissingPersonDetail({ role: propRole }) {
     // Show loading while data is being fetched
     if (!isInitialized) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
                     <p className="text-slate-300">Loading...</p>
@@ -76,9 +76,9 @@ function MissingPersonDetail({ role: propRole }) {
 
     if (!person) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="text-center px-4">
-                    <h1 className="text-2xl font-bold text-white mb-4">Person Not Found</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Person Not Found</h1>
                     <p className="text-slate-300 mb-6">The missing person record could not be found.</p>
                     <button onClick={() => navigate(-1)} className="btn-primary">
                         ← Go Back
@@ -143,7 +143,7 @@ function MissingPersonDetail({ role: propRole }) {
     const canMarkFound = role === 'responder' && status === 'Active';
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 {/* Header - Single Row */}
                 <div className="mb-4">
@@ -152,7 +152,7 @@ function MissingPersonDetail({ role: propRole }) {
                             <IconUserSearch className="h-6 w-6 sm:h-7 sm:w-7" />
                         </div>
                         <div>
-                            <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
+                            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                                 {person.name} <span className="text-xs sm:text-sm text-slate-500 font-normal ml-2 sm:ml-3">ID: #{person.id} • {reportedAt ? formatDate(reportedAt) : 'N/A'}</span>
                             </h1>
                         </div>
@@ -171,15 +171,15 @@ function MissingPersonDetail({ role: propRole }) {
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center mb-3">
                                 <div className="border-r border-white/10">
                                     <p className="text-xs text-slate-500 mb-1">Age</p>
-                                    <p className="text-base font-bold text-white">{person.age || 'N/A'}</p>
+                                    <p className="text-base font-bold text-slate-900 dark:text-white">{person.age || 'N/A'}</p>
                                 </div>
                                 <div className="border-r border-white/10">
                                     <p className="text-xs text-slate-500 mb-1">Gender</p>
-                                    <p className="text-base font-bold text-white capitalize">{person.gender || 'N/A'}</p>
+                                    <p className="text-base font-bold text-slate-900 dark:text-white capitalize">{person.gender || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-500 mb-1">Status</p>
-                                    <p className="text-sm font-bold text-white">{getTimeSince(lastSeenDate)}</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{getTimeSince(lastSeenDate)}</p>
                                 </div>
                             </div>
                         </div>
@@ -204,11 +204,11 @@ function MissingPersonDetail({ role: propRole }) {
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <p className="text-xs text-slate-500 mb-0.5">Name</p>
-                                    <p className="text-sm font-medium text-white">{reporterName || 'N/A'}</p>
+                                    <p className="text-sm font-medium text-slate-900 dark:text-white">{reporterName || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-500 mb-0.5">Phone</p>
-                                    <p className="text-sm font-medium text-white">{contactNumber || 'N/A'}</p>
+                                    <p className="text-sm font-medium text-slate-900 dark:text-white">{contactNumber || 'N/A'}</p>
                                 </div>
                             </div>
                             {foundByContact && (
@@ -226,7 +226,7 @@ function MissingPersonDetail({ role: propRole }) {
                                 <div className="flex gap-2.5 items-start">
                                     <div className="w-7 h-7 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold text-white">Reported</p>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Reported</p>
                                         <p className="text-xs text-slate-400">{reportedAt ? formatDate(reportedAt) : 'N/A'} • {reporterName || 'Anonymous'}</p>
                                     </div>
                                 </div>
@@ -236,7 +236,7 @@ function MissingPersonDetail({ role: propRole }) {
                                             <IconCheck className="h-3.5 w-3.5" />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-sm font-semibold text-white">Found</p>
+                                            <p className="text-sm font-semibold text-slate-900 dark:text-white">Found</p>
                                             <p className="text-xs text-slate-400">{formatDate(foundAt)}</p>
                                         </div>
                                     </div>
@@ -284,11 +284,11 @@ function MissingPersonDetail({ role: propRole }) {
                                     <div className="space-y-2">
                                         <div>
                                             <p className="text-xs text-slate-500 mb-0.5">Location</p>
-                                            <p className="text-sm text-white">{lastSeenLocation?.address || 'N/A'}</p>
+                                            <p className="text-sm text-slate-900 dark:text-white">{lastSeenLocation?.address || 'N/A'}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 mb-0.5">Date & Time</p>
-                                            <p className="text-sm text-white">{lastSeenDate ? formatDate(lastSeenDate) : 'N/A'}</p>
+                                            <p className="text-sm text-slate-900 dark:text-white">{lastSeenDate ? formatDate(lastSeenDate) : 'N/A'}</p>
                                         </div>
                                     </div>
 
@@ -307,19 +307,19 @@ function MissingPersonDetail({ role: propRole }) {
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                         <p className="text-xs text-slate-400">🌡️ Temp</p>
-                                                        <p className="text-base font-bold text-white">{weather.temperature_2m}°C</p>
+                                                        <p className="text-base font-bold text-slate-900 dark:text-white">{weather.temperature_2m}°C</p>
                                                     </div>
                                                     <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                         <p className="text-xs text-slate-400">💧 Humidity</p>
-                                                        <p className="text-base font-bold text-white">{weather.relative_humidity_2m}%</p>
+                                                        <p className="text-base font-bold text-slate-900 dark:text-white">{weather.relative_humidity_2m}%</p>
                                                     </div>
                                                     <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                         <p className="text-xs text-slate-400">💨 Wind</p>
-                                                        <p className="text-sm font-bold text-white">{weather.wind_speed_10m} km/h</p>
+                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{weather.wind_speed_10m} km/h</p>
                                                     </div>
                                                     <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                         <p className="text-xs text-slate-400">☁️ Sky</p>
-                                                        <p className="text-xs font-bold text-white">{getWeatherDescription(weather.weather_code)}</p>
+                                                        <p className="text-xs font-bold text-slate-900 dark:text-white">{getWeatherDescription(weather.weather_code)}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -380,7 +380,7 @@ function MissingPersonDetail({ role: propRole }) {
                 {showConfirmDialog && (
                     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
                         <div className="bg-slate-900 border border-white/10 rounded-lg shadow-2xl max-w-md w-full p-4">
-                            <h3 className="text-lg font-bold text-white mb-2">Confirm Found</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Confirm Found</h3>
                             <p className="text-sm text-slate-300 mb-3">Confirm that this person has been found.</p>
 
                             <div className="space-y-2.5 mb-4">
@@ -403,7 +403,7 @@ function MissingPersonDetail({ role: propRole }) {
                                         </span>
                                     ) : 'Confirm'}
                                 </button>
-                                <button onClick={() => { setShowConfirmDialog(false); setFoundContact(''); setFoundNotes(''); }} disabled={isSubmitting} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">Cancel</button>
+                                <button onClick={() => { setShowConfirmDialog(false); setFoundContact(''); setFoundNotes(''); }} disabled={isSubmitting} className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">Cancel</button>
                             </div>
                         </div>
                     </div>

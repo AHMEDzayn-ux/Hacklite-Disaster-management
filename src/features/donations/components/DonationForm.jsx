@@ -175,7 +175,7 @@ function DonationForm({ onSuccess }) {
 
     const renderStep1 = () => (
         <div>
-            <h3 className="text-base font-bold text-white mb-3">Choose Your Impact</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">Choose Your Impact</h3>
 
             {/* Preset Amounts */}
             <div className="grid grid-cols-3 gap-2 mb-3">
@@ -238,7 +238,7 @@ function DonationForm({ onSuccess }) {
     const renderStep2 = () => (
         <div>
             <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-bold text-white">Your Information</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Your Information</h3>
                 <button
                     type="button"
                     onClick={autofillTestData}
@@ -349,13 +349,13 @@ function DonationForm({ onSuccess }) {
 
     const renderStep3 = () => (
         <div>
-            <h3 className="text-base font-bold text-white mb-3">Payment Details</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">Payment Details</h3>
 
             {/* Amount Summary */}
             <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
                 <div className="flex justify-between items-center">
                     <span className="text-sm text-slate-300 font-medium">Donation Amount:</span>
-                    <span className="text-lg font-bold text-white">
+                    <span className="text-lg font-bold text-slate-900 dark:text-white">
                         {getCurrencySymbol()}{getFinalAmount().toLocaleString()}
                     </span>
                 </div>
@@ -416,7 +416,7 @@ function DonationForm({ onSuccess }) {
                 <button
                     type="submit"
                     disabled={isProcessing || !stripe}
-                    className="flex-1 bg-success-600 hover:bg-success-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm flex items-center justify-center gap-2"
+                    className="flex-1 bg-success-600 hover:bg-success-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm transition-colors duration-150 flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <>

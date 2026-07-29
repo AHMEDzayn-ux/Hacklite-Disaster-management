@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '@/lib/leafletIconFix';
@@ -8,7 +8,7 @@ import HeatmapLayer from '@/components/map/HeatmapLayer';
 import MapFrame from '@/components/map/MapFrame';
 import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
 import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
-import { defaultMapConfig, districtBounds, allDistricts } from '@/lib/mapConfig';
+import { defaultMapConfig, sriLankaFitBounds, districtBounds, allDistricts } from '@/lib/mapConfig';
 import {
     IconGrid,
     IconBolt,
@@ -187,7 +187,7 @@ function Card({ title, icon: Icon, right, children, className = '' }) {
             {(title || right) && (
                 <div className="flex items-center justify-between mb-3 gap-2">
                     {title && (
-                        <h3 className="flex items-center gap-1.5 font-semibold text-white text-sm truncate min-w-0">
+                        <h3 className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white text-sm truncate min-w-0">
                             {Icon && <Icon className="h-4 w-4 text-primary-300 flex-shrink-0" />}
                             <span className="truncate">{title}</span>
                         </h3>
@@ -204,8 +204,6 @@ const ICON_BADGE = {
     primary: 'bg-primary-500/15 text-primary-300',
     danger: 'bg-danger-500/15 text-danger-300',
     success: 'bg-success-500/15 text-success-300',
-    orange: 'bg-orange-500/15 text-orange-300',
-    emerald: 'bg-emerald-500/15 text-emerald-300',
     slate: 'bg-white/10 text-slate-300',
 };
 
@@ -214,7 +212,8 @@ function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor =
         <button
             type="button"
             onClick={onClick}
-            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
+            title={sub || undefined}
+            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full transition-colors duration-150 ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
         >
             <div className="flex items-start justify-between gap-2">
                 <p className={`text-3xl font-extrabold leading-none ${accent}`}>{value}</p>
@@ -273,7 +272,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     return (
         <div className="space-y-4">
             {/* Global filter bar */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
+            <div className="rounded-2xl border border-white/10 bg-white/95 dark:bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
                 <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
                     {Object.keys(RANGE_CONF).map(r => (
                         <button
@@ -288,7 +287,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                 <select
                     value={district}
                     onChange={e => setDistrict(e.target.value)}
-                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50"
+                    className="text-xs bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
                 >
                     <option value="all" className="bg-slate-900 text-white">All districts</option>
                     {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
@@ -317,6 +316,17 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 // ---------------------------------------------------------------------------
 // OVERVIEW: mission KPIs, AI summary, live map, needs-attention, timeline
 // ---------------------------------------------------------------------------
+
+// Fits the map to Sri Lanka's coastline on mount using Leaflet's own
+// fitBounds() rather than a guessed center/zoom, so the island fills the
+// viewport regardless of the container's actual rendered size.
+function FitSriLanka() {
+    const map = useMap();
+    useEffect(() => {
+        map.fitBounds(sriLankaFitBounds, { padding: [4,4] });
+    }, [map]);
+    return null;
+}
 
 function OverviewView({ A, layers, setLayers, navigate, range }) {
     return (
@@ -368,6 +378,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                         style={{ height: '100%', width: '100%' }}
                         preferCanvas
                     >
+                        <FitSriLanka />
                         <TileLayer
                             attribution='&copy; OpenStreetMap'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -411,18 +422,33 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                         <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
                     ) : (
                         <div className="divide-y divide-white/10 -mx-1">
-                            {A.urgentFeed.map(item => (
-                                <div key={`${item.kind}-${item.id}`} onClick={() => navigate(item.link)} className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg">
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <span className="text-base flex-shrink-0">{item.icon}</span>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-semibold text-white truncate">{item.title}</p>
-                                            <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
+                            {A.urgentFeed.map(item => {
+                                const isCritical = item.icon === '🚨';
+                                const isHigh = item.icon === '⚠️';
+                                const badge = item.kind === 'disaster'
+                                    ? { text: isCritical ? 'Critical' : 'High', tone: isCritical ? 'bg-danger-500/15 text-danger-300' : 'bg-amber-500/15 text-amber-300' }
+                                    : { text: 'Missing', tone: 'bg-primary-500/15 text-primary-300' };
+                                return (
+                                    <div
+                                        key={`${item.kind}-${item.id}`}
+                                        onClick={() => navigate(item.link)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.link); } }}
+                                        role="button"
+                                        tabIndex={0}
+                                        className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
+                                    >
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <span className="text-base flex-shrink-0">{item.icon}</span>
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{item.title}</p>
+                                                <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
+                                            </div>
                                         </div>
+                                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${badge.tone}`}>{badge.text}</span>
+                                        <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
                                     </div>
-                                    <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </Card>
@@ -435,7 +461,14 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                         <div className="relative pl-4 max-h-[340px] overflow-y-auto">
                             <span className="absolute left-1 top-1 bottom-1 w-px bg-white/10" />
                             {A.timeline.map((ev, i) => (
-                                <div key={i} onClick={() => ev.link && navigate(ev.link)} className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group' : ''}`}>
+                                <div
+                                    key={i}
+                                    onClick={() => ev.link && navigate(ev.link)}
+                                    onKeyDown={(e) => { if (ev.link && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); navigate(ev.link); } }}
+                                    role={ev.link ? 'button' : undefined}
+                                    tabIndex={ev.link ? 0 : undefined}
+                                    className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400' : ''}`}
+                                >
                                     <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
                                     <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
                                     <p className="text-xs text-slate-500">{ev.time}</p>
@@ -553,7 +586,7 @@ function AiView({ A }) {
                 {A.hotspots.map((h, i) => (
                     <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-3">
                         <p className="text-xs font-medium text-slate-400">{h.icon} {h.label}</p>
-                        <p className="text-lg font-bold text-white mt-1 truncate">{h.value}</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 truncate">{h.value}</p>
                         <p className="text-xs text-slate-500 truncate">{h.detail}</p>
                     </div>
                 ))}
@@ -585,7 +618,7 @@ function AiView({ A }) {
                             {A.duplicates.map((d, i) => (
                                 <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-white">{d.icon} {d.title}</p>
+                                        <p className="text-xs font-semibold text-slate-900 dark:text-white">{d.icon} {d.title}</p>
                                         <span className="text-xs font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
                                     </div>
                                     <p className="text-xs text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
@@ -605,7 +638,7 @@ function AiView({ A }) {
                         {A.recommendations.map((r, i) => (
                             <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2.5 flex flex-col">
                                 <div className="flex items-start justify-between gap-2">
-                                    <p className="text-xs font-semibold text-white">{r.icon} {r.action}</p>
+                                    <p className="text-xs font-semibold text-slate-900 dark:text-white">{r.icon} {r.action}</p>
                                     <span className={`text-xs font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
                                 </div>
                                 <p className="text-xs text-slate-400 mt-1 flex-1">{r.reason}</p>
@@ -900,7 +933,7 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
 }
 
 // ---------------------------------------------------------------------------
-// Page shell — top-level category tabs wrapping the Command Center + lists
+// Page shell — wraps the Command Center (the single operational pane)
 // ---------------------------------------------------------------------------
 
 function RespondDashboard() {
@@ -920,7 +953,7 @@ function RespondDashboard() {
     const loading = !mpInit || !dInit || !arInit || !cInit;
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>

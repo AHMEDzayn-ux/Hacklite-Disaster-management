@@ -81,7 +81,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
             {/* Recent Donations List */}
             <div className="rounded-xl border border-white/10 bg-white/[0.04] overflow-hidden">
                 <div className="bg-white/[0.03] p-3 border-b border-white/10">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <IconHeart className="h-4 w-4 text-slate-400" /> Recent Donations
                     </h3>
                     <p className="text-slate-500 text-xs">Live updates from our donors</p>
@@ -94,7 +94,10 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                 {/* Left: Donor Info */}
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-0.5">
-                                        <span className="text-sm font-semibold text-white truncate">
+                                        <span className="text-sm">
+                                            {donation.is_anonymous ? '🙏' : '👤'}
+                                        </span>
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                                             {formatDonorName(donation)}
                                         </span>
                                     </div>
@@ -147,7 +150,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                             {[...recentDonations, ...recentDonations].map((donation, index) => (
                                 <div
                                     key={`${donation.id}-${index}`}
-                                    className="flex items-center gap-3 text-white whitespace-nowrap"
+                                    className="flex items-center gap-3 text-slate-900 dark:text-white whitespace-nowrap"
                                 >
                                     <span>🎁</span>
                                     <span className="font-semibold">

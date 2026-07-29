@@ -171,7 +171,7 @@ function DisasterReportsList({ role = 'responder' }) {
     // Show loading state while initializing
     if (isInitializing) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -183,7 +183,7 @@ function DisasterReportsList({ role = 'responder' }) {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -200,7 +200,7 @@ function DisasterReportsList({ role = 'responder' }) {
                                 <IconSiren className="h-5 w-5" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-black text-white md:text-2xl">
+                                <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">
                                     {role === 'responder' ? 'Disaster Response Operations' : 'Disaster Reports'}
                                 </h1>
                                 <p className="mt-0.5 text-sm text-slate-300">
@@ -253,31 +253,31 @@ function DisasterReportsList({ role = 'responder' }) {
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
                             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-field">
-                                <option value="all">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="resolved">Resolved</option>
+                                <option value="all" className="text-slate-900">All Status</option>
+                                <option value="active" className="text-slate-900">Active</option>
+                                <option value="resolved" className="text-slate-900">Resolved</option>
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">Type</label>
                             <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="input-field">
-                                <option value="all">All Types</option>
-                                <option value="flood">Flood</option>
-                                <option value="landslide">Landslide</option>
-                                <option value="fire">Fire</option>
-                                <option value="cyclone">Cyclone</option>
-                                <option value="earthquake">Earthquake</option>
-                                <option value="drought">Drought</option>
+                                <option value="all" className="text-slate-900">All Types</option>
+                                <option value="flood" className="text-slate-900">Flood</option>
+                                <option value="landslide" className="text-slate-900">Landslide</option>
+                                <option value="fire" className="text-slate-900">Fire</option>
+                                <option value="cyclone" className="text-slate-900">Cyclone</option>
+                                <option value="earthquake" className="text-slate-900">Earthquake</option>
+                                <option value="drought" className="text-slate-900">Drought</option>
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">Severity</label>
                             <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)} className="input-field">
-                                <option value="all">All Severities</option>
-                                <option value="critical">Critical</option>
-                                <option value="high">High</option>
-                                <option value="moderate">Moderate</option>
-                                <option value="low">Low</option>
+                                <option value="all" className="text-slate-900">All Severities</option>
+                                <option value="critical" className="text-slate-900">Critical</option>
+                                <option value="high" className="text-slate-900">High</option>
+                                <option value="moderate" className="text-slate-900">Moderate</option>
+                                <option value="low" className="text-slate-900">Low</option>
                             </select>
                         </div>
                         <div className="flex items-end">
@@ -327,7 +327,7 @@ function DisasterReportsList({ role = 'responder' }) {
 
                                     <div className="space-y-3">
                                         <div className="flex items-start justify-between gap-2">
-                                            <h3 className="text-lg font-bold text-white capitalize flex items-center gap-2">
+                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2">
                                                 <span>{getDisasterIcon(disasterType)}</span>
                                                 {disasterType?.replace('-', ' ') || 'Unknown'}
                                             </h3>

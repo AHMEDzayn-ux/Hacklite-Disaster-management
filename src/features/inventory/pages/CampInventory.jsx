@@ -142,7 +142,7 @@ function CampInventory() {
 
     if (!unlocked) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center px-4">
+            <div className="page-shell flex items-center justify-center px-4">
                 <div
                     className="absolute inset-0 pointer-events-none opacity-10"
                     style={{
@@ -154,7 +154,7 @@ function CampInventory() {
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
                         <IconGrid className="h-6 w-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-1 text-center">Camp Inventory</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 text-center">Camp Inventory</h1>
                     <p className="text-sm text-slate-400 text-center mb-6">Enter the camp ID and access code given by your coordinator.</p>
                     <form onSubmit={handleUnlock} className="space-y-4">
                         <input
@@ -187,7 +187,7 @@ function CampInventory() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans pb-24">
+        <div className="page-shell pb-24">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -223,7 +223,7 @@ function CampInventory() {
                             <div key={`${item.item_name}-${item.category}`} className={`card p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
-                                        <div className="font-bold text-white">{item.item_name}</div>
+                                        <div className="font-bold text-slate-900 dark:text-white">{item.item_name}</div>
                                         <div className="text-xs text-slate-400">{CATEGORY_LABELS[item.category] || item.category}</div>
                                     </div>
                                     <div className={`text-2xl font-extrabold ${low ? 'text-danger-400' : 'text-white'}`}>
@@ -256,7 +256,7 @@ function CampInventory() {
                 {/* Add a new item type */}
                 <div className="mt-6 card p-4">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-bold text-white">➕ Add New Item</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white">➕ Add New Item</h3>
                         <button
                             type="button"
                             onClick={autofillNewItem}
@@ -278,7 +278,7 @@ function CampInventory() {
                             onChange={(e) => setNewItemCategory(e.target.value)}
                             className="input-field text-lg py-3"
                         >
-                            {INVENTORY_CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>)}
+                            {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
                         </select>
                         <input
                             type="number"
@@ -304,7 +304,7 @@ function CampInventory() {
                 <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-20 p-4">
                     <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                            <h3 className="text-xl font-bold text-white">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                 {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                             </h3>
                             <button
@@ -333,7 +333,7 @@ function CampInventory() {
                                 className="input-field text-sm"
                             />
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-white hover:bg-white/10 py-3 rounded-xl font-bold">Cancel</button>
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 py-3 rounded-xl font-bold transition-colors">Cancel</button>
                                 <button type="submit" disabled={submitting} className="flex-1 btn-primary rounded-xl disabled:opacity-50">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>

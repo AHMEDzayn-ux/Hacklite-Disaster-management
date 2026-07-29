@@ -4,7 +4,7 @@ import { IconSiren, IconPhone, IconUserSearch, IconTent, IconPawPrint } from '@/
 
 function NotFound() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -23,7 +23,7 @@ function NotFound() {
                         <IconSiren className="h-5 w-5" />
                     </div>
 
-                    <h2 className="mb-1.5 text-xl font-bold text-white md:text-2xl">
+                    <h2 className="mb-1.5 text-xl font-bold text-slate-900 dark:text-white md:text-2xl">
                         Page Not Found
                     </h2>
                     <p className="mb-3 text-sm text-slate-300">
@@ -33,20 +33,20 @@ function NotFound() {
                     <div className="flex flex-col justify-center gap-3 sm:flex-row">
                         <Link
                             to="/"
-                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-6 py-2 font-bold text-white shadow-lg shadow-danger-500/30 hover:shadow-xl hover:shadow-danger-500/40"
+                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-6 py-2 font-bold text-white shadow-lg shadow-danger-500/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-danger-500/40"
                         >
                             Go Home
                         </Link>
                         <Link
                             to="/emergency"
-                            className="rounded-lg border border-white/20 bg-white/10 px-6 py-2 font-bold text-white backdrop-blur-md hover:bg-white/20"
+                            className="rounded-lg border border-white/20 bg-white/10 px-6 py-2 font-bold text-slate-900 dark:text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                         >
                             Emergency Contacts
                         </Link>
                     </div>
 
                     <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-left backdrop-blur-md">
-                        <h3 className="mb-2 text-base font-bold text-white">
+                        <h3 className="mb-2 text-base font-bold text-slate-900 dark:text-white">
                             Quick Links
                         </h3>
                         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -58,7 +58,7 @@ function NotFound() {
                                     <IconUserSearch className="h-5 w-5" />
                                 </span>
                                 <div>
-                                    <p className="font-semibold text-white">Missing Persons</p>
+                                    <p className="font-semibold text-slate-900 dark:text-white">Missing Persons</p>
                                     <p className="text-sm text-slate-400">View reports</p>
                                 </div>
                             </Link>
@@ -70,7 +70,7 @@ function NotFound() {
                                     <IconSiren className="h-5 w-5" />
                                 </span>
                                 <div>
-                                    <p className="font-semibold text-white">Disaster Reports</p>
+                                    <p className="font-semibold text-slate-900 dark:text-white">Disaster Reports</p>
                                     <p className="text-sm text-slate-400">Check alerts</p>
                                 </div>
                             </Link>
@@ -82,7 +82,7 @@ function NotFound() {
                                     <IconTent className="h-5 w-5" />
                                 </span>
                                 <div>
-                                    <p className="font-semibold text-white">Relief Camps</p>
+                                    <p className="font-semibold text-slate-900 dark:text-white">Relief Camps</p>
                                     <p className="text-sm text-slate-400">Find shelter</p>
                                 </div>
                             </Link>
@@ -94,7 +94,7 @@ function NotFound() {
                                     <IconPawPrint className="h-5 w-5" />
                                 </span>
                                 <div>
-                                    <p className="font-semibold text-white">Animal Rescue</p>
+                                    <p className="font-semibold text-slate-900 dark:text-white">Animal Rescue</p>
                                     <p className="text-sm text-slate-400">Report animals</p>
                                 </div>
                             </Link>

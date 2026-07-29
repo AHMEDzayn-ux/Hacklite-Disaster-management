@@ -149,7 +149,7 @@ function CampsList() {
     // Show loading state while initializing
     if (isInitializing) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -161,7 +161,7 @@ function CampsList() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -180,7 +180,7 @@ function CampsList() {
                                 <IconTent className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-white">Relief Camps</h1>
+                                <h1 className="text-xl font-bold text-slate-900 dark:text-white">Relief Camps</h1>
                                 <div className="hidden sm:flex items-center gap-3 text-sm mt-1">
                                     <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
                                         {activeCount} Active
@@ -225,45 +225,45 @@ function CampsList() {
                         <select
                             value={districtFilter}
                             onChange={(e) => setDistrictFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
                         >
-                            <option value="all">All Districts</option>
+                            <option value="all" className="text-slate-900">All Districts</option>
                             {allDistricts.map(district => (
-                                <option key={district} value={district}>{district}</option>
+                                <option key={district} value={district} className="text-slate-900">{district}</option>
                             ))}
                         </select>
 
                         <select
                             value={needsFilter}
                             onChange={(e) => setNeedsFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
                         >
-                            <option value="all">All Needs</option>
+                            <option value="all" className="text-slate-900">All Needs</option>
                             {allNeeds.map((need, idx) => (
-                                <option key={need + '-' + idx} value={need}>{need}</option>
+                                <option key={need + '-' + idx} value={need} className="text-slate-900">{need}</option>
                             ))}
                         </select>
 
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
                         >
-                            <option value="all">All Status</option>
-                            <option value="active">Active Only</option>
-                            <option value="closed">Closed</option>
+                            <option value="all" className="text-slate-900">All Status</option>
+                            <option value="active" className="text-slate-900">Active Only</option>
+                            <option value="closed" className="text-slate-900">Closed</option>
                         </select>
 
                         <select
                             value={typeFilter}
                             onChange={(e) => setTypeFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
                         >
-                            <option value="all">All Types</option>
-                            <option value="temporary-shelter">Temporary Shelter</option>
-                            <option value="emergency-evacuation">Emergency Evacuation</option>
-                            <option value="long-term-relief">Long-term Relief</option>
-                            <option value="medical-facility">Medical Facility</option>
+                            <option value="all" className="text-slate-900">All Types</option>
+                            <option value="temporary-shelter" className="text-slate-900">Temporary Shelter</option>
+                            <option value="emergency-evacuation" className="text-slate-900">Emergency Evacuation</option>
+                            <option value="long-term-relief" className="text-slate-900">Long-term Relief</option>
+                            <option value="medical-facility" className="text-slate-900">Medical Facility</option>
                         </select>
 
                         <div className="relative">
@@ -273,7 +273,7 @@ function CampsList() {
                                 placeholder="Search camps..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="text-sm bg-white/5 border border-white/15 text-white placeholder:text-slate-500 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
+                                className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
                             />
                         </div>
 
@@ -304,7 +304,7 @@ function CampsList() {
                         <div className="mb-3 flex justify-center text-amber-300">
                             <IconTent className="h-12 w-12" />
                         </div>
-                        <h2 className="text-xl font-bold text-white mb-1">No Relief Camps Available</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">No Relief Camps Available</h2>
                         <p className="text-slate-400 text-sm">There are currently no registered relief camps.</p>
                     </div>
                 ) : (
@@ -316,7 +316,7 @@ function CampsList() {
                                         <div className="mb-2 flex justify-center text-slate-500">
                                             <IconSearch className="h-8 w-8" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-white mb-1">No Camps Match Filters</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Camps Match Filters</h3>
                                         <p className="text-slate-400 text-sm">Try adjusting your filter criteria</p>
                                     </div>
                                 ) : (
@@ -331,7 +331,7 @@ function CampsList() {
                                                 {/* Header */}
                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                     <div className="min-w-0 flex-1">
-                                                        <h3 className="text-sm font-bold text-white truncate flex items-center gap-1">
+                                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate flex items-center gap-1">
                                                             <span className="text-base">{getCampTypeIcon(camp.type || 'unknown')}</span>
                                                             {camp.name || 'Unnamed Camp'}
                                                         </h3>
@@ -414,7 +414,7 @@ function CampsList() {
                                         <div className="mb-2 flex justify-center text-slate-500">
                                             <IconSearch className="h-8 w-8" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-white mb-1">No Camps Match Filters</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Camps Match Filters</h3>
                                         <p className="text-slate-400 text-sm">Try adjusting your filter criteria</p>
                                     </div>
                                 ) : (
