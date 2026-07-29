@@ -6,6 +6,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { greenIcon, greyIcon } from '@/lib/leafletIconFix';
+import MapResizeFix from '@/components/map/MapResizeFix';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import { invalidateCache } from '@/lib/cacheManager';
 import { IconTent, IconSearch, IconGrid, IconMap, IconUsers, IconX, IconPhone } from '@/components/icons/Icons';
@@ -433,6 +434,7 @@ function CampsList() {
                                                 />
 
                                                 <MapController districtFilter={districtFilter} />
+                                                <MapResizeFix />
 
                                                 {districtFilter !== 'all' && districtBounds[districtFilter] && (
                                                     <Rectangle

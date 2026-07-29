@@ -6,6 +6,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
+import MapResizeFix from '@/components/map/MapResizeFix';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconUserSearch, IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconPhone, IconInfo, IconCheck } from '@/components/icons/Icons';
@@ -403,6 +404,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                 />
 
                                 <MapController districtFilter={districtFilter} />
+                                <MapResizeFix />
 
                                 {/* Show district boundary when filtered */}
                                 {districtFilter !== 'all' && districtBounds[districtFilter] && (

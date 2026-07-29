@@ -6,6 +6,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
+import MapResizeFix from '@/components/map/MapResizeFix';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconPawPrint, IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconX, IconInfo } from '@/components/icons/Icons';
@@ -451,6 +452,7 @@ function AnimalRescueList({ role = 'responder' }) {
                                     />
 
                                     <MapController districtFilter={districtFilter} />
+                                    <MapResizeFix />
 
                                     {/* District boundary overlay */}
                                     {districtFilter !== 'all' && districtBounds[districtFilter] && (

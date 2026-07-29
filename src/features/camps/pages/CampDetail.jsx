@@ -4,6 +4,8 @@ import { useCampStore } from '@/store';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
+import { defaultMapConfig } from '@/lib/mapConfig';
+import MapResizeFix from '@/components/map/MapResizeFix';
 
 function CampDetail() {
     const { id } = useParams();
@@ -379,8 +381,17 @@ function CampDetail() {
                                     </div>
                                     {hasLocation && (
                                         <div style={{ height: '300px' }} className="rounded-2xl overflow-hidden border border-white/15 shadow-xl">
-                                            <MapContainer center={[lat, lng]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                                            <MapContainer
+                                                center={[lat, lng]}
+                                                zoom={15}
+                                                minZoom={defaultMapConfig.minZoom}
+                                                maxZoom={defaultMapConfig.maxZoom}
+                                                maxBounds={defaultMapConfig.maxBounds}
+                                                maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                                style={{ height: '100%', width: '100%' }}
+                                            >
                                                 <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                                <MapResizeFix />
                                                 <Marker position={[lat, lng]}>
                                                     <Popup>
                                                         <div className="p-2">

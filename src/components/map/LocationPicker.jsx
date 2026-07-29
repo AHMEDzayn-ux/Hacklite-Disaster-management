@@ -59,14 +59,25 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
 
             // Default to Sri Lanka center
             const defaultCenter = position || { lat: 7.8731, lng: 80.7718 };
+            const sriLankaBounds = [[5.5, 79.3], [10.2, 82.2]];
 
-            const map = L.map('location-map').setView([defaultCenter.lat, defaultCenter.lng], position ? 13 : 7);
+            const map = L.map('location-map', {
+                minZoom: 7,
+                maxZoom: 18,
+                maxBounds: sriLankaBounds,
+                maxBoundsViscosity: 1.0
+            }).setView([defaultCenter.lat, defaultCenter.lng], position ? 13 : 7);
 
             // Using OpenStreetMap (free, no API key required)
             // Can be replaced with Google Maps, Mapbox, etc.
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
+
+            // The container isn't laid out yet on the render that mounts it,
+            // so Leaflet can cache a stale size unless this runs after paint.
+            requestAnimationFrame(() => map.invalidateSize());
+            setTimeout(() => map.invalidateSize(), 300);
 
             let marker = null;
             if (position) {

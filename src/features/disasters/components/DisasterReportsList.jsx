@@ -6,6 +6,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
+import MapResizeFix from '@/components/map/MapResizeFix';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconSiren, IconSearch, IconGrid, IconMap, IconMapPin, IconUsers, IconX, IconInfo } from '@/components/icons/Icons';
@@ -394,6 +395,7 @@ function DisasterReportsList({ role = 'responder' }) {
                                     />
 
                                     <MapController districtFilter={districtFilter} />
+                                    <MapResizeFix />
 
                                     {districtFilter !== 'all' && districtBounds[districtFilter] && (
                                         <Rectangle

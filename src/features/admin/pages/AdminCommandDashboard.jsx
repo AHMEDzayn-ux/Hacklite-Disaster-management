@@ -16,6 +16,7 @@ import {
     fetchInFlightAllocationPlans, fetchLatestRoutePlans, fetchAgentRunHistory,
 } from '@/features/admin/services/aiAgentService';
 import { defaultMapConfig } from '@/lib/mapConfig';
+import MapResizeFix from '@/components/map/MapResizeFix';
 import { IconSiren, IconBolt, IconClock, IconGlobe } from '@/components/icons/Icons';
 
 /**
@@ -206,11 +207,20 @@ function AdminCommandDashboard() {
             <main className="relative z-10 mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Map: heatmap + camp markers + route polylines */}
                 <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl" style={{ height: '600px' }}>
-                    <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }}>
+                    <MapContainer
+                        center={defaultMapConfig.center}
+                        zoom={defaultMapConfig.zoom}
+                        minZoom={defaultMapConfig.minZoom}
+                        maxZoom={defaultMapConfig.maxZoom}
+                        maxBounds={defaultMapConfig.maxBounds}
+                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                        style={{ height: '100%', width: '100%' }}
+                    >
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
+                        <MapResizeFix />
                         <HeatmapLayer points={heatmapPoints} />
                         {camps.map(camp => (
                             <Marker key={camp.id} position={[camp.latitude, camp.longitude]} icon={occupancyIcon(camp)}>

@@ -4,6 +4,8 @@ import { useDisasterStore } from '@/store';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
+import { defaultMapConfig } from '@/lib/mapConfig';
+import MapResizeFix from '@/components/map/MapResizeFix';
 
 function DisasterReportDetail({ role: propRole }) {
     const { id } = useParams();
@@ -345,8 +347,17 @@ function DisasterReportDetail({ role: propRole }) {
                         <p className="text-sm font-semibold text-slate-200 mb-2">🗺️ Map View</p>
                         {disaster.location?.lat && disaster.location?.lng ? (
                             <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                <MapContainer center={[disaster.location.lat, disaster.location.lng]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                                <MapContainer
+                                    center={[disaster.location.lat, disaster.location.lng]}
+                                    zoom={15}
+                                    minZoom={defaultMapConfig.minZoom}
+                                    maxZoom={defaultMapConfig.maxZoom}
+                                    maxBounds={defaultMapConfig.maxBounds}
+                                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                    style={{ height: '100%', width: '100%' }}
+                                >
                                     <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    <MapResizeFix />
                                     <Marker position={[disaster.location.lat, disaster.location.lng]}>
                                         <Popup><div className="p-1"><p className="text-xs font-bold">{disasterType}</p><p className="text-xs text-gray-600">{disaster.location.address}</p></div></Popup>
                                     </Marker>
@@ -354,8 +365,17 @@ function DisasterReportDetail({ role: propRole }) {
                             </div>
                         ) : (
                             <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                <MapContainer center={[7.8731, 80.7718]} zoom={7} style={{ height: '100%', width: '100%' }}>
+                                <MapContainer
+                                    center={defaultMapConfig.center}
+                                    zoom={defaultMapConfig.zoom}
+                                    minZoom={defaultMapConfig.minZoom}
+                                    maxZoom={defaultMapConfig.maxZoom}
+                                    maxBounds={defaultMapConfig.maxBounds}
+                                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                    style={{ height: '100%', width: '100%' }}
+                                >
                                     <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                    <MapResizeFix />
                                 </MapContainer>
                                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-10 pointer-events-none">
                                     <p className="text-xs text-slate-200 bg-slate-900/90 px-2 py-1 rounded shadow">No specific location</p>
