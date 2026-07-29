@@ -52,10 +52,10 @@ The **Disaster Management Platform** enables efficient coordination of emergency
 | [🔧 API Reference](docs/API_REFERENCE.md)      | Service layer and database operations       |
 | [📱 User Guide](docs/USER_GUIDE.md)            | Guide for reporters, responders, and admins |
 | [👨‍💻 Developer Guide](docs/DEVELOPER_GUIDE.md)  | Technical guide for contributors            |
-| [🗄️ Supabase Setup](SUPABASE_SETUP.md)         | Database configuration guide                |
-| [💳 Stripe Setup](STRIPE_SETUP_GUIDE.md)       | Payment integration guide                   |
-| [🚀 Deployment](DEPLOYMENT.md)                 | AWS Amplify deployment guide                |
-| [🔒 Security Audit](SECURITY_AUDIT_REPORT.md)  | Security implementation report              |
+| [🗄️ Supabase Setup](docs/setup/SUPABASE_SETUP.md)         | Database configuration guide                |
+| [💳 Stripe Setup](docs/setup/STRIPE_SETUP_GUIDE.md)       | Payment integration guide                   |
+| [🚀 Deployment](docs/setup/DEPLOYMENT.md)                 | AWS Amplify deployment guide                |
+| [🔒 Security Audit](docs/security/SECURITY_AUDIT_REPORT.md)  | Security implementation report              |
 
 ---
 
@@ -227,7 +227,7 @@ See [API Reference](docs/API_REFERENCE.md) for full schema details.
 - ✅ PCI compliant payments via Stripe
 - ✅ Protected admin routes
 
-See [Security Audit Report](SECURITY_AUDIT_REPORT.md) for details.
+See [Security Audit Report](docs/security/SECURITY_AUDIT_REPORT.md) for details.
 
 ---
 

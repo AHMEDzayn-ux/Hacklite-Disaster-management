@@ -5,9 +5,8 @@ import {
     updateDocument, 
     deleteDocument,
     subscribeToTable,
-    uploadPhoto,
-    TABLES 
-} from '../services/supabaseService';
+    TABLES
+} from '@/lib/supabaseService';
 
 /**
  * Supabase-integrated Zustand stores

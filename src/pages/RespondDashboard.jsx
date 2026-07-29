@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../utils/leafletIconFix';
-import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '../utils/leafletIconFix';
-import HeatmapLayer from '../components/shared/HeatmapLayer';
-import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '../components/shared/Charts';
-import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '../store';
-import { defaultMapConfig, districtBounds, allDistricts } from '../utils/mapConfig';
-import DisasterReportsList from '../components/DisasterReportsList';
-import MissingPersonsList from '../components/MissingPersonsList';
-import AnimalRescueList from '../components/AnimalRescueList';
-import CampsList from '../components/CampsList';
+import '@/lib/leafletIconFix';
+import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '@/lib/leafletIconFix';
+import HeatmapLayer from '@/components/map/HeatmapLayer';
+import MapFrame from '@/components/map/MapFrame';
+import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
+import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
+import { defaultMapConfig, districtBounds, allDistricts } from '@/lib/mapConfig';
+import DisasterReportsList from '@/features/disasters/components/DisasterReportsList';
+import MissingPersonsList from '@/features/missing-persons/components/MissingPersonsList';
+import AnimalRescueList from '@/features/animal-rescue/components/AnimalRescueList';
+import CampsList from '@/features/camps/components/CampsList';
 import {
     IconLifeBuoy,
     IconGrid,
@@ -22,14 +23,11 @@ import {
     IconUserSearch,
     IconPawPrint,
     IconTent,
-    IconUsers,
     IconMap,
     IconMapPin,
     IconClock,
     IconCheck,
-    IconHeart,
-} from '../components/icons/Icons';
-import heroImage from '../assets/blue.png';
+} from '@/components/icons/Icons';
 
 /**
  * Responder Dashboard — AI-assisted Emergency Operations Center
@@ -190,7 +188,7 @@ const KIND_META = {
 
 function Card({ title, icon: Icon, right, children, className = '' }) {
     return (
-        <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 transition-colors duration-300 hover:border-white/20 ${className}`}>
+        <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 hover:border-white/20 ${className}`}>
             {(title || right) && (
                 <div className="flex items-center justify-between mb-3 gap-2">
                     {title && (
@@ -221,12 +219,12 @@ function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor =
         <button
             type="button"
             onClick={onClick}
-            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full transition-all duration-300 ${onClick ? 'hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
+            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
         >
             <div className="flex items-start justify-between gap-2">
                 <p className={`text-3xl font-extrabold leading-none ${accent}`}>{value}</p>
                 {Icon && (
-                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${ICON_BADGE[iconColor]}`}>
+                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${ICON_BADGE[iconColor]}`}>
                         <Icon className="h-5 w-5" />
                     </span>
                 )}
@@ -241,7 +239,7 @@ function MiniStat({ value, label, accent = 'text-white' }) {
     return (
         <div className="rounded-xl bg-white/5 border border-white/10 px-2.5 py-2 text-center">
             <p className={`text-lg font-bold leading-none ${accent}`}>{value}</p>
-            <p className="text-[11px] text-slate-400 mt-1 leading-tight">{label}</p>
+            <p className="text-xs text-slate-400 mt-1 leading-tight">{label}</p>
         </div>
     );
 }
@@ -278,15 +276,15 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Global filter bar */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20 animate-fade-in-up">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
                 <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
                     {Object.keys(RANGE_CONF).map(r => (
                         <button
                             key={r}
                             onClick={() => setRange(r)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
                         >
                             {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
                         </button>
@@ -295,7 +293,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                 <select
                     value={district}
                     onChange={e => setDistrict(e.target.value)}
-                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
+                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50"
                 >
                     <option value="all" className="bg-slate-900 text-white">All districts</option>
                     {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
@@ -305,7 +303,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                         <button
                             key={s.key}
                             onClick={() => setView(s.key)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
                         >
                             <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
                         </button>
@@ -314,7 +312,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
             </div>
 
             {view === 'overview' && <OverviewView A={A} layers={layers} setLayers={setLayers} navigate={navigate} range={range} />}
-            {view === 'analytics' && <AnalyticsView A={A} range={range} />}
+            {view === 'analytics' && <AnalyticsView A={A} />}
             {view === 'categories' && <CategoriesView A={A} />}
             {view === 'ai' && <AiView A={A} />}
         </div>
@@ -327,9 +325,9 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 
 function OverviewView({ A, layers, setLayers, navigate, range }) {
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-fade-in-up">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
                 <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
                 <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
@@ -339,12 +337,12 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
             </div>
 
             {/* AI operational summary */}
-            <Card icon={IconInfo} title="AI Operational Summary" className="animate-fade-in-up" right={<span className="text-[10px] text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
+            <Card icon={IconInfo} title="AI Operational Summary" right={<span className="text-xs text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
                 <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
                 {A.summary.chips.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {A.summary.chips.map((c, i) => (
-                            <span key={i} className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
+                            <span key={i} className={`text-xs font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
                         ))}
                     </div>
                 )}
@@ -354,14 +352,13 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
             <Card
                 icon={IconMap}
                 title="Live Incident Map"
-                className="animate-fade-in-up [animation-delay:80ms]"
                 right={
                     <div className="flex flex-wrap gap-1">
                         {['disaster', 'missing', 'animal', 'camp'].map(k => (
                             <button
                                 key={k}
                                 onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
                                 style={layers[k] ? { background: KIND_META[k].color, boxShadow: `0 6px 18px -4px ${KIND_META[k].color}99` } : undefined}
                             >
                                 <span className="text-base leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
@@ -369,15 +366,25 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                         ))}
                         <button
                             onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
-                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
                         >
                             <span className="text-base leading-none">🔥</span> Heat
                         </button>
                     </div>
                 }
             >
-                <div className="rounded-2xl border border-white/15 overflow-hidden shadow-xl" style={{ height: 380 }}>
-                    <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }} preferCanvas>
+                <div className="flex justify-center">
+                    <MapFrame height={420} className="rounded-2xl border border-white/15 overflow-hidden shadow-xl">
+                    <MapContainer
+                        center={defaultMapConfig.center}
+                        zoom={defaultMapConfig.zoom}
+                        minZoom={defaultMapConfig.minZoom}
+                        maxZoom={defaultMapConfig.maxZoom}
+                        maxBounds={defaultMapConfig.maxBounds}
+                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                        style={{ height: '100%', width: '100%' }}
+                        preferCanvas
+                    >
                         <TileLayer
                             attribution='&copy; OpenStreetMap'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -410,12 +417,13 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                             </Marker>
                         ))}
                     </MapContainer>
+                    </MapFrame>
                 </div>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Needs attention */}
-                <Card icon={IconBolt} title="Needs Immediate Attention" className="animate-fade-in-up [animation-delay:140ms]">
+                <Card icon={IconBolt} title="Needs Immediate Attention">
                     {A.urgentFeed.length === 0 ? (
                         <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
                     ) : (
@@ -426,10 +434,10 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                                         <span className="text-base flex-shrink-0">{item.icon}</span>
                                         <div className="min-w-0">
                                             <p className="text-xs font-semibold text-white truncate">{item.title}</p>
-                                            <p className="text-[11px] text-slate-400 truncate">{item.subtitle}</p>
+                                            <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
+                                    <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
                                 </div>
                             ))}
                         </div>
@@ -437,7 +445,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 </Card>
 
                 {/* Live activity timeline */}
-                <Card icon={IconClock} title="Live Activity Timeline" className="animate-fade-in-up [animation-delay:180ms]">
+                <Card icon={IconClock} title="Live Activity Timeline">
                     {A.timeline.length === 0 ? (
                         <p className="text-sm text-slate-500 py-6 text-center">No recent activity.</p>
                     ) : (
@@ -447,7 +455,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                                 <div key={i} onClick={() => ev.link && navigate(ev.link)} className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group' : ''}`}>
                                     <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
                                     <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
-                                    <p className="text-[10px] text-slate-500">{ev.time}</p>
+                                    <p className="text-xs text-slate-500">{ev.time}</p>
                                 </div>
                             ))}
                         </div>
@@ -462,9 +470,9 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 // ANALYTICS: distribution, priority, trends, resolution, response, district, resources
 // ---------------------------------------------------------------------------
 
-function AnalyticsView({ A, range }) {
+function AnalyticsView({ A }) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card icon={IconGrid} title="Report Distribution">
                 <Donut data={A.distribution} centerLabel={A.kpi.totalReports} centerSub="reports" />
             </Card>
@@ -473,11 +481,7 @@ function AnalyticsView({ A, range }) {
                 <VBars data={A.priority} height={140} />
             </Card>
 
-            <Card icon={IconBolt} title="Report Trend" right={<span className="text-[10px] text-slate-500">incoming / {RANGE_CONF[range].label}</span>}>
-                <TrendLine series={[{ label: 'New reports', color: CHART_COLORS[0], values: A.trend.incoming }]} labels={A.trend.labels} />
-            </Card>
-
-            <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-[10px] text-slate-500">incoming vs resolved</span>}>
+            <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-xs text-slate-500">incoming vs resolved</span>}>
                 <TrendLine
                     series={[
                         { label: 'Incoming', color: CHART_COLORS[7], values: A.trend.incoming },
@@ -487,15 +491,15 @@ function AnalyticsView({ A, range }) {
                 />
             </Card>
 
-            <Card icon={IconClock} title="Response Time" right={<span className="text-[10px] text-slate-500">avg hrs to resolve</span>}>
+            <Card icon={IconClock} title="Response Time" right={<span className="text-xs text-slate-500">avg hrs to resolve</span>}>
                 <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[4], values: A.responseTrend.values }]} labels={A.responseTrend.labels} />
             </Card>
 
-            <Card icon={IconMapPin} title="District Analytics" right={<span className="text-[10px] text-slate-500">active reports</span>}>
+            <Card icon={IconMapPin} title="District Analytics" right={<span className="text-xs text-slate-500">active reports</span>}>
                 <HBars data={A.districtRanking} />
             </Card>
 
-            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-[10px] text-slate-500">from report text</span>} className="lg:col-span-2">
+            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-xs text-slate-500">from report text</span>}>
                 <HBars data={A.resourceDemand} labelWidth={110} />
             </Card>
         </div>
@@ -509,7 +513,7 @@ function AnalyticsView({ A, range }) {
 function CategoriesView({ A }) {
     const c = A.categories;
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Missing persons */}
             <Card icon={IconUserSearch} title="Missing Person Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
@@ -560,19 +564,19 @@ function CategoriesView({ A }) {
 
 function AiView({ A }) {
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Hotspots */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {A.hotspots.map((h, i) => (
                     <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-3">
-                        <p className="text-[11px] font-medium text-slate-400">{h.icon} {h.label}</p>
+                        <p className="text-xs font-medium text-slate-400">{h.icon} {h.label}</p>
                         <p className="text-lg font-bold text-white mt-1 truncate">{h.value}</p>
-                        <p className="text-[11px] text-slate-500 truncate">{h.detail}</p>
+                        <p className="text-xs text-slate-500 truncate">{h.detail}</p>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Operational insights */}
                 <Card icon={IconInfo} title="AI Operational Insights">
                     {A.insights.length === 0 ? (
@@ -590,7 +594,7 @@ function AiView({ A }) {
                 </Card>
 
                 {/* Duplicate detection */}
-                <Card icon={IconSearch} title="Duplicate Report Detection" right={<span className="text-[10px] text-slate-500">{A.duplicates.length} cluster(s)</span>}>
+                <Card icon={IconSearch} title="Duplicate Report Detection" right={<span className="text-xs text-slate-500">{A.duplicates.length} cluster(s)</span>}>
                     {A.duplicates.length === 0 ? (
                         <p className="text-sm text-slate-500 py-4 text-center">No likely duplicate clusters detected.</p>
                     ) : (
@@ -599,9 +603,9 @@ function AiView({ A }) {
                                 <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2">
                                     <div className="flex items-center justify-between">
                                         <p className="text-xs font-semibold text-white">{d.icon} {d.title}</p>
-                                        <span className="text-[10px] font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
+                                        <span className="text-xs font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
                                     </div>
-                                    <p className="text-[11px] text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
+                                    <p className="text-xs text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
                                 </div>
                             ))}
                         </div>
@@ -619,10 +623,10 @@ function AiView({ A }) {
                             <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2.5 flex flex-col">
                                 <div className="flex items-start justify-between gap-2">
                                     <p className="text-xs font-semibold text-white">{r.icon} {r.action}</p>
-                                    <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
+                                    <span className={`text-xs font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
                                 </div>
-                                <p className="text-[11px] text-slate-400 mt-1 flex-1">{r.reason}</p>
-                                <p className="text-[10px] text-slate-500 mt-1.5">⏱ {r.impact}</p>
+                                <p className="text-xs text-slate-400 mt-1 flex-1">{r.reason}</p>
+                                <p className="text-xs text-slate-500 mt-1.5">⏱ {r.impact}</p>
                             </div>
                         ))}
                     </div>
@@ -969,9 +973,9 @@ function RespondDashboard() {
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
-                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob [animation-delay:4s]"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div
@@ -982,55 +986,37 @@ function RespondDashboard() {
                 }}
             ></div>
 
-            {/* Cinematic command-center banner */}
-            <div className="relative z-10 h-36 w-full overflow-hidden sm:h-48 lg:h-56 animate-fade-in-up">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
-            </div>
-
-            <div className="relative z-10 mx-auto -mt-12 max-w-[1800px] px-4 pb-6 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-6 animate-fade-in-up">
+            <div className="relative z-10 mx-auto max-w-[1800px] px-4 pt-4 pb-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between flex-wrap gap-4 mb-3">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
-                            <IconLifeBuoy className="h-6 w-6" />
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
+                            <IconLifeBuoy className="h-5 w-5" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2.5">
-                                <h1 className="text-3xl md:text-4xl font-black text-white leading-tight">Responder Operations Center</h1>
+                                <h1 className="text-xl md:text-2xl font-black text-white leading-tight">Responder Operations Center</h1>
                                 <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75"></span>
+                                    <span className="absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
                                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success-500"></span>
                                 </span>
                             </div>
-                            <p className="text-slate-300 text-sm mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
+                            <p className="text-slate-300 text-xs mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
                         </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
-                            <IconUsers className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Volunteer
-                        </Link>
-                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-purple-500/40">
-                            <IconHeart className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Donate
-                        </Link>
-                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
-                            <IconTent className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" /> Request Camp
-                        </Link>
                     </div>
                 </div>
 
                 {/* Top-level tabs */}
-                <div className="flex flex-wrap gap-2 mb-6 animate-fade-in-up [animation-delay:40ms]">
+                <div className="flex flex-wrap gap-2 mb-3">
                     {TABS.map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:text-white'}`}
                         >
                             <tab.icon className="h-4 w-4" />
                             {tab.label}
                             {tab.key !== 'command' && (
-                                <span className={`text-[10px] font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
+                                <span className={`text-xs font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
                             )}
                         </button>
                     ))}

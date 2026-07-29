@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import MissingPersonsList from '../components/MissingPersonsList';
-import AnimalRescueList from '../components/AnimalRescueList';
-import DisasterReportsList from '../components/DisasterReportsList';
-import CampsList from '../components/CampsList';
+import MissingPersonsList from '@/features/missing-persons/components/MissingPersonsList';
+import AnimalRescueList from '@/features/animal-rescue/components/AnimalRescueList';
+import DisasterReportsList from '@/features/disasters/components/DisasterReportsList';
+import CampsList from '@/features/camps/components/CampsList';
 
 function Dashboard({ role = 'responder' }) {
     const location = useLocation();

@@ -24,15 +24,15 @@ html, body {
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 text-white font-bold py-2.5 px-4 rounded-lg shadow-md shadow-primary-500/25 transition-all duration-200;
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 text-white font-bold py-2.5 px-4 rounded-lg shadow-md shadow-primary-500/25;
   }
 
   .btn-danger {
-    @apply bg-gradient-to-r from-danger-600 to-danger-500 hover:shadow-lg hover:shadow-danger-500/40 text-white font-bold py-2.5 px-4 rounded-lg shadow-md shadow-danger-500/25 transition-all duration-200;
+    @apply bg-gradient-to-r from-danger-600 to-danger-500 hover:shadow-lg hover:shadow-danger-500/40 text-white font-bold py-2.5 px-4 rounded-lg shadow-md shadow-danger-500/25;
   }
 
   .btn-success {
-    @apply bg-gradient-to-r from-success-600 to-success-500 hover:shadow-lg hover:shadow-success-500/40 text-white font-bold py-2.5 px-4 rounded-lg shadow-md shadow-success-500/25 transition-all duration-200;
+    @apply bg-gradient-to-r from-success-600 to-success-500 hover:shadow-lg hover:shadow-success-500/40 text-white font-bold py-2.5 px-4 rounded-lg shadow-md shadow-success-500/25;
   }
 
   .card {
@@ -40,7 +40,7 @@ html, body {
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 bg-white/5 border border-white/15 text-white placeholder:text-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors;
+    @apply w-full px-4 py-2.5 bg-white/5 border border-white/15 text-white placeholder:text-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50;
   }
 }
 
