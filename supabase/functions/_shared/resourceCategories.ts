@@ -1,40 +1,28 @@
-// Bridges the two resource vocabularies already in the codebase:
-//  - camps.needs is a TEXT[] of free-text tags from NEEDS_OPTIONS
-//    (src/services/campManagementService.js) - the pre-existing, coarse signal.
-//  - inventory_transactions.category is one of 7 fixed categories - the new,
-//    precise signal from the ledger.
-// The Resource Allocation Engine prefers real ledger data (via
-// camp_inventory_levels) and only falls back to the legacy tag heuristic for
-// camps that haven't started using the inventory system yet - documented
-// explicitly as an interim measure, not a permanent design.
+// The 7 fixed resource categories used by inventory_transactions,
+// camp_resource_requests and the Resource Allocation Engine.
 
 export type ResourceCategory = 'food' | 'water' | 'medical' | 'shelter' | 'clothing' | 'hygiene' | 'other';
 
 export const RESOURCE_CATEGORIES: ResourceCategory[] = ['food', 'water', 'medical', 'shelter', 'clothing', 'hygiene', 'other'];
 
-const NEEDS_TAG_TO_CATEGORY: Record<string, ResourceCategory> = {
-    'Food': 'food',
-    'Drinking Water': 'water',
-    'Medical Supplies': 'medical',
-    'Medicines': 'medical',
-    'First Aid Kits': 'medical',
-    'Blankets': 'shelter',
-    'Tents': 'shelter',
-    'Mattresses': 'shelter',
-    'Clothing': 'clothing',
-    'Hygiene Items': 'hygiene',
-    'Baby Products': 'hygiene',
-    'Wheelchairs': 'other',
-    'Generators': 'other',
-    // 'Volunteers' intentionally omitted - not a shippable resource category.
-};
-
-/** Maps a camp's legacy needs tag array to the set of resource categories it implies. */
-export function legacyNeedsToCategories(needs: string[] | null | undefined): Set<ResourceCategory> {
-    const categories = new Set<ResourceCategory>();
-    for (const tag of needs ?? []) {
-        const category = NEEDS_TAG_TO_CATEGORY[tag];
-        if (category) categories.add(category);
-    }
-    return categories;
+export function isResourceCategory(value: unknown): value is ResourceCategory {
+    return typeof value === 'string' && (RESOURCE_CATEGORIES as string[]).includes(value);
 }
+
+// Units per occupant a camp is assumed to need on hand for its OWN people.
+// Used as the floor of the source-camp reserve in the Resource Allocation
+// Engine, so a camp that never configured inventory_thresholds still can't be
+// stripped bare to fill someone else's request.
+//
+// These are explicit planning assumptions, not measurements - deliberately
+// stated here as tunable constants rather than buried in the solver. They only
+// ever make the agent MORE conservative about shipping stock away.
+export const PER_OCCUPANT_MINIMUM: Record<ResourceCategory, number> = {
+    food: 3,      // ~1 day of rations
+    water: 5,     // ~litres for 1 day
+    medical: 0.5,
+    shelter: 1,   // a mat/blanket per person
+    clothing: 1,
+    hygiene: 1,
+    other: 0.2,
+};

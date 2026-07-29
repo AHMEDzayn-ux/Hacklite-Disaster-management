@@ -15,6 +15,7 @@ import {
     runRouteOptimizationAgent, runVolunteerAssignmentAgent,
     fetchLatestSituationReports, fetchLatestPriorityQueue, fetchPendingAllocationPlans,
     fetchInFlightAllocationPlans, fetchLatestRoutePlans, fetchAgentRunHistory,
+    fetchOpenCampRequests,
 } from '@/features/admin/services/aiAgentService';
 import { defaultMapConfig } from '@/lib/mapConfig';
 import MapResizeFix from '@/components/map/MapResizeFix';
@@ -39,6 +40,13 @@ function riskColor(score) {
     return 'text-success-300 bg-success-500/15';
 }
 
+const URGENCY_STYLES = {
+    low: 'bg-slate-500/20 text-slate-300',
+    normal: 'bg-primary-500/20 text-primary-300',
+    high: 'bg-amber-500/20 text-amber-300',
+    critical: 'bg-danger-500/20 text-danger-300',
+};
+
 function occupancyIcon(camp) {
     if (!camp.capacity) return greenIcon;
     const pct = camp.current_occupancy / camp.capacity;
@@ -58,6 +66,7 @@ function AdminCommandDashboard() {
     const [allocationPlans, setAllocationPlans] = useState([]);
     const [inFlightPlans, setInFlightPlans] = useState([]);
     const [routePlans, setRoutePlans] = useState([]);
+    const [campRequests, setCampRequests] = useState([]);
     const [runHistory, setRunHistory] = useState({});
     const [reviewPlan, setReviewPlan] = useState(null);
     const [shipmentPlan, setShipmentPlan] = useState(null);
@@ -70,7 +79,7 @@ function AdminCommandDashboard() {
     }, [user, authLoading, navigate]);
 
     const loadAll = useCallback(async () => {
-        const [campsRes, disastersRes, sitRes, queueRes, plansRes, inFlightRes, routesRes] = await Promise.all([
+        const [campsRes, disastersRes, sitRes, queueRes, plansRes, inFlightRes, routesRes, requestsRes] = await Promise.all([
             supabase.from('camps').select('id, name, district, latitude, longitude, capacity, current_occupancy').eq('status', 'Active'),
             supabase.from('disasters').select('id, disaster_type, severity, description, location, damage_index, status').eq('status', 'Active'),
             fetchLatestSituationReports(),
@@ -78,6 +87,7 @@ function AdminCommandDashboard() {
             fetchPendingAllocationPlans(),
             fetchInFlightAllocationPlans(),
             fetchLatestRoutePlans(),
+            fetchOpenCampRequests(),
         ]);
 
         setCamps((campsRes.data || []).filter(c => c.latitude != null && c.longitude != null));
@@ -87,8 +97,9 @@ function AdminCommandDashboard() {
         setAllocationPlans(plansRes.data || []);
         setInFlightPlans(inFlightRes.data || []);
         setRoutePlans(routesRes.data || []);
+        setCampRequests(requestsRes.data || []);
 
-        const agentNames = ['situation_awareness', 'incident_prioritization', 'resource_allocation', 'route_optimization', 'volunteer_assignment'];
+        const agentNames =['situation_awareness', 'incident_prioritization', 'resource_allocation', 'route_optimization', 'volunteer_assignment'];
         const histories = await Promise.all(agentNames.map(name => fetchAgentRunHistory(name, 1)));
         const historyMap = {};
         agentNames.forEach((name, i) => { historyMap[name] = histories[i].data?.[0] || null; });
@@ -140,6 +151,17 @@ function AdminCommandDashboard() {
         .map(d => ({ lat: d.location.lat, lng: d.location.lng, weight: (d.damage_index ?? 30) / 100 }));
 
     const campById = Object.fromEntries(camps.map(c => [c.id, c]));
+
+    // How much of each request is already covered by a suggested or in-flight
+    // shipment - the gap is what the allocation engine could not source within
+    // the distance cap without leaving some other camp short.
+    const plannedByRequest = {};
+    for (const plan of [...allocationPlans, ...inFlightPlans]) {
+        if (!plan.request_id) continue;
+        plannedByRequest[plan.request_id] = (plannedByRequest[plan.request_id] || 0) + Number(plan.quantity);
+    }
+    const requestById = Object.fromEntries(campRequests.map(r => [r.id, r]));
+
     const shipmentStatusBadge = (status) => ({
         approved: 'bg-blue-500/15 text-blue-300',
         dispatched: 'bg-amber-500/15 text-amber-300',
@@ -272,6 +294,34 @@ function AdminCommandDashboard() {
                         </div>
                     </div>
 
+                    {/* Open camp requests - the demand driving every allocation */}
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">🙋 Open Camp Requests ({campRequests.length})</h3>
+                        <div className="space-y-2">
+                            {campRequests.length === 0 && <p className="text-xs text-slate-500">No camp has requested supplies.</p>}
+                            {campRequests.map(request => {
+                                const requested = Number(request.quantity_requested);
+                                const covered = Number(request.quantity_fulfilled) + (plannedByRequest[request.id] || 0);
+                                const outstanding = Math.max(0, requested - covered);
+                                return (
+                                    <div key={request.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
+                                        <div className="flex justify-between items-center gap-2">
+                                            <span className="font-medium text-slate-900 dark:text-white truncate">{request.item_name}</span>
+                                            <span className={`px-2 py-0.5 rounded-full font-bold capitalize flex-shrink-0 ${URGENCY_STYLES[request.urgency]}`}>
+                                                {request.urgency}
+                                            </span>
+                                        </div>
+                                        <p className="text-slate-400 truncate">{request.camps?.name || 'Unknown camp'} · {request.camps?.district}</p>
+                                        <p className="mt-1 text-slate-400">
+                                            {covered.toFixed(0)} / {requested.toFixed(0)} {request.unit} covered
+                                            {outstanding > 0 && <span className="text-amber-300"> · {outstanding.toFixed(0)} unsourced</span>}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
                     {/* Pending allocation plans */}
                     <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                         <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">📦 Pending Resource Allocations ({allocationPlans.length})</h3>
@@ -279,8 +329,18 @@ function AdminCommandDashboard() {
                             {allocationPlans.length === 0 && <p className="text-xs text-slate-500">No pending recommendations.</p>}
                             {allocationPlans.map(plan => (
                                 <div key={plan.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
-                                    <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.resource_category} units</p>
+                                    <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.unit || 'units'} {plan.item_name || plan.resource_category}</p>
                                     <p className="text-slate-400">{plan.from_camp?.name || 'Unknown'} → {plan.to_camp?.name || 'Unknown'} ({plan.distance_km?.toFixed(1)}km)</p>
+                                    {requestById[plan.request_id] && (
+                                        <p className="text-primary-300 mt-0.5">
+                                            serves a {requestById[plan.request_id].urgency} request for {Number(requestById[plan.request_id].quantity_requested).toFixed(0)} {requestById[plan.request_id].unit}
+                                        </p>
+                                    )}
+                                    {plan.solver_metadata?.source_reserve != null && (
+                                        <p className="text-slate-500 mt-0.5">
+                                            source keeps {Number(plan.solver_metadata.source_reserve).toFixed(0)} in reserve
+                                        </p>
+                                    )}
                                     {plan.solver_metadata?.recommendation_text && (
                                         <p className="text-slate-500 italic mt-1">{plan.solver_metadata.recommendation_text}</p>
                                     )}
@@ -302,7 +362,7 @@ function AdminCommandDashboard() {
                                 return (
                                     <div key={plan.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
                                         <div className="flex items-center justify-between mb-1">
-                                            <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.resource_category} units</p>
+                                            <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.unit || 'units'} {plan.item_name || plan.resource_category}</p>
                                             <span className={`px-2 py-0.5 rounded-full font-bold capitalize ${shipmentStatusBadge(plan.status)}`}>{plan.status}</span>
                                         </div>
                                         <p className="text-slate-400">{plan.from_camp?.name || 'Unknown'} → {plan.to_camp?.name || 'Unknown'}</p>

@@ -97,6 +97,25 @@ Deno.serve(async (req: Request) => {
     }).eq('id', planId)
     if (error) return json(500, { error: 'Failed to mark plan delivered', details: error.message })
 
+    // Delivery - not approval - is what actually satisfies the camp's request:
+    // approval only moves the ledger, the goods still have to arrive.
+    if (plan.request_id) {
+      const { data: request } = await supabase
+        .from('camp_resource_requests')
+        .select('quantity_requested, quantity_fulfilled')
+        .eq('id', plan.request_id)
+        .single()
+
+      if (request) {
+        const fulfilled = Number(request.quantity_fulfilled) + Number(plan.quantity)
+        await supabase.from('camp_resource_requests').update({
+          quantity_fulfilled: fulfilled,
+          status: fulfilled >= Number(request.quantity_requested) ? 'fulfilled' : 'open',
+          updated_at: new Date().toISOString(),
+        }).eq('id', plan.request_id)
+      }
+    }
+
     await supabase.from('audit_logs').insert({
       admin_id: user.id, admin_email: user.email, action: 'DELIVER_ALLOCATION_PLAN',
       table_name: 'allocation_plans', record_id: planId, record_snapshot: plan,
@@ -134,7 +153,7 @@ Deno.serve(async (req: Request) => {
     camp_id: plan.from_camp_id,
     item_name: plan.item_name || plan.resource_category,
     category: plan.resource_category,
-    unit: 'units',
+    unit: plan.unit || 'units',
     transaction_type: 'transferred_out',
     quantity: plan.quantity,
     source_allocation_plan_id: plan.id,
@@ -147,7 +166,7 @@ Deno.serve(async (req: Request) => {
     camp_id: plan.to_camp_id,
     item_name: plan.item_name || plan.resource_category,
     category: plan.resource_category,
-    unit: 'units',
+    unit: plan.unit || 'units',
     transaction_type: 'transferred_in',
     quantity: plan.quantity,
     source_allocation_plan_id: plan.id,

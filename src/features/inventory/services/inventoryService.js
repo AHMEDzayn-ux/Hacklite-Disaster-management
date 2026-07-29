@@ -56,4 +56,21 @@ export const recordInventoryTransactionAsAdmin = (campId, transaction) =>
 export const regenerateInventoryAccessCode = (campId) =>
     invokeInventoryAsAdmin({ action: 'regenerate-code', campId });
 
+/**
+ * Camp admin path: raise a supply request. These requests are the only demand
+ * signal the Resource Allocation Engine considers - the agent no longer infers
+ * need from stock thresholds.
+ */
+export const createResourceRequest = (request) =>
+    invokeInventoryAsAdmin({ action: 'create-request', ...request });
+
+/** Camp admin sees their own camp's requests; a full admin with no campId sees all. */
+export const fetchResourceRequests = (campId) =>
+    invokeInventoryAsAdmin({ action: 'list-requests', ...(campId ? { campId } : {}) });
+
+export const cancelResourceRequest = (requestId) =>
+    invokeInventoryAsAdmin({ action: 'cancel-request', requestId });
+
 export const INVENTORY_CATEGORIES = ['food', 'water', 'medical', 'shelter', 'clothing', 'hygiene', 'other'];
+
+export const REQUEST_URGENCY_LEVELS = ['low', 'normal', 'high', 'critical'];

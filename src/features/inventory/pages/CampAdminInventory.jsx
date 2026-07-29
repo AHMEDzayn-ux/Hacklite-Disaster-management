@@ -5,22 +5,37 @@ import { supabase } from '@/lib/supabase';
 import {
     fetchAllInventoryLevels,
     recordInventoryTransactionAsAdmin,
+    createResourceRequest,
+    fetchResourceRequests,
+    cancelResourceRequest,
     INVENTORY_CATEGORIES,
+    REQUEST_URGENCY_LEVELS,
 } from '@/features/inventory/services/inventoryService';
 import { IconTent } from '@/components/icons/Icons';
 
 /**
  * Camp Admin Inventory
  * ====================
- * The camp_admin's home screen: add stock and distribute for their one camp.
- * A camp_admin is hard-scoped server-side, so the edge function returns (and
- * accepts) only this camp's data regardless of what the client sends - the
- * campId here is used just for display and to pass along.
+ * The camp_admin's home screen: add stock, distribute, and request supplies for
+ * their one camp. A camp_admin is hard-scoped server-side, so the edge function
+ * returns (and accepts) only this camp's data regardless of what the client
+ * sends - the campId here is used just for display and to pass along.
+ *
+ * Requests raised here are the only demand signal the Resource Allocation
+ * Engine considers, so this screen is what drives the shipment suggestions an
+ * admin sees on the command dashboard.
  */
 
 const CATEGORY_LABELS = {
     food: '🍚 Food', water: '💧 Water', medical: '⚕️ Medical', shelter: '⛺ Shelter',
     clothing: '👕 Clothing', hygiene: '🧼 Hygiene', other: '📦 Other',
+};
+
+const URGENCY_STYLES = {
+    low: 'bg-slate-500/20 text-slate-300',
+    normal: 'bg-primary-500/20 text-primary-300',
+    high: 'bg-amber-500/20 text-amber-300',
+    critical: 'bg-danger-500/20 text-danger-300',
 };
 
 function CampAdminInventory() {
@@ -41,6 +56,10 @@ function CampAdminInventory() {
     const [newItemUnit, setNewItemUnit] = useState('units');
     const [submitting, setSubmitting] = useState(false);
 
+    const [requests, setRequests] = useState([]);
+    const [reqForm, setReqForm] = useState({ itemName: '', category: 'food', unit: 'units', quantity: '', urgency: 'normal', notes: '' });
+    const [reqSubmitting, setReqSubmitting] = useState(false);
+
     // Only camp_admins belong here.
     useEffect(() => {
         if (authLoading) return;
@@ -51,13 +70,17 @@ function CampAdminInventory() {
     const load = useCallback(async () => {
         setLoading(true);
         setError('');
-        const result = await fetchAllInventoryLevels();
+        const [result, requestResult] = await Promise.all([
+            fetchAllInventoryLevels(),
+            fetchResourceRequests(),
+        ]);
         if (result.success) {
             setLevels(result.levels || []);
             setThresholds(result.thresholds || {});
         } else {
             setError(result.error || 'Failed to load inventory');
         }
+        if (requestResult.success) setRequests(requestResult.requests || []);
         setLoading(false);
     }, []);
 
@@ -142,6 +165,50 @@ function CampAdminInventory() {
         }
     };
 
+    const requestItem = (item) => {
+        setReqForm({
+            itemName: item.item_name,
+            category: item.category,
+            unit: item.unit || 'units',
+            quantity: '',
+            urgency: isLowStock(item.item_name, item.quantity_on_hand) ? 'high' : 'normal',
+            notes: '',
+        });
+        setError('');
+        document.getElementById('request-supplies')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const submitRequest = async (e) => {
+        e.preventDefault();
+        if (!reqForm.itemName.trim() || !reqForm.quantity || Number(reqForm.quantity) <= 0) return;
+        setReqSubmitting(true);
+        setError('');
+        const result = await createResourceRequest({
+            campId,
+            itemName: reqForm.itemName.trim(),
+            category: reqForm.category,
+            unit: reqForm.unit.trim() || 'units',
+            quantity: Number(reqForm.quantity),
+            urgency: reqForm.urgency,
+            notes: reqForm.notes || null,
+        });
+        setReqSubmitting(false);
+        if (result.success) {
+            setReqForm({ itemName: '', category: 'food', unit: 'units', quantity: '', urgency: 'normal', notes: '' });
+            load();
+        } else {
+            setError(result.error || 'Failed to raise request');
+        }
+    };
+
+    const cancelRequest = async (requestId) => {
+        const result = await cancelResourceRequest(requestId);
+        if (result.success) load();
+        else setError(result.error || 'Failed to cancel request');
+    };
+
+    const openRequests = requests.filter(r => r.status === 'open');
+
     const sortedLevels = [...levels].sort((a, b) => {
         const aLow = isLowStock(a.item_name, a.quantity_on_hand);
         const bLow = isLowStock(b.item_name, b.quantity_on_hand);
@@ -214,6 +281,12 @@ function CampAdminInventory() {
                                     >
                                         − Distribute
                                     </button>
+                                    <button
+                                        onClick={() => requestItem(item)}
+                                        className="flex-1 bg-primary-500/15 hover:bg-primary-500/25 border border-primary-400/20 text-primary-300 font-bold py-3 rounded-lg"
+                                    >
+                                        ↗ Request
+                                    </button>
                                 </div>
                             </div>
                         );
@@ -221,6 +294,96 @@ function CampAdminInventory() {
                     {!loading && sortedLevels.length === 0 && (
                         <p className="text-center text-slate-400 py-8">No items tracked yet. Add one below.</p>
                     )}
+                </div>
+
+                {/* Request supplies - the only demand signal the allocation agent reads */}
+                <div id="request-supplies" className="mt-6 rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
+                    <h3 className="font-bold text-slate-900 dark:text-white">Request Supplies</h3>
+                    <p className="text-xs text-slate-400 mt-1 mb-3">
+                        Relief coordinators only see what you ask for here. Requests are matched against spare stock at nearby camps.
+                    </p>
+
+                    {openRequests.length > 0 && (
+                        <div className="space-y-2 mb-4">
+                            {openRequests.map(request => {
+                                const fulfilled = Number(request.quantity_fulfilled);
+                                const requested = Number(request.quantity_requested);
+                                return (
+                                    <div key={request.id} className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="font-semibold text-slate-900 dark:text-white">{request.item_name}</span>
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold capitalize ${URGENCY_STYLES[request.urgency]}`}>
+                                                {request.urgency}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
+                                            <span>{fulfilled} / {requested} {request.unit} received</span>
+                                            <button onClick={() => cancelRequest(request.id)} className="text-danger-300 hover:text-danger-200 underline">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    <form onSubmit={submitRequest} className="space-y-3">
+                        <input
+                            type="text"
+                            placeholder="Item needed (e.g. Rice, Bottled Water)"
+                            value={reqForm.itemName}
+                            onChange={(e) => setReqForm({ ...reqForm, itemName: e.target.value })}
+                            className="input-field"
+                        />
+                        <div className="flex gap-2">
+                            <select
+                                value={reqForm.category}
+                                onChange={(e) => setReqForm({ ...reqForm, category: e.target.value })}
+                                className="input-field flex-1"
+                            >
+                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
+                            </select>
+                            <input
+                                type="text"
+                                placeholder="Unit"
+                                value={reqForm.unit}
+                                onChange={(e) => setReqForm({ ...reqForm, unit: e.target.value })}
+                                className="input-field w-28"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <input
+                                type="number"
+                                placeholder="Quantity needed"
+                                value={reqForm.quantity}
+                                onChange={(e) => setReqForm({ ...reqForm, quantity: e.target.value })}
+                                min="1"
+                                className="input-field flex-1"
+                            />
+                            <select
+                                value={reqForm.urgency}
+                                onChange={(e) => setReqForm({ ...reqForm, urgency: e.target.value })}
+                                className="input-field w-32 capitalize"
+                            >
+                                {REQUEST_URGENCY_LEVELS.map(u => <option key={u} value={u} className="text-slate-900 capitalize">{u}</option>)}
+                            </select>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Note (optional)"
+                            value={reqForm.notes}
+                            onChange={(e) => setReqForm({ ...reqForm, notes: e.target.value })}
+                            className="input-field text-sm"
+                        />
+                        <button
+                            type="submit"
+                            disabled={reqSubmitting}
+                            className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white font-bold py-3 rounded-lg shadow-md shadow-primary-500/25"
+                        >
+                            {reqSubmitting ? 'Sending...' : 'Raise Request'}
+                        </button>
+                    </form>
                 </div>
 
                 {/* Add a new item */}

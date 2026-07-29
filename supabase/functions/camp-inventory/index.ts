@@ -26,8 +26,11 @@ function generateAccessCode(): string {
   return code
 }
 
+const RESOURCE_CATEGORIES = ['food', 'water', 'medical', 'shelter', 'clothing', 'hygiene', 'other']
+const URGENCY_LEVELS = ['low', 'normal', 'high', 'critical']
+
 interface RequestBody {
-  action: 'record' | 'get-levels' | 'regenerate-code'
+  action: 'record' | 'get-levels' | 'regenerate-code' | 'create-request' | 'list-requests' | 'cancel-request'
   campId: string
   accessCode?: string
   itemName?: string
@@ -37,13 +40,15 @@ interface RequestBody {
   quantity?: number
   recordedByName?: string
   notes?: string
+  urgency?: string
+  requestId?: string
 }
 
 // 'admin'      - full admin/super_admin, any camp
 // 'camp_admin' - scoped to campAdminCampId only
 // 'code'       - volunteer holding a camp's access code, scoped to body.campId
 type Access =
-  | { ok: true; kind: 'admin' | 'camp_admin' | 'code'; campAdminCampId: string | null }
+  | { ok: true; kind: 'admin' | 'camp_admin' | 'code'; campAdminCampId: string | null; userId: string | null }
   | { ok: false; reason: string }
 
 async function resolveAccess(supabase: any, req: Request, body: RequestBody): Promise<Access> {
@@ -60,9 +65,9 @@ async function resolveAccess(supabase: any, req: Request, body: RequestBody): Pr
         .single()
       if (adminUser) {
         if (adminUser.role === 'camp_admin') {
-          return { ok: true, kind: 'camp_admin', campAdminCampId: adminUser.camp_id }
+          return { ok: true, kind: 'camp_admin', campAdminCampId: adminUser.camp_id, userId: user.id }
         }
-        return { ok: true, kind: 'admin', campAdminCampId: null }
+        return { ok: true, kind: 'admin', campAdminCampId: null, userId: user.id }
       }
     }
   }
@@ -70,7 +75,7 @@ async function resolveAccess(supabase: any, req: Request, body: RequestBody): Pr
   if (body.campId && body.accessCode) {
     const { data: camp } = await supabase.from('camps').select('id, inventory_access_code').eq('id', body.campId).single()
     if (camp && camp.inventory_access_code && camp.inventory_access_code === body.accessCode) {
-      return { ok: true, kind: 'code', campAdminCampId: null }
+      return { ok: true, kind: 'code', campAdminCampId: null, userId: null }
     }
   }
 
@@ -144,6 +149,92 @@ Deno.serve(async (req: Request) => {
 
     const { data: camp } = await supabase.from('camps').select('inventory_thresholds').eq('id', campId).single()
     return json(200, { success: true, levels: data, thresholds: camp?.inventory_thresholds ?? {} })
+  }
+
+  // A camp asking for supplies. These requests are the only demand signal the
+  // Resource Allocation Engine considers, so they are written here under the
+  // same camp scoping as inventory: a camp_admin can only ever request for its
+  // own camp, whatever campId the body carries.
+  if (body.action === 'create-request') {
+    if (access.kind === 'code') return json(403, { error: 'An access code cannot raise supply requests - a camp admin login is required' })
+
+    const { itemName, category, unit, quantity, urgency, notes, recordedByName } = body
+    const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
+
+    if (!campId || !itemName || !category || quantity == null) {
+      return json(400, { error: 'campId, itemName, category, and quantity are required' })
+    }
+    if (!RESOURCE_CATEGORIES.includes(category)) {
+      return json(400, { error: `category must be one of: ${RESOURCE_CATEGORIES.join(', ')}` })
+    }
+    if (typeof quantity !== 'number' || quantity <= 0) {
+      return json(400, { error: 'quantity must be a positive number' })
+    }
+    if (urgency && !URGENCY_LEVELS.includes(urgency)) {
+      return json(400, { error: `urgency must be one of: ${URGENCY_LEVELS.join(', ')}` })
+    }
+
+    const { data, error } = await supabase.from('camp_resource_requests').insert({
+      camp_id: campId,
+      item_name: itemName.trim(),
+      resource_category: category,
+      unit: unit || 'units',
+      quantity_requested: quantity,
+      urgency: urgency || 'normal',
+      notes: notes || null,
+      requested_by_name: recordedByName || (access.kind === 'camp_admin' ? 'camp_admin' : 'admin'),
+      requested_by_user_id: access.userId,
+    }).select('*').single()
+
+    if (error) return json(500, { error: 'Failed to create request', details: error.message })
+
+    return json(200, { success: true, request: data })
+  }
+
+  if (body.action === 'list-requests') {
+    let query = supabase
+      .from('camp_resource_requests')
+      .select('*, camps:camp_id (name, district)')
+      .order('created_at', { ascending: false })
+
+    // A full admin with no camp specified sees every camp's requests;
+    // everyone else is pinned to a single camp.
+    if (!(access.kind === 'admin' && !body.campId)) {
+      const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
+      if (!campId) return json(400, { error: 'campId is required' })
+      query = query.eq('camp_id', campId)
+    }
+
+    const { data, error } = await query
+    if (error) return json(500, { error: 'Failed to fetch requests', details: error.message })
+
+    return json(200, { success: true, requests: data })
+  }
+
+  if (body.action === 'cancel-request') {
+    if (access.kind === 'code') return json(403, { error: 'An access code cannot cancel supply requests' })
+    if (!body.requestId) return json(400, { error: 'requestId is required' })
+
+    const { data: existing } = await supabase
+      .from('camp_resource_requests')
+      .select('id, camp_id, status')
+      .eq('id', body.requestId)
+      .single()
+
+    if (!existing) return json(404, { error: 'Request not found' })
+    if (access.kind === 'camp_admin' && existing.camp_id !== access.campAdminCampId) {
+      return json(403, { error: 'That request belongs to another camp' })
+    }
+    if (existing.status !== 'open') return json(400, { error: `Cannot cancel a request that is already ${existing.status}` })
+
+    const { error } = await supabase
+      .from('camp_resource_requests')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', body.requestId)
+
+    if (error) return json(500, { error: 'Failed to cancel request', details: error.message })
+
+    return json(200, { success: true })
   }
 
   if (body.action === 'record') {
