@@ -6,7 +6,6 @@ import DonationCounter from '@/features/donations/components/DonationCounter';
 import RecentDonations from '@/features/donations/components/RecentDonations';
 import { useDonationStore } from '@/store/supabaseStore';
 import { IconHeart, IconCheck } from '@/components/icons/Icons';
-import heroImage from '@/assets/yellow.png';
 
 const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY
     ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
@@ -35,14 +34,7 @@ function Donations() {
                 }}
             ></div>
 
-            {/* Cinematic community banner */}
-            <div className="relative z-10 h-16 w-full overflow-hidden sm:h-20">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
-            </div>
-
-            <div className="relative z-10 mx-auto -mt-4 max-w-[1600px] px-4 pb-4 sm:px-8">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 pt-4 pb-4 sm:px-8">
                 <div className="mb-3 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:text-left">
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
                         <IconHeart className="h-5 w-5" />

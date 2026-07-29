@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { IconTent } from '@/components/icons/Icons';
-import heroImage from '@/assets/dark.png';
 
 /**
  * Camp Admin Portal
@@ -49,12 +48,6 @@ function CampAdminLogin() {
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
-            {/* Cinematic night-ops background */}
-            <div className="absolute inset-0">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.16]" />
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-950/90 to-slate-950/95"></div>
-            </div>
-
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-amber-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>

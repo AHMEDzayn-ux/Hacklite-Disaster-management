@@ -12,7 +12,6 @@ import {
     IconUsers,
     IconHeart,
 } from '@/components/icons/Icons';
-import heroImage from '@/assets/dark.png';
 
 function Navbar({ userType = 'reporter' }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -44,14 +43,8 @@ function Navbar({ userType = 'reporter' }) {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-white/10 shadow-lg shadow-black/30 backdrop-blur-xl">
+        <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/95 shadow-lg shadow-black/30 backdrop-blur-xl">
             <div className={`h-0.5 bg-gradient-to-r ${isReporter ? 'from-danger-500 via-orange-400 to-danger-600' : 'from-success-500 via-primary-400 to-success-600'}`}></div>
-
-            {/* Faint atmospheric background */}
-            <div className="absolute inset-0 overflow-hidden">
-                <img src={heroImage} alt="" className="h-full w-full object-cover object-top opacity-[0.12]" />
-                <div className="absolute inset-0 bg-slate-950/92"></div>
-            </div>
 
             <div className="relative w-full px-4 sm:px-6 lg:px-10">
                 <div className="flex h-14 items-center">

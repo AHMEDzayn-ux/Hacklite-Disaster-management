@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '@/assets/home.png';
 import {
     IconSiren,
     IconShieldLock,
@@ -42,18 +41,7 @@ function RoleSelection() {
     const navigate = useNavigate();
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-slate-950 font-sans">
-            {/* Background photo */}
-            <div className="absolute inset-0">
-                <img
-                    src={heroImage}
-                    alt=""
-                    className="absolute inset-0 h-full w-full object-cover object-[70%_center]"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(2,6,23)_0%,rgba(2,6,23,0.8)_28%,rgba(2,6,23,0.35)_46%,transparent_60%)]"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/10"></div>
-            </div>
-
+        <div className="relative h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
             {/* Subtle dot-grid overlay */}
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
@@ -81,8 +69,8 @@ function RoleSelection() {
                 </button>
             </div>
 
-            <div className="relative z-10 flex min-h-screen w-full flex-col justify-center px-6 py-6 sm:px-10 lg:pl-44 lg:pr-0 xl:pl-60">
-                <div className="max-w-6xl">
+            <div className="relative z-10 flex h-full w-full flex-col overflow-y-auto px-6 py-4 sm:px-10 lg:pl-44 lg:pr-0 xl:pl-60">
+                <div className="m-auto max-w-6xl py-2">
                     <div
                         className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold tracking-wide text-primary-100 backdrop-blur-md"
                     >
@@ -117,7 +105,7 @@ function RoleSelection() {
                     </p>
 
                     {/* Role Selection Cards */}
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:grid-cols-2">
                         {/* Reporter/Victim Card */}
                         <div
                             onClick={() => navigate('/report')}
@@ -143,11 +131,11 @@ function RoleSelection() {
                                 </span>
                             </div>
 
-                            <div className="mt-3 space-y-1.5">
+                            <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
                                 {REPORT_ITEMS.map((item) => (
-                                    <div key={item} className="flex items-center gap-3 text-sm text-slate-200">
-                                        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/20 text-danger-400">
-                                            <IconCheck className="h-3 w-3" />
+                                    <div key={item} className="flex items-center gap-2 text-xs text-slate-200">
+                                        <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/20 text-danger-400">
+                                            <IconCheck className="h-2.5 w-2.5" />
                                         </span>
                                         {item}
                                     </div>
@@ -188,11 +176,11 @@ function RoleSelection() {
                                 </span>
                             </div>
 
-                            <div className="mt-3 space-y-1.5">
+                            <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
                                 {RESPOND_ITEMS.map((item) => (
-                                    <div key={item} className="flex items-center gap-3 text-sm text-slate-200">
-                                        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success-500/20 text-success-400">
-                                            <IconCheck className="h-3 w-3" />
+                                    <div key={item} className="flex items-center gap-2 text-xs text-slate-200">
+                                        <span className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-success-500/20 text-success-400">
+                                            <IconCheck className="h-2.5 w-2.5" />
                                         </span>
                                         {item}
                                     </div>
@@ -211,7 +199,7 @@ function RoleSelection() {
 
                     {/* Hotline bar */}
                     <div
-                        className="mt-4 flex items-center gap-3 rounded-2xl border border-white/20 bg-slate-950/60 px-4 py-3 shadow-xl backdrop-blur-md"
+                        className="mt-3 flex items-center gap-3 rounded-2xl border border-white/20 bg-slate-950/60 px-4 py-2 shadow-xl backdrop-blur-md"
                     >
                         <span className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/25">
                             <span className="absolute inline-flex h-full w-full rounded-full bg-danger-400/40"></span>
@@ -224,7 +212,7 @@ function RoleSelection() {
                     </div>
 
                     {/* Feature strip */}
-                    <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-3 lg:grid-cols-4">
+                    <div className="mt-3 hidden grid-cols-2 gap-3 border-t border-white/15 pt-2 sm:grid lg:grid-cols-4">
                         {FEATURES.map(({ icon: Icon, title, desc }) => (
                             <div
                                 key={title}

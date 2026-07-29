@@ -17,7 +17,6 @@ import {
 } from '@/features/admin/services/aiAgentService';
 import { defaultMapConfig } from '@/lib/mapConfig';
 import { IconSiren, IconBolt, IconClock, IconGlobe } from '@/components/icons/Icons';
-import heroImage from '@/assets/blue.png';
 
 /**
  * Emergency Command Dashboard
@@ -168,13 +167,6 @@ function AdminCommandDashboard() {
                     backgroundSize: '28px 28px',
                 }}
             ></div>
-
-            {/* Cinematic command-center banner */}
-            <div className="relative z-10 h-28 w-full overflow-hidden sm:h-36">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-slate-950/10"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
-            </div>
 
             <header className="relative z-10 border-b border-white/10 bg-white/[0.03] backdrop-blur-md">
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between flex-wrap gap-3">

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
 import { IconShieldLock, IconSiren, IconTent } from '@/components/icons/Icons';
-import heroImage from '@/assets/back.png';
 
 const COLOR_STYLES = {
     danger: {
@@ -143,16 +142,6 @@ function AdminDashboard() {
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
-            {/* Faint background photo for atmosphere */}
-            <div className="absolute inset-0">
-                <img
-                    src={heroImage}
-                    alt=""
-                    className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.06]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/97 to-slate-950"></div>
-            </div>
-
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>

@@ -10,7 +10,6 @@ import {
     IconMessageSquare,
     IconArrowRight,
 } from '@/components/icons/Icons';
-import heroImage from '@/assets/red.png';
 
 const REPORT_OPTIONS = [
     {
@@ -106,14 +105,7 @@ function ReportDashboard() {
                 }}
             ></div>
 
-            {/* Cinematic disaster-response banner */}
-            <div className="relative z-10 h-16 w-full overflow-hidden sm:h-20 lg:h-24">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
-            </div>
-
-            <div className="relative z-10 mx-auto -mt-5 max-w-[1600px] px-4 pb-6 sm:px-8 lg:px-12">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-4 pt-6 pb-6 sm:px-8 lg:px-12">
                 <div className="mb-4 flex items-center gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
                         <IconSiren className="h-5 w-5" />
