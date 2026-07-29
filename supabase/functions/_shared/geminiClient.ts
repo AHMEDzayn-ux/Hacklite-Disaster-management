@@ -10,6 +10,14 @@
 
 const GEMINI_MODEL = 'gemini-flash-lite-latest';
 
+// Supabase edge functions get force-killed at ~150s wall time with no chance
+// to run their own catch block or update the DB - seen in practice with
+// call-transcription-agent leaving a row stuck in 'processing' forever after
+// a Gemini audio call hung. Aborting well before that lets every caller's
+// own try/catch handle the failure (mark the row 'failed' with a real error)
+// instead of the platform silently killing the whole invocation.
+const GEMINI_TIMEOUT_MS = 100_000;
+
 export interface GeminiCallResult<T> {
     ok: boolean;
     data: T | null;
@@ -30,6 +38,7 @@ export async function callGeminiForJSON<T>(
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
@@ -104,6 +113,7 @@ export async function callGeminiForAudioJSON<T>(
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
             body: JSON.stringify({
                 contents: [{
                     parts: [

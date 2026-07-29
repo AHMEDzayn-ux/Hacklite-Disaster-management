@@ -9,12 +9,7 @@ import MapFrame from '@/components/map/MapFrame';
 import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
 import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
 import { defaultMapConfig, districtBounds, allDistricts } from '@/lib/mapConfig';
-import DisasterReportsList from '@/features/disasters/components/DisasterReportsList';
-import MissingPersonsList from '@/features/missing-persons/components/MissingPersonsList';
-import AnimalRescueList from '@/features/animal-rescue/components/AnimalRescueList';
-import CampsList from '@/features/camps/components/CampsList';
 import {
-    IconLifeBuoy,
     IconGrid,
     IconBolt,
     IconSearch,
@@ -335,18 +330,6 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 <KPI value={A.kpi.activeAnimals} label="Animal Rescues" sub="pending" accent="text-emerald-400" icon={IconPawPrint} iconColor="emerald" />
                 <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-white" icon={IconClock} iconColor="slate" />
             </div>
-
-            {/* AI operational summary */}
-            <Card icon={IconInfo} title="AI Operational Summary" right={<span className="text-xs text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
-                <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
-                {A.summary.chips.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2.5">
-                        {A.summary.chips.map((c, i) => (
-                            <span key={i} className={`text-xs font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
-                        ))}
-                    </div>
-                )}
-            </Card>
 
             {/* Live incident map */}
             <Card
@@ -910,25 +893,9 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
     if (topMissing && topMissing[1] >= 2) recommendations.push({ icon: '👥', action: `Assign search team to ${topMissing[0]}`, reason: `${topMissing[1]} active missing-person case(s) clustered here.`, confidence: Math.min(80, 45 + topMissing[1] * 8), impact: 'Concentrates search effort' });
     if (topRising && topRising[1] >= 3) recommendations.push({ icon: '📡', action: `Pre-position resources in ${topRising[0]}`, reason: `Report volume up +${topRising[1]} vs the previous window — an emerging hotspot.`, confidence: 60, impact: 'Gets ahead of the surge' });
 
-    // ---- AI operational summary narrative + chips
-    const topDistrictStr = districtRanking[0] ? districtRanking[0].label : 'no single district';
-    const scope = district === 'all' ? 'across all districts' : `in ${district}`;
-    const narrative = active.length === 0
-        ? `No active reports ${scope} in the selected scope. Operations are clear.`
-        : `${active.length} active report(s) ${scope}: ${activeDisasters.length} disaster(s), ${activeMissing.length} missing-person case(s), and ${activeAnimals.length} animal rescue(s). `
-        + `${highPriority} are high-priority (${critical} critical). Highest activity is in ${topDistrictStr}. `
-        + `${kpi.newInWindow} report(s) came in over the last ${RANGE_CONF[range].label}, and average resolution time is ${fmtDuration(avgResponseH)}.`
-        + (topResource ? ` Most-referenced need: ${topResource.label}.` : '');
-    const chips = [];
-    if (topFlood) chips.push({ text: `🌊 Flood hotspot: ${topFlood[0]}`, tone: 'bg-primary-500/15 text-primary-300' });
-    if (trapped > 0) chips.push({ text: `🆘 ${trapped} trapped mentions`, tone: 'bg-danger-500/15 text-danger-300' });
-    if (nearFull.length > 0) chips.push({ text: `⛺ ${nearFull.length} camps near full`, tone: 'bg-amber-500/15 text-amber-300' });
-    if (duplicates.length > 0) chips.push({ text: `🔄 ${duplicates.length} duplicate clusters`, tone: 'bg-white/10 text-slate-300' });
-
     return {
         kpi, distribution, priority, trend, responseTrend, districtRanking, resourceDemand,
         map, urgentFeed, timeline, categories, hotspots, duplicates, insights, recommendations,
-        summary: { narrative, chips },
     };
 }
 
@@ -936,17 +903,7 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
 // Page shell — top-level category tabs wrapping the Command Center + lists
 // ---------------------------------------------------------------------------
 
-const TABS = [
-    { key: 'command', label: 'Command Center', icon: IconGrid },
-    { key: 'disasters', label: 'Disasters', icon: IconSiren },
-    { key: 'missing', label: 'Missing Persons', icon: IconUserSearch },
-    { key: 'animals', label: 'Animal Rescues', icon: IconPawPrint },
-    { key: 'camps', label: 'Camps', icon: IconTent },
-];
-
 function RespondDashboard() {
-    const [activeTab, setActiveTab] = useState('command');
-
     const { missingPersons, isInitialized: mpInit, subscribeToMissingPersons } = useMissingPersonStore();
     const { disasters, isInitialized: dInit, subscribeToDisasters } = useDisasterStore();
     const { animalRescues, isInitialized: arInit, subscribeToAnimalRescues } = useAnimalRescueStore();
@@ -961,13 +918,6 @@ function RespondDashboard() {
     }, []);
 
     const loading = !mpInit || !dInit || !arInit || !cInit;
-
-    const tabCounts = {
-        disasters: disasters.filter(d => !isResolved(d.status)).length,
-        missing: missingPersons.filter(p => !isResolved(p.status)).length,
-        animals: animalRescues.filter(a => !isResolved(a.status)).length,
-        camps: camps.filter(c => !isResolved(c.status)).length,
-    };
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
@@ -987,54 +937,13 @@ function RespondDashboard() {
             ></div>
 
             <div className="relative z-10 mx-auto max-w-[1800px] px-4 pt-4 pb-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between flex-wrap gap-4 mb-3">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
-                            <IconLifeBuoy className="h-5 w-5" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2.5">
-                                <h1 className="text-xl md:text-2xl font-black text-white leading-tight">Responder Operations Center</h1>
-                                <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
-                                    <span className="absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
-                                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success-500"></span>
-                                </span>
-                            </div>
-                            <p className="text-slate-300 text-xs mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Top-level tabs */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                    {TABS.map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`px-3 py-1.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            <tab.icon className="h-4 w-4" />
-                            {tab.label}
-                            {tab.key !== 'command' && (
-                                <span className={`text-xs font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
-                            )}
-                        </button>
-                    ))}
-                </div>
-
-                {activeTab === 'command' && (
-                    <CommandCenter
-                        disasters={disasters}
-                        missingPersons={missingPersons}
-                        animalRescues={animalRescues}
-                        camps={camps}
-                        loading={loading}
-                    />
-                )}
-                {activeTab === 'disasters' && <DisasterReportsList role="responder" />}
-                {activeTab === 'missing' && <MissingPersonsList role="responder" />}
-                {activeTab === 'animals' && <AnimalRescueList role="responder" />}
-                {activeTab === 'camps' && <CampsList role="responder" />}
+                <CommandCenter
+                    disasters={disasters}
+                    missingPersons={missingPersons}
+                    animalRescues={animalRescues}
+                    camps={camps}
+                    loading={loading}
+                />
             </div>
         </div>
     );
