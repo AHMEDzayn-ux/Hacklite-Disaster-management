@@ -93,14 +93,14 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
 
     return (
         <div
-            className="relative rounded-2xl border border-amber-400/20 bg-gradient-to-r from-amber-500/10 to-danger-500/10 backdrop-blur-md p-6 shadow-xl"
+            className="relative rounded-xl border border-amber-400/20 bg-gradient-to-r from-amber-500/10 to-danger-500/10 p-6"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
             {/* Navigation Arrows */}
             <button
                 onClick={handlePrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-slate-200 rounded-full p-2 shadow-md transition-all duration-200 hover:scale-110"
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-slate-200 rounded-full p-2 transition-colors duration-150"
                 aria-label="Previous message"
             >
                 <IconChevronRight className="w-5 h-5 rotate-180" />
@@ -108,7 +108,7 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
 
             <button
                 onClick={handleNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-slate-200 rounded-full p-2 shadow-md transition-all duration-200 hover:scale-110"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 text-slate-200 rounded-full p-2 transition-colors duration-150"
                 aria-label="Next message"
             >
                 <IconChevronRight className="w-5 h-5" />

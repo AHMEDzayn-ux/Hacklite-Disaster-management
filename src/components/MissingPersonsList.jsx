@@ -174,49 +174,49 @@ function MissingPersonsList({ role = 'responder' }) {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-10 sm:px-10">
+            <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-6 sm:px-10">
                 {/* Header */}
-                <div className="mb-8 flex items-center gap-5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/30">
-                        <IconUserSearch className="h-7 w-7" />
+                <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-fuchsia-500 text-white">
+                        <IconUserSearch className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-white md:text-4xl">Missing Persons</h1>
-                        <p className="mt-1 text-slate-300">Reported missing persons in Sri Lanka</p>
+                        <h1 className="text-xl font-bold text-fuchsia-400">Missing Persons</h1>
+                        <p className="mt-0.5 text-sm text-slate-400">Reported missing persons in Sri Lanka</p>
                     </div>
                 </div>
 
                 {/* View Mode Toggle */}
-                <div className="mb-6 flex justify-center">
+                <div className="mb-4 flex justify-center">
                     <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
                         <button
                             onClick={() => setViewMode('cards')}
-                            className={`flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-lg transition-colors ${viewMode === 'cards'
-                                ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                            className={`flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-lg transition-colors ${viewMode === 'cards'
+                                ? 'bg-primary-500 text-white'
                                 : 'text-slate-300 hover:bg-white/10'
                                 }`}
                         >
-                            <IconGrid className="h-4 w-4" />
+                            <IconGrid className="h-3.5 w-3.5" />
                             Card View
                         </button>
                         <button
                             onClick={() => setViewMode('map')}
-                            className={`flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-lg transition-colors ${viewMode === 'map'
-                                ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                            className={`flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-lg transition-colors ${viewMode === 'map'
+                                ? 'bg-primary-500 text-white'
                                 : 'text-slate-300 hover:bg-white/10'
                                 }`}
                         >
-                            <IconMap className="h-4 w-4" />
+                            <IconMap className="h-3.5 w-3.5" />
                             Map View
                         </button>
                     </div>
                 </div>
 
                 {/* Filters */}
-                <div className="card mb-6">
-                    <div className="flex flex-col md:flex-row gap-4">
+                <div className="card mb-5">
+                    <div className="flex flex-col md:flex-row gap-3">
                         <div className="relative flex-1">
-                            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
                                 placeholder="Search by name or location..."
@@ -243,7 +243,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             <button
                                 onClick={() => setStatusFilter('all')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'all'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    ? 'bg-primary-500 text-white'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
                             >
@@ -252,7 +252,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             <button
                                 onClick={() => setStatusFilter('active')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'active'
-                                    ? 'bg-danger-500 text-white shadow-md shadow-danger-500/30'
+                                    ? 'bg-danger-500 text-white'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
                             >
@@ -261,7 +261,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             <button
                                 onClick={() => setStatusFilter('found')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'found'
-                                    ? 'bg-success-500 text-white shadow-md shadow-success-500/30'
+                                    ? 'bg-success-500 text-white'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
                             >
@@ -300,11 +300,11 @@ function MissingPersonsList({ role = 'responder' }) {
 
                                         <div className="space-y-1 text-sm text-slate-400">
                                             <p><span className="font-medium text-slate-300">Age:</span> {person.age || 'N/A'} | <span className="font-medium text-slate-300">Gender:</span> {person.gender || 'N/A'}</p>
-                                            <p className="flex items-start gap-1 text-xs text-slate-500 truncate" title={(person.last_seen_location || person.lastSeenLocation)?.address}>
+                                            <p className="flex items-start gap-1 text-xs text-slate-400 truncate" title={(person.last_seen_location || person.lastSeenLocation)?.address}>
                                                 <IconMapPin className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
                                                 {(person.last_seen_location || person.lastSeenLocation)?.address}
                                             </p>
-                                            <p className="flex items-center gap-1 text-xs text-slate-500">
+                                            <p className="flex items-center gap-1 text-xs text-slate-400">
                                                 <IconClock className="h-3.5 w-3.5 flex-shrink-0" />
                                                 Last seen {getTimeSince(person.last_seen_date || person.lastSeenDate)}
                                             </p>
@@ -357,7 +357,7 @@ function MissingPersonsList({ role = 'responder' }) {
 
                                 {/* Reporter Info */}
                                 <div className="mt-2 pt-2 border-t border-white/10">
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-400">
                                         Reported by <span className="font-medium text-slate-300">{person.reporter_name || person.reporterName}</span> &middot; {formatDate(person.reported_at || person.reportedAt || person.created_at)}
                                     </p>
                                 </div>
@@ -370,7 +370,7 @@ function MissingPersonsList({ role = 'responder' }) {
                 {viewMode === 'map' && (
                     <div>
                         {/* Warning Note */}
-                        <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
+                        <div className="mb-4 rounded-xl border border-amber-400/20 bg-amber-500/10 p-4">
                             <div className="flex items-start gap-3">
                                 <IconInfo className="h-5 w-5 flex-shrink-0 text-amber-300 mt-0.5" />
                                 <div>
@@ -383,7 +383,7 @@ function MissingPersonsList({ role = 'responder' }) {
                             </div>
                         </div>
 
-                        <div className="h-[600px] rounded-2xl overflow-hidden border border-white/10">
+                        <div className="h-[600px] rounded-xl overflow-hidden border border-white/10">
                             <MapContainer
                                 center={[7.8731, 80.7718]} // Center of Sri Lanka
                                 zoom={7}
@@ -520,7 +520,7 @@ function MissingPersonsList({ role = 'responder' }) {
                 )}
 
                 {filteredPersons.length === 0 && (
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center text-slate-400">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-10 text-center text-slate-400">
                         No missing persons found matching your criteria
                     </div>
                 )}

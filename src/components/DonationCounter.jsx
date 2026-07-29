@@ -12,7 +12,7 @@ function DonationCounter() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-8 shadow-xl"
+            className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.05] p-8"
         >
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-success-500/10 rounded-full -mr-32 -mt-32"></div>
@@ -28,7 +28,7 @@ function DonationCounter() {
                     className="text-center mb-6"
                 >
                     <h2 className="flex items-center justify-center gap-2 text-2xl md:text-3xl font-bold text-white mb-2">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-success-500 text-white shadow-md shadow-success-500/30">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-success-500 text-white">
                             <IconHeart className="h-5 w-5" />
                         </span>
                         Total Contributions

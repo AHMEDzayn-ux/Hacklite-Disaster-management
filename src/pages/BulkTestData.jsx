@@ -67,11 +67,11 @@ function BulkTestData() {
                         ← Back to Home
                     </button>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                             <IconFlask className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-white md:text-4xl">Bulk Test Data Generator</h1>
+                            <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Bulk Test Data Generator</h1>
                             <p className="mt-1 text-slate-300">Generate realistic test data for testing and demo purposes</p>
                         </div>
                     </div>

@@ -308,11 +308,11 @@ function AdminEditCamp() {
                         ← Back to Camps
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">Edit Camp</h1>
+                            <h1 className="text-xl md:text-2xl font-bold text-amber-400">Edit Camp</h1>
                         </div>
                     </div>
                 </div>
@@ -338,7 +338,7 @@ function AdminEditCamp() {
                 )}
 
                 {/* Form */}
-                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
+                <div className="bg-white/[0.05] border border-white/10 rounded-xl p-6 md:p-8">
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {/* Basic Information */}
                         <section>
@@ -543,7 +543,7 @@ function AdminEditCamp() {
                                 <label className="block text-sm font-semibold text-slate-300 mb-2">
                                     Map Location
                                     {formData.latitude && formData.longitude && (
-                                        <span className="ml-2 text-xs text-slate-500">
+                                        <span className="ml-2 text-xs text-slate-400">
                                             ({formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)})
                                         </span>
                                     )}

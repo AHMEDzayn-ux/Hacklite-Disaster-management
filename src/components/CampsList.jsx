@@ -174,11 +174,11 @@ function CampsList({ role = 'responder' }) {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         {/* Title & Stats */}
                         <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                                 <IconTent className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-white">Relief Camps</h1>
+                                <h1 className="text-xl font-bold text-amber-400">Relief Camps</h1>
                                 <div className="hidden sm:flex items-center gap-3 text-sm mt-1">
                                     <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
                                         {activeCount} Active
@@ -197,7 +197,7 @@ function CampsList({ role = 'responder' }) {
                                 <button
                                     onClick={() => setViewMode('map')}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map'
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        ? 'bg-primary-500 text-white'
                                         : 'text-slate-300 hover:bg-white/10'
                                         }`}
                                 >
@@ -207,7 +207,7 @@ function CampsList({ role = 'responder' }) {
                                 <button
                                     onClick={() => setViewMode('cards')}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'cards'
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        ? 'bg-primary-500 text-white'
                                         : 'text-slate-300 hover:bg-white/10'
                                         }`}
                                 >
@@ -265,13 +265,13 @@ function CampsList({ role = 'responder' }) {
                         </select>
 
                         <div className="relative">
-                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
                                 placeholder="Search camps..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="text-sm bg-white/5 border border-white/15 text-white placeholder:text-slate-500 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
+                                className="text-sm bg-white/5 border border-white/15 text-white placeholder:text-slate-400 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
                             />
                         </div>
 
@@ -291,14 +291,14 @@ function CampsList({ role = 'responder' }) {
                             </button>
                         )}
 
-                        <span className="ml-auto text-xs text-slate-500">
+                        <span className="ml-auto text-xs text-slate-400">
                             {filteredCamps.length} of {camps.length} camps
                         </span>
                     </div>
                 </div>
 
                 {camps.length === 0 ? (
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-10 text-center">
                         <div className="mb-3 flex justify-center text-amber-300">
                             <IconTent className="h-12 w-12" />
                         </div>
@@ -310,8 +310,8 @@ function CampsList({ role = 'responder' }) {
                         {viewMode === 'cards' ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                                 {filteredCamps.length === 0 ? (
-                                    <div className="col-span-full rounded-2xl border border-white/10 bg-white/[0.03] text-center py-8">
-                                        <div className="mb-2 flex justify-center text-slate-500">
+                                    <div className="col-span-full rounded-xl border border-white/10 bg-white/[0.03] text-center py-8">
+                                        <div className="mb-2 flex justify-center text-slate-400">
                                             <IconSearch className="h-8 w-8" />
                                         </div>
                                         <h3 className="text-lg font-bold text-white mb-1">No Camps Match Filters</h3>
@@ -333,7 +333,7 @@ function CampsList({ role = 'responder' }) {
                                                             <span className="text-base">{getCampTypeIcon(camp.type || 'unknown')}</span>
                                                             {camp.name || 'Unnamed Camp'}
                                                         </h3>
-                                                        <p className="text-xs text-slate-500 capitalize truncate">{camp.type?.replace('-', ' ') || 'Unknown'} &middot; {camp.district || 'N/A'}</p>
+                                                        <p className="text-xs text-slate-400 capitalize truncate">{camp.type?.replace('-', ' ') || 'Unknown'} &middot; {camp.district || 'N/A'}</p>
                                                     </div>
                                                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${camp.status === 'Active' ? 'bg-success-500/15 text-success-300' : 'bg-white/10 text-slate-400'
                                                         }`}>
@@ -344,7 +344,7 @@ function CampsList({ role = 'responder' }) {
                                                 {/* Occupancy Bar */}
                                                 <div className="mb-2">
                                                     <div className="flex justify-between items-center mb-0.5">
-                                                        <span className="text-xs text-slate-500">Occupancy</span>
+                                                        <span className="text-xs text-slate-400">Occupancy</span>
                                                         <span className={`text-xs font-semibold ${getOccupancyColor(camp)}`}>
                                                             {camp.current_occupancy || 0}/{camp.capacity || 0}
                                                         </span>
@@ -409,7 +409,7 @@ function CampsList({ role = 'responder' }) {
 
                                 {filteredCamps.length === 0 ? (
                                     <div className="text-center py-8">
-                                        <div className="mb-2 flex justify-center text-slate-500">
+                                        <div className="mb-2 flex justify-center text-slate-400">
                                             <IconSearch className="h-8 w-8" />
                                         </div>
                                         <h3 className="text-lg font-bold text-white mb-1">No Camps Match Filters</h3>

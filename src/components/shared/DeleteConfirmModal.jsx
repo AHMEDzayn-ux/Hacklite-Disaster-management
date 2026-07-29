@@ -35,7 +35,7 @@ function DeleteConfirmModal({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-900 border border-white/10 rounded-lg p-6 max-w-md w-full shadow-2xl">
+            <div className="bg-slate-900 border border-white/10 rounded-lg p-6 max-w-md w-full">
                 {/* Warning Header */}
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 bg-danger-500/15 rounded-full flex items-center justify-center">
@@ -71,7 +71,7 @@ function DeleteConfirmModal({
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             placeholder="Enter reason for deletion (required for audit log)"
-                            className="w-full px-3 py-2 bg-white/5 border border-white/20 text-white placeholder:text-slate-500 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 h-20 resize-none"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/20 text-white placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 h-20 resize-none"
                             disabled={isProcessing}
                         />
                     </div>
@@ -106,7 +106,7 @@ function DeleteConfirmModal({
                 </div>
 
                 {/* Audit Notice */}
-                <p className="mt-4 text-xs text-slate-500 text-center">
+                <p className="mt-4 text-xs text-slate-400 text-center">
                     🔒 This action will be logged for audit purposes
                 </p>
             </div>

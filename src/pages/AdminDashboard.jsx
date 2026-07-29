@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { IconShieldLock, IconSiren, IconTent } from '../components/icons/Icons';
-import heroImage from '../assets/back.png';
 
 const COLOR_STYLES = {
     danger: {
@@ -128,21 +127,14 @@ function AdminDashboard() {
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
-            {/* Faint background photo for atmosphere */}
-            <div className="absolute inset-0">
-                <img
-                    src={heroImage}
-                    alt=""
-                    className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.06]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/97 to-slate-950"></div>
-            </div>
-
-            {/* Slow-moving colour blobs for depth */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
-            </div>
+            {/* Static colour glow - CSS gradient only, no image/filter/animation */}
+            <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                    backgroundImage:
+                        'radial-gradient(circle at 10% 5%, rgba(59,130,246,0.10), transparent 40%), radial-gradient(circle at 90% 35%, rgba(239,68,68,0.08), transparent 40%)',
+                }}
+            ></div>
 
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
@@ -153,14 +145,14 @@ function AdminDashboard() {
             ></div>
 
             {/* Top nav */}
-            <header className="relative z-10 border-b border-white/10 bg-white/[0.03] backdrop-blur-md">
+            <header className="relative z-10 border-b border-white/10 bg-white/[0.03]">
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-4">
                             <Link to="/" className="text-slate-400 hover:text-white transition-colors text-sm">
                                 ← Home
                             </Link>
-                            <h1 className="flex items-center gap-2 text-xl font-bold text-white">
+                            <h1 className="flex items-center gap-2 text-xl font-bold text-primary-400">
                                 <IconShieldLock className="h-5 w-5 text-primary-400" />
                                 Admin Portal
                             </h1>
@@ -183,7 +175,7 @@ function AdminDashboard() {
                 {/* Header & Stats Row */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                             <IconShieldLock className="h-6 w-6" />
                         </div>
                         <div>
@@ -194,15 +186,15 @@ function AdminDashboard() {
 
                     {/* Quick Stats - Inline */}
                     <div className="flex flex-wrap gap-3">
-                        <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-2 flex items-center gap-2">
+                        <div className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 flex items-center gap-2">
                             <span className="text-amber-400 font-bold text-lg">-</span>
                             <span className="text-xs text-slate-400">Pending</span>
                         </div>
-                        <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-2 flex items-center gap-2">
+                        <div className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 flex items-center gap-2">
                             <span className="text-success-400 font-bold text-lg">-</span>
                             <span className="text-xs text-slate-400">Active Camps</span>
                         </div>
-                        <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-2 flex items-center gap-2">
+                        <div className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 flex items-center gap-2">
                             <span className="text-primary-300 font-bold text-lg">-</span>
                             <span className="text-xs text-slate-400">Capacity</span>
                         </div>
@@ -215,10 +207,10 @@ function AdminDashboard() {
                         const styles = COLOR_STYLES[color];
                         return (
                             <Link key={to} to={to} className="block group animate-fade-in-up" style={{ animationDelay: `${i * 50}ms` }}>
-                                <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08]">
+                                <div className="relative h-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.05] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08]">
                                     <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${styles.bar}`}></div>
                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${styles.badge}`}>
+                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${styles.badge}`}>
                                             {Icon ? <Icon className="h-6 w-6" /> : <span className="text-2xl leading-none">{emoji}</span>}
                                         </div>
                                         <h3 className={`text-lg font-bold text-white transition-colors ${styles.text}`}>{title}</h3>

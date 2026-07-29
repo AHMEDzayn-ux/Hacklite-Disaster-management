@@ -111,31 +111,31 @@ function DonationList() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/10 bg-gradient-to-br from-primary-600/20 to-indigo-700/20 backdrop-blur-md p-6 shadow-xl"
+                className="rounded-xl border border-white/10 bg-gradient-to-br from-primary-600/20 to-indigo-700/20 p-6"
             >
                 <h3 className="text-white text-lg font-bold mb-4 text-center">
                     📊 Donation Statistics
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white/5 border border-white/10 backdrop-blur rounded-lg p-3 text-center">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Total Raised</div>
                         <div className="text-2xl font-bold text-white">LKR {stats.total.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500 mt-1">{stats.count} donations</div>
+                        <div className="text-xs text-slate-400 mt-1">{stats.count} donations</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 backdrop-blur rounded-lg p-3 text-center">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Average</div>
                         <div className="text-2xl font-bold text-white">LKR {stats.average.toFixed(0)}</div>
-                        <div className="text-xs text-slate-500 mt-1">per contributor</div>
+                        <div className="text-xs text-slate-400 mt-1">per contributor</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 backdrop-blur rounded-lg p-3 text-center">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Largest</div>
                         <div className="text-2xl font-bold text-white">LKR {stats.max.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500 mt-1">single gift</div>
+                        <div className="text-xs text-slate-400 mt-1">single gift</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 backdrop-blur rounded-lg p-3 text-center">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Total Donors</div>
                         <div className="text-2xl font-bold text-white">{stats.count}</div>
-                        <div className="text-xs text-slate-500 mt-1">generous people</div>
+                        <div className="text-xs text-slate-400 mt-1">generous people</div>
                     </div>
                 </div>
             </motion.div>
@@ -217,7 +217,7 @@ function DonationList() {
             </div>
 
             {/* Donation Table */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl">
+            <div className="rounded-xl border border-white/10 bg-white/[0.05] overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-white/5 border-b border-white/10">
@@ -264,7 +264,7 @@ function DonationList() {
                                                     {donation.is_anonymous ? '🙏 Anonymous' : donation.donor_name || 'Anonymous'}
                                                 </div>
                                                 {!donation.is_anonymous && (
-                                                    <div className="text-sm text-slate-500">
+                                                    <div className="text-sm text-slate-400">
                                                         {donation.donor_email}
                                                     </div>
                                                 )}
@@ -274,7 +274,7 @@ function DonationList() {
                                             <div className="text-lg font-bold text-success-400">
                                                 {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toLocaleString()}
                                             </div>
-                                            <div className="text-xs text-slate-500">
+                                            <div className="text-xs text-slate-400">
                                                 {donation.currency || 'LKR'}
                                             </div>
                                         </td>
@@ -283,7 +283,7 @@ function DonationList() {
                                                 {donation.donation_purpose || 'General Relief'}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                                             {formatDate(donation.created_at)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -306,7 +306,7 @@ function DonationList() {
             </div>
 
             {/* Transparency Note */}
-            <div className="rounded-2xl border border-primary-400/20 bg-primary-500/10 backdrop-blur-md p-4">
+            <div className="rounded-xl border border-primary-400/20 bg-primary-500/10 p-4">
                 <div className="flex items-start gap-3">
                     <IconInfo className="w-6 h-6 text-primary-300 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">

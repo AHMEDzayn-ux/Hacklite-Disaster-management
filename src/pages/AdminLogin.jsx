@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import { IconShieldLock } from '../components/icons/Icons';
-import heroImage from '../assets/dark.png';
 
 function AdminLogin() {
     const navigate = useNavigate();
@@ -41,16 +40,14 @@ function AdminLogin() {
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
-            {/* Cinematic night-ops background */}
-            <div className="absolute inset-0">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.16]" />
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-950/95 via-slate-950/90 to-slate-950/95"></div>
-            </div>
-
-            <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl animate-blob [animation-delay:2s]"></div>
-            </div>
+            {/* Static colour glow - CSS gradient only, no image/filter/animation */}
+            <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                    backgroundImage:
+                        'radial-gradient(circle at 15% 10%, rgba(59,130,246,0.12), transparent 45%), radial-gradient(circle at 85% 90%, rgba(239,68,68,0.10), transparent 45%)',
+                }}
+            ></div>
 
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
@@ -60,37 +57,37 @@ function AdminLogin() {
                 }}
             ></div>
 
-            <div className="relative z-10 max-w-md w-full animate-fade-in-up">
+            <div className="relative z-10 max-w-sm w-full animate-fade-in-up">
                 {/* Back to Home */}
                 <button
                     onClick={() => navigate('/')}
-                    className="text-slate-400 hover:text-white mb-8 flex items-center gap-2 transition-colors"
+                    className="text-slate-400 hover:text-white mb-5 flex items-center gap-2 text-sm transition-colors"
                 >
                     ← Back to Home
                 </button>
 
-                <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-2xl p-8">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
                     {/* Header */}
-                    <div className="text-center mb-8">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/20 text-primary-300 transition-transform duration-300 hover:scale-110">
-                            <IconShieldLock className="h-8 w-8" />
+                    <div className="text-center mb-6">
+                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/15 text-primary-300 ring-1 ring-inset ring-primary-400/20">
+                            <IconShieldLock className="h-6 w-6" />
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Admin Portal</h1>
-                        <p className="text-slate-400 mt-2">
+                        <h1 className="text-xl font-bold text-primary-300">Admin Portal</h1>
+                        <p className="text-slate-400 text-sm mt-1">
                             Camp Management & Verification
                         </p>
                     </div>
 
                     {/* Login Form */}
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    <form onSubmit={handleLogin} className="space-y-4">
                         {error && (
-                            <div className="bg-danger-500/10 border border-danger-400/30 text-danger-300 px-4 py-3 rounded-lg text-sm">
+                            <div className="bg-danger-500/10 border border-danger-400/30 text-danger-300 px-3 py-2 rounded-lg text-sm">
                                 {error}
                             </div>
                         )}
 
                         <div>
-                            <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            <label className="block text-sm font-semibold text-slate-300 mb-1.5">
                                 Email Address
                             </label>
                             <input
@@ -104,7 +101,7 @@ function AdminLogin() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold text-slate-300 mb-2">
+                            <label className="block text-sm font-semibold text-slate-300 mb-1.5">
                                 Password
                             </label>
                             <input
@@ -120,15 +117,15 @@ function AdminLogin() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 text-white font-bold py-3 px-4 rounded-lg shadow-md shadow-primary-500/25 transition-all disabled:opacity-50"
+                            className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>
                     </form>
 
                     {/* Info */}
-                    <div className="mt-6 pt-6 border-t border-white/10">
-                        <p className="text-xs text-slate-500 text-center">
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                        <p className="text-xs text-slate-400 text-center">
                             This portal is for authorized personnel only.
                             <br />
                             For camp requests, please use the public form.

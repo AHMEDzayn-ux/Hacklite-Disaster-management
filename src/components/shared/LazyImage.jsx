@@ -65,7 +65,7 @@ function LazyImage({
                     className={`absolute inset-0 bg-white/10 animate-pulse flex items-center justify-center ${placeholderClassName}`}
                 >
                     <svg
-                        className="w-10 h-10 text-slate-500"
+                        className="w-10 h-10 text-slate-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ function LazyImage({
                     {fallbackSrc ? (
                         <img src={fallbackSrc} alt={alt} className="w-full h-full object-cover" />
                     ) : (
-                        <div className="text-center text-slate-500">
+                        <div className="text-center text-slate-400">
                             <svg
                                 className="w-8 h-8 mx-auto mb-1"
                                 fill="none"

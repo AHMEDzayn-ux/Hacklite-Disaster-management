@@ -80,7 +80,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4">
-            <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
                 {!result ? (
                     <>
                         <div className="flex items-center gap-3 mb-4">
@@ -98,7 +98,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                 <div className="bg-white/5 rounded p-2 border border-white/10">
                                     <p className="text-xs text-slate-400">FROM</p>
                                     <p className="font-medium text-white">{plan.from_camp?.name || 'Unknown camp'}</p>
-                                    <p className="text-xs text-slate-500">{plan.from_camp?.district}</p>
+                                    <p className="text-xs text-slate-400">{plan.from_camp?.district}</p>
                                     <p className="text-xs mt-1 text-slate-300">
                                         Current stock: {loadingStock ? '…' : <span className="font-semibold text-white">{stock.from} units</span>}
                                         {!loadingStock && <span className="text-danger-400"> → {Math.max(0, stock.from - plan.quantity)} after</span>}
@@ -107,7 +107,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                 <div className="bg-white/5 rounded p-2 border border-white/10">
                                     <p className="text-xs text-slate-400">TO</p>
                                     <p className="font-medium text-white">{plan.to_camp?.name || 'Unknown camp'}</p>
-                                    <p className="text-xs text-slate-500">{plan.to_camp?.district}</p>
+                                    <p className="text-xs text-slate-400">{plan.to_camp?.district}</p>
                                     <p className="text-xs mt-1 text-slate-300">
                                         Current stock: {loadingStock ? '…' : <span className="font-semibold text-white">{stock.to} units</span>}
                                         {!loadingStock && <span className="text-success-400"> → {stock.to + plan.quantity} after</span>}
@@ -168,12 +168,12 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                     <div className="bg-danger-500/10 border border-danger-400/20 rounded p-2 text-center">
                                         <p className="text-xs text-slate-400">{plan.from_camp?.name}</p>
                                         <p className="font-bold text-danger-300">{result.afterFrom} units</p>
-                                        <p className="text-xs text-slate-500">on hand now</p>
+                                        <p className="text-xs text-slate-400">on hand now</p>
                                     </div>
                                     <div className="bg-success-500/10 border border-success-400/20 rounded p-2 text-center">
                                         <p className="text-xs text-slate-400">{plan.to_camp?.name}</p>
                                         <p className="font-bold text-success-300">{result.afterTo} units</p>
-                                        <p className="text-xs text-slate-500">on hand now</p>
+                                        <p className="text-xs text-slate-400">on hand now</p>
                                     </div>
                                 </div>
                                 <p className="text-xs text-slate-400 text-center">Logged to the audit trail as <code>APPROVE_ALLOCATION_PLAN</code>. A route can now be generated for this shipment from the Route Optimization agent.</p>

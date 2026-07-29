@@ -19,7 +19,7 @@ function NotFound() {
                         404
                     </h1>
 
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/20 text-primary-300">
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
                         <IconSiren className="h-8 w-8" />
                     </div>
 
@@ -33,19 +33,19 @@ function NotFound() {
                     <div className="flex flex-col justify-center gap-4 sm:flex-row">
                         <Link
                             to="/"
-                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-8 py-3 font-bold text-white shadow-lg shadow-danger-500/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-danger-500/40"
+                            className="rounded-lg bg-danger-600 hover:bg-danger-500 px-8 py-3 font-bold text-white transition-colors duration-150 hover:-translate-y-0.5"
                         >
                             Go Home
                         </Link>
                         <Link
                             to="/emergency"
-                            className="rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
+                            className="rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                         >
                             Emergency Contacts
                         </Link>
                     </div>
 
-                    <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-left backdrop-blur-md">
+                    <div className="mt-12 rounded-xl border border-white/10 bg-white/[0.05] p-6 text-left">
                         <h3 className="mb-4 text-xl font-bold text-white">
                             Quick Links
                         </h3>

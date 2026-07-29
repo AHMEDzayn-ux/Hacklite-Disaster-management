@@ -165,7 +165,7 @@ function DonationForm({ onSuccess }) {
                         type="button"
                         onClick={() => handleAmountSelect(amount)}
                         className={`p-4 rounded-lg border transition-all duration-200 ${selectedAmount === amount && !customAmount
-                            ? 'bg-success-600 text-white border-success-500 shadow-md shadow-success-500/30 scale-105'
+                            ? 'bg-success-600 text-white border-success-500 scale-105'
                             : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                             }`}
                     >
@@ -180,7 +180,7 @@ function DonationForm({ onSuccess }) {
                     Or enter custom amount
                 </label>
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">{getCurrencySymbol()}</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">{getCurrencySymbol()}</span>
                     <input
                         type="text"
                         value={customAmount}
@@ -209,7 +209,7 @@ function DonationForm({ onSuccess }) {
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={!getFinalAmount() || getFinalAmount() < 1}
-                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-200"
             >
                 Continue to Your Information
             </button>
@@ -402,7 +402,7 @@ function DonationForm({ onSuccess }) {
                 <button
                     type="submit"
                     disabled={isProcessing || !stripe}
-                    className="flex-1 bg-gradient-to-r from-success-600 to-success-500 hover:shadow-lg hover:shadow-success-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none text-white font-semibold py-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+                    className="flex-1 bg-success-600 hover:bg-success-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-150 flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <>
@@ -423,12 +423,12 @@ function DonationForm({ onSuccess }) {
     );
 
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-6 md:p-8">
+        <div className="rounded-xl border border-white/10 bg-white/[0.05] p-6 md:p-8">
             {/* Progress Steps */}
             <div className="flex items-center justify-center mb-8">
                 {[1, 2, 3].map((s) => (
                     <React.Fragment key={s}>
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${step >= s ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/10 text-slate-400'
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${step >= s ? 'bg-primary-500 text-white' : 'bg-white/10 text-slate-400'
                             }`}>
                             {s}
                         </div>

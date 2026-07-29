@@ -55,7 +55,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
     if (recentDonations.length === 0) {
         return (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-6 text-center shadow-xl">
+            <div className="rounded-xl border border-white/10 bg-white/[0.05] p-6 text-center">
                 <p className="text-slate-400">No donations yet. Be the first to contribute!</p>
             </div>
         );
@@ -70,7 +70,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                         initial={{ opacity: 0, y: -50, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                        className="rounded-lg border border-success-400/30 bg-success-500 text-white p-4 shadow-xl shadow-success-500/30"
+                        className="rounded-lg border border-success-400/30 bg-success-500 text-white p-4"
                     >
                         <div className="flex items-center gap-3">
                             <span className="text-3xl">🎉</span>
@@ -88,8 +88,8 @@ function RecentDonations({ limit = 10, showTicker = true }) {
             </AnimatePresence>
 
             {/* Recent Donations List */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl">
-                <div className="bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 backdrop-blur-md p-4 border-b border-white/10">
+            <div className="rounded-xl border border-white/10 bg-white/[0.05] overflow-hidden">
+                <div className="bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 p-4 border-b border-white/10">
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
                         <IconHeart className="h-5 w-5" /> Recent Donations
                     </h3>
@@ -128,7 +128,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                         </p>
                                     )}
 
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-xs text-slate-400 mt-2">
                                         {formatTimeAgo(donation.created_at)}
                                     </p>
                                 </div>
@@ -138,7 +138,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                     <div className="text-2xl font-bold text-success-400">
                                         {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toFixed(2)}
                                     </div>
-                                    <div className="text-xs text-slate-500 uppercase">
+                                    <div className="text-xs text-slate-400 uppercase">
                                         {donation.currency || 'USD'}
                                     </div>
                                 </div>
@@ -159,7 +159,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
             {/* Ticker Mode (Optional) */}
             {showTicker && recentDonations.length > 3 && (
-                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 backdrop-blur-md overflow-hidden">
+                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 overflow-hidden">
                     <div className="ticker-container py-3">
                         <div className="ticker-content flex gap-8 items-center">
                             {[...recentDonations, ...recentDonations].map((donation, index) => (

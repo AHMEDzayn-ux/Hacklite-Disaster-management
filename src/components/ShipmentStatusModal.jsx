@@ -15,7 +15,7 @@ function StatusTracker({ current }) {
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${i <= currentIndex ? 'bg-primary-600 text-white' : 'bg-white/10 text-slate-400'}`}>
                             {i < currentIndex ? <IconCheck className="h-4 w-4" /> : i + 1}
                         </div>
-                        <span className={`text-xs mt-1 ${i <= currentIndex ? 'text-slate-200 font-medium' : 'text-slate-500'}`}>{labels[step]}</span>
+                        <span className={`text-xs mt-1 ${i <= currentIndex ? 'text-slate-200 font-medium' : 'text-slate-400'}`}>{labels[step]}</span>
                     </div>
                     {i < STATUS_STEPS.length - 1 && (
                         <div className={`flex-1 h-0.5 mx-1 ${i < currentIndex ? 'bg-primary-600' : 'bg-white/10'}`} />
@@ -61,7 +61,7 @@ function ShipmentStatusModal({ plan, routeInfo, onClose, onUpdated }) {
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4">
-            <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full">
                 {!result ? (
                     <>
                         <h3 className="text-lg font-bold text-white mb-1">Update Shipment Status</h3>

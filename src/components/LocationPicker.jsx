@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IconMap, IconMapPin, IconInfo } from './icons/Icons';
+import { defaultMapConfig } from '../utils/mapConfig';
 
 /**
  * LocationPicker Component
@@ -58,9 +59,14 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
             });
 
             // Default to Sri Lanka center
-            const defaultCenter = position || { lat: 7.8731, lng: 80.7718 };
+            const defaultCenter = position || { lat: defaultMapConfig.center[0], lng: defaultMapConfig.center[1] };
 
-            const map = L.map('location-map').setView([defaultCenter.lat, defaultCenter.lng], position ? 13 : 7);
+            const map = L.map('location-map', {
+                minZoom: defaultMapConfig.minZoom,
+                maxZoom: defaultMapConfig.maxZoom,
+                maxBounds: defaultMapConfig.maxBounds,
+                maxBoundsViscosity: defaultMapConfig.maxBoundsViscosity,
+            }).setView([defaultCenter.lat, defaultCenter.lng], position ? 13 : defaultMapConfig.zoom);
 
             // Using OpenStreetMap (free, no API key required)
             // Can be replaced with Google Maps, Mapbox, etc.
@@ -121,7 +127,7 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <button
                     type="button"
                     onClick={() => setShowMap(!showMap)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg shadow-md shadow-primary-500/20 hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-500/30 transition-all text-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm"
                 >
                     <IconMap className="h-4 w-4" />
                     {showMap ? 'Enter Manually' : 'Pick on Map'}
@@ -129,7 +135,7 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <button
                     type="button"
                     onClick={getCurrentLocation}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-success-500 text-white rounded-lg shadow-md shadow-success-500/20 hover:bg-success-600 hover:shadow-lg hover:shadow-success-500/30 transition-all text-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-success-500 text-white rounded-lg hover:bg-success-600 transition-colors text-sm"
                 >
                     <IconMapPin className="h-4 w-4" />
                     Use My Location
@@ -141,10 +147,10 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 <div className="mb-3">
                     <div
                         id="location-map"
-                        className="w-full h-64 rounded-xl border border-white/15 overflow-hidden shadow-xl"
+                        className="w-full h-64 rounded-xl border border-white/15 overflow-hidden"
                     ></div>
                     <p className="flex items-center gap-1.5 text-sm text-slate-400 mt-2">
-                        <IconInfo className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                        <IconInfo className="h-4 w-4 flex-shrink-0 text-slate-400" />
                         Click anywhere on the map to set the location
                     </p>
                 </div>
@@ -174,7 +180,7 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
                 </span>
             )}
 
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
                 Map works offline if cached. Coordinates are more accurate.
             </p>
         </div>

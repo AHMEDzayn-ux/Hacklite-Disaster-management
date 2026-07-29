@@ -154,9 +154,9 @@ function CampAdminInventory() {
                 }}
             ></div>
 
-            <header className="relative z-10 sticky top-0 flex items-center justify-between border-b border-white/10 bg-slate-950/90 backdrop-blur-xl px-4 py-4 shadow-lg shadow-black/30">
+            <header className="relative z-10 sticky top-0 flex items-center justify-between border-b border-white/10 bg-slate-950/95 px-4 py-4 shadow-lg shadow-black/30">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                         <IconTent className="h-5 w-5" />
                     </div>
                     <div>
@@ -177,7 +177,7 @@ function CampAdminInventory() {
                     {sortedLevels.map((item) => {
                         const low = isLowStock(item.item_name, item.quantity_on_hand);
                         return (
-                            <div key={`${item.item_name}-${item.category}-${item.unit}`} className={`rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
+                            <div key={`${item.item_name}-${item.category}-${item.unit}`} className={`rounded-xl border border-white/10 bg-white/[0.05] p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
                                         <div className="font-bold text-white">{item.item_name}</div>
@@ -211,7 +211,7 @@ function CampAdminInventory() {
                 </div>
 
                 {/* Add a new item */}
-                <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
+                <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.05] p-4">
                     <h3 className="font-bold text-white mb-3">Add New Item</h3>
                     <form onSubmit={submitNewItem} className="space-y-3">
                         <input
@@ -248,7 +248,7 @@ function CampAdminInventory() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white font-bold py-3 rounded-lg shadow-md shadow-primary-500/25 transition-all"
+                            className="w-full bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors duration-150"
                         >
                             {submitting ? 'Saving...' : 'Add Item'}
                         </button>
@@ -258,8 +258,8 @@ function CampAdminInventory() {
 
             {/* Quantity modal for existing items */}
             {actionItem && (
-                <div className="fixed inset-0 z-20 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+                <div className="fixed inset-0 z-20 flex items-end sm:items-center justify-center bg-black/60 p-4">
+                    <div className="w-full max-w-sm rounded-xl border border-white/10 bg-slate-900 p-6">
                         <h3 className="text-xl font-bold text-white mb-1">
                             {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                         </h3>
@@ -283,7 +283,7 @@ function CampAdminInventory() {
                             {error && <p className="text-danger-400 text-sm">{error}</p>}
                             <div className="flex gap-3">
                                 <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
-                                <button type="submit" disabled={submitting} className="flex-1 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:opacity-50 text-white py-3 rounded-xl font-bold transition-all">
+                                <button type="submit" disabled={submitting} className="flex-1 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white py-3 rounded-xl font-bold transition-colors duration-150">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>
                             </div>

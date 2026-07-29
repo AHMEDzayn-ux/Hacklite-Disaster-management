@@ -5,6 +5,7 @@ import { checkIsAdmin } from '../services/adminService';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../utils/leafletIconFix';
+import { defaultMapConfig } from '../utils/mapConfig';
 
 function CampDetail() {
     const { id } = useParams();
@@ -121,7 +122,7 @@ function CampDetail() {
                 <div className="card mb-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                            <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
                                 {getCampTypeIcon(camp.type)} {camp.name || camp.camp_name || 'Unnamed Camp'}
                             </h1>
                             <div className="flex flex-wrap gap-2 mt-2 text-sm text-slate-400">
@@ -154,7 +155,7 @@ function CampDetail() {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md mb-6 overflow-hidden">
+                <div className="rounded-xl border border-white/10 bg-white/[0.05] mb-6 overflow-hidden">
                     <div className="flex border-b border-white/10">
                         {[
                             { id: 'overview', label: '📊 Overview' },
@@ -202,7 +203,7 @@ function CampDetail() {
                                                     style={{ width: `${Math.min(occupancyPercent, 100)}%` }}
                                                 />
                                             </div>
-                                            <p className="text-sm text-slate-500">{occupancyPercent}% capacity used</p>
+                                            <p className="text-sm text-slate-400">{occupancyPercent}% capacity used</p>
                                         </div>
                                         {camp.status === 'Active' && (
                                             <button
@@ -220,11 +221,11 @@ function CampDetail() {
                                     <h3 className="text-lg font-semibold text-white mb-4">📞 Contact Information</h3>
                                     <div className="space-y-3">
                                         <div>
-                                            <p className="text-xs text-slate-500 uppercase tracking-wide">Contact Person</p>
+                                            <p className="text-xs text-slate-400 uppercase tracking-wide">Contact Person</p>
                                             <p className="font-medium text-white">{camp.contact_person || camp.managed_by || 'N/A'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs text-slate-500 uppercase tracking-wide">Phone Number</p>
+                                            <p className="text-xs text-slate-400 uppercase tracking-wide">Phone Number</p>
                                             <p className="font-medium text-white">
                                                 {camp.contact_number ? (
                                                     <a href={`tel:${camp.contact_number}`} className="text-primary-300 hover:underline">
@@ -235,7 +236,7 @@ function CampDetail() {
                                         </div>
                                         {camp.contact_email && (
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase tracking-wide">Email</p>
+                                                <p className="text-xs text-slate-400 uppercase tracking-wide">Email</p>
                                                 <p className="font-medium text-white">
                                                     <a href={`mailto:${camp.contact_email}`} className="text-primary-300 hover:underline">
                                                         {camp.contact_email}
@@ -281,7 +282,7 @@ function CampDetail() {
                                             })}
                                         </div>
                                     ) : (
-                                        <p className="text-slate-500 text-sm">No supply information available</p>
+                                        <p className="text-slate-400 text-sm">No supply information available</p>
                                     )}
                                 </div>
 
@@ -292,7 +293,7 @@ function CampDetail() {
                                         {Object.entries(facilityIcons).slice(0, 6).map(([key, icon]) => (
                                             <div
                                                 key={key}
-                                                className={`p-2 rounded text-center ${camp.facilities?.[key] ? 'bg-success-500/15 text-success-300' : 'bg-white/5 text-slate-500'}`}
+                                                className={`p-2 rounded text-center ${camp.facilities?.[key] ? 'bg-success-500/15 text-success-300' : 'bg-white/5 text-slate-400'}`}
                                             >
                                                 <div className="text-2xl mb-1">{icon}</div>
                                                 <div className="text-xs font-medium capitalize">{key}</div>
@@ -318,7 +319,7 @@ function CampDetail() {
                                             <div>
                                                 <p className="font-semibold text-white">Camp Created</p>
                                                 <p className="text-sm text-slate-400">{formatDate(camp.created_at || camp.openedDate)}</p>
-                                                {camp.disasterType && <p className="text-sm text-slate-500">Disaster: {camp.disasterType}</p>}
+                                                {camp.disasterType && <p className="text-sm text-slate-400">Disaster: {camp.disasterType}</p>}
                                             </div>
                                         </div>
                                         {camp.updated_at && camp.updated_at !== camp.created_at && (
@@ -353,43 +354,51 @@ function CampDetail() {
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
                                         <div>
-                                            <p className="text-xs text-slate-500 uppercase tracking-wide">Full Address</p>
+                                            <p className="text-xs text-slate-400 uppercase tracking-wide">Full Address</p>
                                             <p className="font-medium text-white">{camp.address || camp.location?.address || 'N/A'}</p>
                                         </div>
                                         {camp.village_area && (
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase tracking-wide">Village/Area</p>
+                                                <p className="text-xs text-slate-400 uppercase tracking-wide">Village/Area</p>
                                                 <p className="font-medium text-white">{camp.village_area}</p>
                                             </div>
                                         )}
                                         {camp.nearby_landmark && (
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase tracking-wide">Nearby Landmark</p>
+                                                <p className="text-xs text-slate-400 uppercase tracking-wide">Nearby Landmark</p>
                                                 <p className="font-medium text-white">{camp.nearby_landmark}</p>
                                             </div>
                                         )}
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase tracking-wide">District</p>
+                                                <p className="text-xs text-slate-400 uppercase tracking-wide">District</p>
                                                 <p className="font-medium text-white">{camp.district || 'N/A'}</p>
                                             </div>
                                             {camp.ds_division && (
                                                 <div>
-                                                    <p className="text-xs text-slate-500 uppercase tracking-wide">DS Division</p>
+                                                    <p className="text-xs text-slate-400 uppercase tracking-wide">DS Division</p>
                                                     <p className="font-medium text-white">{camp.ds_division}</p>
                                                 </div>
                                             )}
                                         </div>
                                         {hasLocation && (
                                             <div>
-                                                <p className="text-xs text-slate-500 uppercase tracking-wide">GPS Coordinates</p>
+                                                <p className="text-xs text-slate-400 uppercase tracking-wide">GPS Coordinates</p>
                                                 <p className="font-mono text-sm text-slate-300">{lat.toFixed(6)}, {lng.toFixed(6)}</p>
                                             </div>
                                         )}
                                     </div>
                                     {hasLocation && (
-                                        <div style={{ height: '300px' }} className="rounded-2xl overflow-hidden border border-white/15 shadow-xl">
-                                            <MapContainer center={[lat, lng]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                                        <div style={{ height: '300px' }} className="rounded-xl overflow-hidden border border-white/15">
+                                            <MapContainer
+                                                center={[lat, lng]}
+                                                zoom={15}
+                                                minZoom={defaultMapConfig.minZoom}
+                                                maxZoom={defaultMapConfig.maxZoom}
+                                                maxBounds={defaultMapConfig.maxBounds}
+                                                maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                                style={{ height: '100%', width: '100%' }}
+                                            >
                                                 <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                                                 <Marker position={[lat, lng]}>
                                                     <Popup>
@@ -424,7 +433,7 @@ function CampDetail() {
                                                     <p className="text-sm mb-2">Quantity: {supply.quantity}</p>
                                                 )}
                                                 {supply?.lastUpdated && (
-                                                    <p className="text-xs text-slate-500">Last updated: {formatDate(supply.lastUpdated)}</p>
+                                                    <p className="text-xs text-slate-400">Last updated: {formatDate(supply.lastUpdated)}</p>
                                                 )}
                                                 {supply?.notes && (
                                                     <p className="text-sm mt-2 text-slate-400">{supply.notes}</p>
@@ -436,7 +445,7 @@ function CampDetail() {
                             ) : (
                                 <div className="card text-center py-12">
                                     <div className="text-6xl mb-4">📦</div>
-                                    <p className="text-slate-500">No supply information recorded for this camp</p>
+                                    <p className="text-slate-400">No supply information recorded for this camp</p>
                                 </div>
                             )}
 
@@ -527,7 +536,7 @@ function CampDetail() {
                                     {Object.entries(facilityIcons).map(([key, icon]) => (
                                         <div
                                             key={key}
-                                            className={`p-3 rounded-lg text-center ${camp.facilities?.[key] ? 'bg-success-500/15 text-success-300 border border-success-400/30' : 'bg-white/5 text-slate-500 border border-white/10'
+                                            className={`p-3 rounded-lg text-center ${camp.facilities?.[key] ? 'bg-success-500/15 text-success-300 border border-success-400/30' : 'bg-white/5 text-slate-400 border border-white/10'
                                                 }`}
                                         >
                                             <div className="text-2xl mb-1">{icon}</div>
@@ -560,7 +569,7 @@ function CampDetail() {
                 {/* Occupancy Update Modal */}
                 {showOccupancyDialog && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-slate-900 border border-white/10 rounded-lg shadow-2xl max-w-md w-full p-6">
+                        <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-6">
                             <h3 className="text-xl font-bold text-white mb-4">Update Occupancy</h3>
                             <p className="text-slate-300 mb-4">
                                 Current: {camp.current_occupancy || 0} / {camp.capacity || camp.total_capacity || 'N/A'} people
@@ -595,7 +604,7 @@ function CampDetail() {
 function DataRow({ label, value, capitalize = false, mono = false }) {
     return (
         <div>
-            <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wide">{label}</p>
             <p className={`font-medium text-white ${capitalize ? 'capitalize' : ''} ${mono ? 'font-mono text-sm' : ''}`}>
                 {value || 'N/A'}
             </p>

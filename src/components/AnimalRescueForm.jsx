@@ -105,17 +105,17 @@ function AnimalRescueForm() {
     return (
         <div className="max-w-3xl mx-auto">
             <div className="card">
-                <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-white">
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                <h1 className="mb-6 flex items-center gap-3 text-2xl font-bold text-white">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconPawPrint className="h-5 w-5" />
                     </span>
                     Animal Rescue Report
-                </h2>
+                </h1>
 
                 {liteMode && <LiteModeBanner photoHidden={false} />}
 
                 {submitSuccess && (
-                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
+                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
                         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
                             <IconCheck className="h-4 w-4" />
                         </span>
@@ -129,10 +129,10 @@ function AnimalRescueForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {/* Photo Upload - Primary Identification */}
                     <div>
-                        <h3 className="mb-4 flex items-center gap-2 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                        <h2 className="mb-4 flex items-center gap-2 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             <IconCamera className="h-5 w-5 text-slate-400" />
                             Photo
-                        </h3>
+                        </h2>
 
                         <div className="flex flex-col md:flex-row gap-4 items-start">
                             <div className="flex-1">
@@ -153,7 +153,7 @@ function AnimalRescueForm() {
                                         {errors.photo.message}
                                     </span>
                                 )}
-                                <p className="text-sm text-slate-500 mt-1">
+                                <p className="text-sm text-slate-400 mt-1">
                                     Clear photo showing the animal (max 5MB)
                                 </p>
                             </div>
@@ -172,9 +172,9 @@ function AnimalRescueForm() {
 
                     {/* Animal Information */}
                     <div>
-                        <h3 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                        <h2 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             Animal Information
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -235,10 +235,10 @@ function AnimalRescueForm() {
 
                     {/* Safety Information */}
                     <div>
-                        <h3 className="mb-4 flex items-center gap-2 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                        <h2 className="mb-4 flex items-center gap-2 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             <IconInfo className="h-5 w-5 text-danger-400" />
                             Safety Information
-                        </h3>
+                        </h2>
 
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
@@ -251,7 +251,7 @@ function AnimalRescueForm() {
                                     <label className="text-slate-200 font-medium">
                                         Animal is dangerous or may bite
                                     </label>
-                                    <p className="text-sm text-slate-500">
+                                    <p className="text-sm text-slate-400">
                                         Check if the animal shows aggressive behavior
                                     </p>
                                 </div>
@@ -310,9 +310,9 @@ function AnimalRescueForm() {
 
                     {/* Location */}
                     <div>
-                        <h3 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                        <h2 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             Location
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
@@ -361,9 +361,9 @@ function AnimalRescueForm() {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
+                        <h2 className="mb-4 border-b border-white/10 pb-2 text-lg font-semibold text-slate-200">
                             Your Contact
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>

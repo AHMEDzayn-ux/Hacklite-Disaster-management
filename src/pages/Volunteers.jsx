@@ -6,7 +6,6 @@ import {
 } from '../services/volunteerService';
 import { SRI_LANKA_DISTRICTS } from '../services/campManagementService';
 import { IconUsers, IconCheck, IconX, IconClock } from '../components/icons/Icons';
-import heroImage from '../assets/yellow.png';
 
 const STORAGE_KEY = 'resqlink_volunteer';
 
@@ -104,11 +103,11 @@ function Volunteers() {
                 <div className="relative z-10 mx-auto max-w-2xl px-6 py-10 sm:px-10">
                     <div className="mb-8 flex items-center justify-between gap-5">
                         <div className="flex items-center gap-5">
-                            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                                 <IconUsers className="h-7 w-7" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-black text-white md:text-4xl">Welcome, {saved.name}</h1>
+                                <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Welcome, {saved.name}</h1>
                                 <p className="mt-1 text-slate-300">Manage your availability and assignments</p>
                             </div>
                         </div>
@@ -200,21 +199,14 @@ function Volunteers() {
                 }}
             ></div>
 
-            {/* Cinematic community banner */}
-            <div className="relative z-10 h-32 w-full overflow-hidden sm:h-40 animate-fade-in-up">
-                <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
-            </div>
-
-            <div className="relative z-10 mx-auto -mt-8 max-w-2xl px-6 pb-10 sm:px-10">
-                <div className="mb-8 flex items-center gap-5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+            <div className="relative z-10 mx-auto max-w-2xl px-6 py-8 sm:px-10">
+                <div className="mb-8 flex items-center gap-5 animate-fade-in-up">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconUsers className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-white md:text-4xl">Volunteer Registration</h1>
-                        <p className="mt-1 text-slate-300">
+                        <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Volunteer Registration</h1>
+                        <p className="mt-1 text-slate-300 text-sm">
                             Register once - no password needed. The AI assignment matcher will propose the nearest task that fits your skills, and you can accept or decline.
                         </p>
                     </div>
@@ -234,7 +226,7 @@ function Volunteers() {
                     <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-2">Phone Number *</label>
                         <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" required />
-                        <p className="text-xs text-slate-500 mt-1">Used to identify you later - no password, no verification code.</p>
+                        <p className="text-xs text-slate-400 mt-1">Used to identify you later - no password, no verification code.</p>
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-2">Email (optional)</label>

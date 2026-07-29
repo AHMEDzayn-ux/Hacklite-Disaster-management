@@ -145,7 +145,7 @@ function CampRequestForm() {
                         backgroundSize: '28px 28px',
                     }}
                 ></div>
-                <div className="relative z-10 max-w-md w-full bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-2xl shadow-xl p-8 text-center">
+                <div className="relative z-10 max-w-md w-full bg-white/[0.05] border border-white/10 rounded-xl p-8 text-center">
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-500/20 text-success-400">
                         <IconCheck className="h-8 w-8" />
                     </div>
@@ -193,11 +193,11 @@ function CampRequestForm() {
                         ← Back
                     </button>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">Request a New Relief Camp</h1>
+                            <h1 className="text-2xl font-bold text-amber-400">Request a New Relief Camp</h1>
                             <p className="text-slate-400 mt-1">
                                 Submit a request for a new relief camp. Your request will be reviewed by authorities.
                             </p>
@@ -206,7 +206,7 @@ function CampRequestForm() {
                 </div>
 
                 {/* Form */}
-                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
+                <div className="bg-white/[0.05] border border-white/10 rounded-xl p-6 md:p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Information Section */}
                         <div>
@@ -262,7 +262,7 @@ function CampRequestForm() {
                                         min="1"
                                         required
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">Approximate count is fine</p>
+                                    <p className="text-xs text-slate-400 mt-1">Approximate count is fine</p>
                                 </div>
 
                                 <div>
@@ -339,7 +339,7 @@ function CampRequestForm() {
                                         placeholder="e.g., Kelaniya North, Maligawatta"
                                         required
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">Name of your village or locality</p>
+                                    <p className="text-xs text-slate-400 mt-1">Name of your village or locality</p>
                                 </div>
 
                                 <div>
@@ -355,7 +355,7 @@ function CampRequestForm() {
                                         placeholder="e.g., Near Kelaniya Temple / Main junction / Community center"
                                         required
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">Well-known place like temple, mosque, church, school, hospital, or major junction</p>
+                                    <p className="text-xs text-slate-400 mt-1">Well-known place like temple, mosque, church, school, hospital, or major junction</p>
                                 </div>
                             </div>
                         </div>
@@ -372,7 +372,7 @@ function CampRequestForm() {
                                         type="button"
                                         onClick={() => handleFacilityToggle(facility)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.facilities_needed.includes(facility)
-                                            ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
+                                            ? 'bg-primary-600 text-white'
                                             : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}
                                     >
@@ -399,7 +399,7 @@ function CampRequestForm() {
 • People with medical conditions
 • Injured persons needing immediate medical care"
                             />
-                            <p className="text-xs text-slate-500 mt-1">This helps authorities prioritize and prepare appropriate resources</p>
+                            <p className="text-xs text-slate-400 mt-1">This helps authorities prioritize and prepare appropriate resources</p>
                         </div>
 
                         {/* Reason */}
@@ -455,7 +455,7 @@ function CampRequestForm() {
                                         placeholder="077 123 4567"
                                         required
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">(Primary contact method)</p>
+                                    <p className="text-xs text-slate-400 mt-1">(Primary contact method)</p>
                                 </div>
                             </div>
                             <div className="mt-4">
@@ -496,7 +496,7 @@ function CampRequestForm() {
                             >
                                 {submitting ? 'Submitting Request...' : 'Submit Camp Request'}
                             </button>
-                            <p className="text-xs text-slate-500 text-center mt-3">
+                            <p className="text-xs text-slate-400 text-center mt-3">
                                 Your request will be reviewed by authorities. You will be contacted once a decision is made.
                             </p>
                         </div>

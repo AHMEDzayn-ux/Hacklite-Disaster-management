@@ -52,14 +52,14 @@ function EmergencyContacts() {
         <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-8 font-sans sm:px-8 lg:px-12">
             <div className="mx-auto max-w-[1600px]">
                 <div className="mb-8 flex items-center gap-4">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-success-500 text-white">
                         <IconPhone className="h-7 w-7" />
                     </div>
-                    <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">Emergency Contacts</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-success-400 md:text-2xl">Emergency Contacts</h1>
                 </div>
 
                 {/* National Hotlines */}
-                <div className="mb-6 rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md">
+                <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.05] p-5">
                     <h2 className="mb-4 text-lg font-bold text-white">National Emergency Hotlines</h2>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                         {nationalHotlines.map((hotline, index) => {
@@ -83,7 +83,7 @@ function EmergencyContacts() {
                 </div>
 
                 {/* District Contacts */}
-                <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md">
+                <div className="rounded-xl border border-white/10 bg-white/[0.05] p-5">
                     <div className="mb-4 flex items-center gap-3">
                         <IconShieldCheck className="h-5 w-5 text-primary-300" />
                         <h2 className="text-lg font-bold text-white">District Disaster Management Centre Units</h2>
@@ -96,7 +96,7 @@ function EmergencyContacts() {
                                 <button
                                     onClick={() => toggleDistrict(contact.district)}
                                     className={`w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${expandedDistrict === contact.district
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        ? 'bg-primary-500 text-white'
                                         : 'bg-white/5 text-slate-200 hover:bg-white/10'
                                         }`}
                                 >

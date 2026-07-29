@@ -109,7 +109,7 @@ export function VBars({ data, height = 128 }) {
             </div>
             <div className="flex gap-1.5 mt-1">
                 {data.map((d, i) => (
-                    <span key={i} className="flex-1 text-[9px] leading-tight text-slate-500 text-center truncate" title={d.label}>{d.label}</span>
+                    <span key={i} className="flex-1 text-[9px] leading-tight text-slate-400 text-center truncate" title={d.label}>{d.label}</span>
                 ))}
             </div>
         </div>
@@ -119,7 +119,7 @@ export function VBars({ data, height = 128 }) {
 /** Horizontal bars — good for rankings (districts, resources). */
 export function HBars({ data, max, valueSuffix = '', labelWidth = 92 }) {
     const m = max || Math.max(1, ...data.map(d => d.value));
-    if (data.length === 0) return <p className="text-xs text-slate-500">No data in this range.</p>;
+    if (data.length === 0) return <p className="text-xs text-slate-400">No data in this range.</p>;
     return (
         <div className="space-y-1.5">
             {data.map((d, i) => (

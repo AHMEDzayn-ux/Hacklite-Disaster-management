@@ -236,11 +236,11 @@ function AdminRegisterCamp() {
                         ← {fromRequest ? 'Back to Requests' : 'Dashboard'}
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">
+                            <h1 className="text-xl md:text-2xl font-bold text-amber-400">
                                 {fromRequest ? 'Approve & Register Camp' : 'Register New Camp'}
                             </h1>
                         </div>
@@ -248,7 +248,7 @@ function AdminRegisterCamp() {
                 </div>
 
                 {/* Form */}
-                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
+                <div className="bg-white/[0.05] border border-white/10 rounded-xl p-6 md:p-8">
                     {/* Form Header */}
                     <div className="mb-6">
                         <h2 className="text-xl font-bold text-white">
@@ -410,7 +410,7 @@ function AdminRegisterCamp() {
                             <div className="mt-4">
                                 <label className="block text-sm font-semibold text-slate-300 mb-2">
                                     Exact Location <span className="text-danger-400">*</span>
-                                    <span className="font-normal text-slate-500 ml-2">(Click on map to select)</span>
+                                    <span className="font-normal text-slate-400 ml-2">(Click on map to select)</span>
                                 </label>
                                 <LocationPicker
                                     value={campLocation}
@@ -544,7 +544,7 @@ function AdminRegisterCamp() {
                                         type="button"
                                         onClick={() => handleArrayToggle('facilities', facility)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.facilities.includes(facility)
-                                            ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
+                                            ? 'bg-primary-600 text-white'
                                             : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}
                                     >
@@ -567,7 +567,7 @@ function AdminRegisterCamp() {
                                         type="button"
                                         onClick={() => handleArrayToggle('needs', need)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${formData.needs.includes(need)
-                                            ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
+                                            ? 'bg-amber-500 text-white'
                                             : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                             }`}
                                     >
@@ -665,8 +665,8 @@ function AdminRegisterCamp() {
 
             {/* One-time camp admin credentials - shown after successful registration */}
             {campAdminResult && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                    <div className="w-full max-w-md rounded-xl border border-white/10 bg-slate-900 p-6">
                         <div className="mb-4 text-center">
                             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success-500/20 text-success-400">
                                 <IconCheck className="h-6 w-6" />
@@ -679,15 +679,15 @@ function AdminRegisterCamp() {
 
                         <div className="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
                             <div>
-                                <div className="text-xs text-slate-500">Camp</div>
+                                <div className="text-xs text-slate-400">Camp</div>
                                 <div className="font-medium text-white">{campAdminResult.campName}</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-500">Email</div>
+                                <div className="text-xs text-slate-400">Email</div>
                                 <div className="break-all font-mono text-sm text-white">{campAdminResult.email}</div>
                             </div>
                             <div>
-                                <div className="text-xs text-slate-500">Password</div>
+                                <div className="text-xs text-slate-400">Password</div>
                                 <div className="break-all font-mono text-lg font-bold tracking-wide text-white">{campAdminResult.password}</div>
                             </div>
                         </div>

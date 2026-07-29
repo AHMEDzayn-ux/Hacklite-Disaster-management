@@ -4,6 +4,7 @@ import { useDisasterStore } from '../store';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../utils/leafletIconFix';
+import { defaultMapConfig } from '../utils/mapConfig';
 
 function DisasterReportDetail({ role: propRole }) {
     const { id } = useParams();
@@ -158,7 +159,7 @@ function DisasterReportDetail({ role: propRole }) {
                     <span className="text-3xl sm:text-4xl">{getDisasterIcon(disasterType)}</span>
                     <div>
                         <h1 className="text-xl sm:text-2xl font-bold text-white capitalize leading-tight">
-                            {disasterType?.replace('-', ' ') || 'Unknown'} <span className="text-xs sm:text-sm text-slate-500 font-normal ml-2 sm:ml-3">ID: #{disaster.id} • {reportedAt ? formatDate(reportedAt) : 'N/A'}</span>
+                            {disasterType?.replace('-', ' ') || 'Unknown'} <span className="text-xs sm:text-sm text-slate-400 font-normal ml-2 sm:ml-3">ID: #{disaster.id} • {reportedAt ? formatDate(reportedAt) : 'N/A'}</span>
                         </h1>
                     </div>
                 </div>
@@ -175,15 +176,15 @@ function DisasterReportDetail({ role: propRole }) {
                         <div className="mb-3">{getSeverityBadge(disaster.severity)}</div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
                             <div className="border-r border-white/10">
-                                <p className="text-xs text-slate-500 mb-1">People</p>
+                                <p className="text-xs text-slate-400 mb-1">People</p>
                                 <p className="text-base font-bold text-white">{peopleAffected || 'N/A'}</p>
                             </div>
                             <div className="border-r border-white/10">
-                                <p className="text-xs text-slate-500 mb-1">Casualties</p>
+                                <p className="text-xs text-slate-400 mb-1">Casualties</p>
                                 <p className="text-sm font-bold text-white">{getCasualtiesDisplay(casualties)}</p>
                             </div>
                             <div>
-                                <p className="text-xs text-slate-500 mb-1">Area</p>
+                                <p className="text-xs text-slate-400 mb-1">Area</p>
                                 <p className="text-base font-bold text-white">{areaSize || 'N/A'}</p>
                             </div>
                         </div>
@@ -209,11 +210,11 @@ function DisasterReportDetail({ role: propRole }) {
                         <p className="text-sm font-semibold text-slate-200 mb-2">📞 Reporter Contact</p>
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <p className="text-xs text-slate-500 mb-0.5">Name</p>
+                                <p className="text-xs text-slate-400 mb-0.5">Name</p>
                                 <p className="text-sm font-medium text-white">{reporterName || 'N/A'}</p>
                             </div>
                             <div>
-                                <p className="text-xs text-slate-500 mb-0.5">Phone</p>
+                                <p className="text-xs text-slate-400 mb-0.5">Phone</p>
                                 <p className="text-sm font-medium text-white">{contactNumber || 'N/A'}</p>
                             </div>
                         </div>
@@ -288,12 +289,12 @@ function DisasterReportDetail({ role: propRole }) {
                                 {/* Location Column */}
                                 <div className="space-y-2.5">
                                     <div>
-                                        <p className="text-xs text-slate-500 mb-1">Address</p>
+                                        <p className="text-xs text-slate-400 mb-1">Address</p>
                                         <p className="text-sm text-white">{disaster.location?.address || 'N/A'}</p>
                                     </div>
                                     {occurredDate && (
                                         <div>
-                                            <p className="text-xs text-slate-500 mb-1">Occurred</p>
+                                            <p className="text-xs text-slate-400 mb-1">Occurred</p>
                                             <p className="text-sm text-white">{formatDate(occurredDate)}</p>
                                         </div>
                                     )}
@@ -307,7 +308,7 @@ function DisasterReportDetail({ role: propRole }) {
                                     {weatherLoading ? (
                                         <div className="flex items-center justify-center py-3">
                                             <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-500 border-t-transparent"></div>
-                                            <p className="text-xs text-slate-500 ml-2">Loading...</p>
+                                            <p className="text-xs text-slate-400 ml-2">Loading...</p>
                                         </div>
                                     ) : weather ? (
                                         <div className="bg-primary-500/10 rounded-lg p-2 border border-primary-400/20">
@@ -332,7 +333,7 @@ function DisasterReportDetail({ role: propRole }) {
                                         </div>
                                     ) : (
                                         <div className="bg-white/5 rounded p-2 text-center">
-                                            <p className="text-xs text-slate-500">Unavailable</p>
+                                            <p className="text-xs text-slate-400">Unavailable</p>
                                         </div>
                                     )}
                                 </div>
@@ -345,7 +346,15 @@ function DisasterReportDetail({ role: propRole }) {
                         <p className="text-sm font-semibold text-slate-200 mb-2">🗺️ Map View</p>
                         {disaster.location?.lat && disaster.location?.lng ? (
                             <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                <MapContainer center={[disaster.location.lat, disaster.location.lng]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                                <MapContainer
+                                    center={[disaster.location.lat, disaster.location.lng]}
+                                    zoom={15}
+                                    minZoom={defaultMapConfig.minZoom}
+                                    maxZoom={defaultMapConfig.maxZoom}
+                                    maxBounds={defaultMapConfig.maxBounds}
+                                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                    style={{ height: '100%', width: '100%' }}
+                                >
                                     <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                                     <Marker position={[disaster.location.lat, disaster.location.lng]}>
                                         <Popup><div className="p-1"><p className="text-xs font-bold">{disasterType}</p><p className="text-xs text-gray-600">{disaster.location.address}</p></div></Popup>
@@ -354,7 +363,15 @@ function DisasterReportDetail({ role: propRole }) {
                             </div>
                         ) : (
                             <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                <MapContainer center={[7.8731, 80.7718]} zoom={7} style={{ height: '100%', width: '100%' }}>
+                                <MapContainer
+                                    center={defaultMapConfig.center}
+                                    zoom={defaultMapConfig.zoom}
+                                    minZoom={defaultMapConfig.minZoom}
+                                    maxZoom={defaultMapConfig.maxZoom}
+                                    maxBounds={defaultMapConfig.maxBounds}
+                                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                    style={{ height: '100%', width: '100%' }}
+                                >
                                     <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                                 </MapContainer>
                                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-10 pointer-events-none">
@@ -368,7 +385,7 @@ function DisasterReportDetail({ role: propRole }) {
 
             {showConfirmDialog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-                    <div className="bg-slate-900 border border-white/10 rounded-lg shadow-2xl max-w-md w-full p-4">
+                    <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-4">
                         <h3 className="text-lg font-bold text-white mb-2">Confirm Resolution</h3>
                         <p className="text-sm text-slate-300 mb-3">Confirm that this disaster has been resolved.</p>
 

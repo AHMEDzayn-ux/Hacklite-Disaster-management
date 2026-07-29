@@ -205,11 +205,11 @@ function AdminReviewRequests() {
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-white md:text-4xl">Review Camp Requests</h1>
+                            <h1 className="text-xl font-bold text-amber-400 md:text-2xl">Review Camp Requests</h1>
                             <p className="mt-1 text-slate-300 text-sm">Approve or reject relief camp requests from the public</p>
                         </div>
                     </div>
@@ -222,7 +222,7 @@ function AdminReviewRequests() {
                             key={status}
                             onClick={() => setFilter(status)}
                             className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${filter === status
-                                ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                ? 'bg-primary-500 text-white'
                                 : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                 }`}
                         >
@@ -375,7 +375,7 @@ function AdminReviewRequests() {
                 {/* Rejection Modal */}
                 {rejectModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full shadow-2xl">
+                        <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full">
                             <h3 className="text-lg font-bold text-white mb-2">Reject Camp Request</h3>
                             <p className="text-sm text-slate-300 mb-4">
                                 Please provide a reason for rejecting "<strong className="text-white">{rejectModal.request?.camp_name}</strong>"

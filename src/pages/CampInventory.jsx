@@ -142,7 +142,7 @@ function CampInventory() {
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
                         <IconGrid className="h-6 w-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-1 text-center">Camp Inventory</h1>
+                    <h1 className="text-2xl font-bold text-primary-300 mb-1 text-center">Camp Inventory</h1>
                     <p className="text-sm text-slate-400 text-center mb-6">Enter the camp ID and access code given by your coordinator.</p>
                     <form onSubmit={handleUnlock} className="space-y-4">
                         <input
@@ -184,7 +184,7 @@ function CampInventory() {
                 }}
             ></div>
 
-            <header className="relative z-10 bg-slate-900/80 border-b border-white/10 backdrop-blur-md text-white px-4 py-4 sticky top-0 shadow-md">
+            <header className="relative z-10 bg-slate-900/95 border-b border-white/10 text-white px-4 py-4 sticky top-0 shadow-md">
                 <h1 className="text-lg font-bold flex items-center gap-2">
                     <IconGrid className="h-5 w-5 text-primary-300" />
                     {unlocked.campName} Inventory
@@ -281,7 +281,7 @@ function CampInventory() {
             {/* Quantity modal for existing items */}
             {actionItem && (
                 <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-20 p-4">
-                    <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+                    <div className="bg-slate-900 border border-white/10 rounded-xl w-full max-w-sm p-6">
                         <h3 className="text-xl font-bold text-white mb-1">
                             {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                         </h3>

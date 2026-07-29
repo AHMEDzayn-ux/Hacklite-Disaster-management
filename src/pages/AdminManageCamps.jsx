@@ -170,17 +170,17 @@ function AdminManageCamps() {
 
                 {/* Header */}
                 <div className="mb-8 flex items-center gap-5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                         <IconTent className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-white md:text-4xl">Manage Camps</h1>
+                        <h1 className="text-xl font-bold text-amber-400 md:text-2xl">Manage Camps</h1>
                         <p className="mt-1 text-slate-300">View and manage all relief camps</p>
                     </div>
                 </div>
 
                 {/* Info Banner */}
-                <div className="mb-6 flex items-start gap-4 rounded-2xl border border-primary-400/20 bg-primary-500/10 p-4 backdrop-blur-md">
+                <div className="mb-6 flex items-start gap-4 rounded-xl border border-primary-400/20 bg-primary-500/10 p-4">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
                         <IconShieldLock className="h-5 w-5" />
                     </div>
@@ -196,7 +196,7 @@ function AdminManageCamps() {
                 <div className="card mb-6">
                     <div className="flex flex-wrap gap-4">
                         <div className="relative flex-1 min-w-[200px]">
-                            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
                                 placeholder="Search camps..."
@@ -211,7 +211,7 @@ function AdminManageCamps() {
                                     key={status}
                                     onClick={() => setFilter(status)}
                                     className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${filter === status
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        ? 'bg-primary-500 text-white'
                                         : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                         }`}
                                 >
@@ -254,7 +254,7 @@ function AdminManageCamps() {
                         <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
                     </div>
                 ) : filteredCamps.length === 0 ? (
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-12 text-center">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-12 text-center">
                         <IconTent className="mx-auto mb-4 h-16 w-16 text-slate-600" />
                         <h3 className="text-xl font-semibold text-white mb-2">No Camps Found</h3>
                         <p className="text-slate-400">
@@ -355,7 +355,7 @@ function AdminManageCamps() {
                 {/* Close Confirmation Modal */}
                 {closeModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-slate-900 border border-white/10 rounded-lg shadow-2xl max-w-md w-full p-6">
+                        <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-6">
                             <h3 className="text-xl font-bold text-white mb-4">Mark Camp as Closed</h3>
                             <p className="text-slate-300 mb-4">
                                 Are you sure you want to mark <strong className="text-white">{closeModal.camp?.name}</strong> as closed?

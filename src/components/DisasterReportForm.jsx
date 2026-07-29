@@ -124,16 +124,16 @@ function DisasterReportForm() {
         <div className="mx-auto max-w-3xl">
             <div className="card">
                 <div className="mb-6 flex items-center gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white">
                         <IconSiren className="h-6 w-6" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">
+                    <h1 className="text-2xl font-bold text-white">
                         Report Disaster
-                    </h2>
+                    </h1>
                 </div>
 
                 {submitSuccess && (
-                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
+                    <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-success-600 text-white px-6 py-4 rounded-lg flex items-center gap-3 transition-all duration-300 ease-in-out ${fadeOut ? 'animate-fade-out' : 'animate-fade-in'}`}>
                         <IconCheck className="h-6 w-6 flex-shrink-0" />
                         <div>
                             <p className="font-bold text-lg">Report Submitted Successfully!</p>
@@ -147,9 +147,9 @@ function DisasterReportForm() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {/* Disaster Information */}
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                        <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Disaster Information
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -206,10 +206,10 @@ function DisasterReportForm() {
                         submission to fail on a real 2G connection. */}
                     {!liteMode && (
                         <div>
-                            <h3 className="flex items-center gap-2 text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                                 <IconCamera className="h-5 w-5 text-primary-300" />
                                 Photo Evidence (Optional)
-                            </h3>
+                            </h2>
 
                             <div className="flex flex-col md:flex-row gap-4 items-start">
                                 <div className="flex-1">
@@ -223,7 +223,7 @@ function DisasterReportForm() {
                                         onChange={handlePhotoChange}
                                         className="input-field"
                                     />
-                                    <p className="text-sm text-slate-500 mt-1">
+                                    <p className="text-sm text-slate-400 mt-1">
                                         Photo helps assess the situation (max 5MB)
                                     </p>
                                 </div>
@@ -243,9 +243,9 @@ function DisasterReportForm() {
 
                     {/* Impact Assessment */}
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                        <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Impact Assessment
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -321,9 +321,9 @@ function DisasterReportForm() {
 
                     {/* Location */}
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                        <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Location
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
@@ -373,9 +373,9 @@ function DisasterReportForm() {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                        <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Your Contact
-                        </h3>
+                        </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -423,9 +423,9 @@ function DisasterReportForm() {
 
                     {/* Description - Moved to bottom */}
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
+                        <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
                             Description
-                        </h3>
+                        </h2>
                         <div>
                             <label className="block text-slate-300 font-semibold mb-2">
                                 Description <span className="text-danger-500">*</span>

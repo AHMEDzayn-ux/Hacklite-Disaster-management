@@ -31,7 +31,7 @@ class ErrorBoundary extends React.Component {
             // Fallback UI
             return (
                 <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
-                    <div className="relative z-10 max-w-md w-full rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-2xl p-8 text-center">
+                    <div className="relative z-10 max-w-md w-full rounded-xl border border-white/10 bg-white/[0.05] p-8 text-center">
                         <div className="mb-6">
                             <div className="inline-block p-4 bg-danger-500/15 rounded-full mb-4">
                                 <svg className="w-12 h-12 text-danger-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +65,7 @@ class ErrorBoundary extends React.Component {
                         <div className="space-y-3">
                             <button
                                 onClick={this.handleReset}
-                                className="w-full bg-gradient-to-r from-primary-600 to-primary-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transition-all"
+                                className="w-full bg-primary-600 hover:bg-primary-500 text-white px-6 py-3 rounded-lg font-bold transition-colors duration-150"
                             >
                                 Reload Page
                             </button>
@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
                             </button>
                         </div>
 
-                        <p className="mt-6 text-sm text-slate-500">
+                        <p className="mt-6 text-sm text-slate-400">
                             If this problem persists, please contact support.
                         </p>
                     </div>

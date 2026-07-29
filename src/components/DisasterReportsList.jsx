@@ -190,18 +190,18 @@ function DisasterReportsList({ role = 'responder' }) {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-10 sm:px-10">
-                <div className="mb-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex items-center gap-5">
-                            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
-                                <IconSiren className="h-7 w-7" />
+            <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-6 sm:px-10">
+                <div className="mb-5">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white">
+                                <IconSiren className="h-5 w-5" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-black text-white md:text-4xl">
+                                <h1 className="text-xl font-bold text-danger-400">
                                     {role === 'responder' ? 'Disaster Response Operations' : 'Disaster Reports'}
                                 </h1>
-                                <p className="mt-1 text-slate-300">
+                                <p className="mt-0.5 text-sm text-slate-400">
                                     {activeCount} ongoing disasters &middot; {criticalCount} critical severity &middot; {resolvedCount} resolved cases
                                 </p>
                             </div>
@@ -210,22 +210,22 @@ function DisasterReportsList({ role = 'responder' }) {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setViewMode('cards')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === 'cards'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'cards'
+                                    ? 'bg-primary-500 text-white'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                <IconGrid className="h-4 w-4" />
+                                <IconGrid className="h-3.5 w-3.5" />
                                 Card View
                             </button>
                             <button
                                 onClick={() => setViewMode('map')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${viewMode === 'map'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'map'
+                                    ? 'bg-primary-500 text-white'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                <IconMap className="h-4 w-4" />
+                                <IconMap className="h-3.5 w-3.5" />
                                 Map View
                             </button>
                         </div>
@@ -233,12 +233,12 @@ function DisasterReportsList({ role = 'responder' }) {
                 </div>
 
                 {/* Filters */}
-                <div className="card mb-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                <div className="card mb-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">Search</label>
                             <div className="relative">
-                                <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
                                     placeholder="Location, description..."
@@ -343,15 +343,15 @@ function DisasterReportsList({ role = 'responder' }) {
 
                                         <div className="pt-2 border-t border-white/10 space-y-2">
                                             <div className="flex items-start gap-2">
-                                                <IconMapPin className="h-4 w-4 flex-shrink-0 text-slate-500 mt-0.5" />
+                                                <IconMapPin className="h-4 w-4 flex-shrink-0 text-slate-400 mt-0.5" />
                                                 <span className="text-sm text-slate-300 line-clamp-2">{disaster.location?.address || 'Unknown'}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <IconUsers className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                                                    <IconUsers className="h-4 w-4 flex-shrink-0 text-slate-400" />
                                                     <span className="text-sm text-slate-400">{peopleAffected || 'Unknown'} affected</span>
                                                 </div>
-                                                <span className="text-sm text-slate-500">{getTimeSince(reportedAt)}</span>
+                                                <span className="text-sm text-slate-400">{getTimeSince(reportedAt)}</span>
                                             </div>
                                         </div>
 
@@ -366,7 +366,7 @@ function DisasterReportsList({ role = 'responder' }) {
                 ) : (
                     <div>
                         {/* Warning Note */}
-                        <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
+                        <div className="mb-4 rounded-xl border border-amber-400/20 bg-amber-500/10 p-4">
                             <div className="flex items-start gap-3">
                                 <IconInfo className="h-5 w-5 flex-shrink-0 text-amber-300 mt-0.5" />
                                 <div>
@@ -473,7 +473,7 @@ function DisasterReportsList({ role = 'responder' }) {
                 )}
 
                 {filteredDisasters.length === 0 && (
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center text-slate-400">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-10 text-center text-slate-400">
                         No disaster reports found matching your criteria
                     </div>
                 )}

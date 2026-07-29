@@ -168,7 +168,7 @@ function AdminRecords() {
         if (value === null || value === undefined || value === '') return null;
         return (
             <div>
-                <p className="text-sm text-slate-500">{label}</p>
+                <p className="text-sm text-slate-400">{label}</p>
                 <p className="font-medium text-white capitalize">{value}</p>
             </div>
         );
@@ -215,11 +215,11 @@ function AdminRecords() {
                             ← Dashboard
                         </Link>
                         <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                                 <IconGrid className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-black text-white md:text-4xl">Records Management</h1>
+                                <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Records Management</h1>
                                 <p className="mt-1 text-slate-300 text-sm">View, inspect, and securely delete any record</p>
                             </div>
                         </div>
@@ -230,7 +230,7 @@ function AdminRecords() {
                 </div>
 
                 {/* Info Banner */}
-                <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
+                <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-500/10 p-4">
                     <span className="text-2xl">⚠️</span>
                     <div>
                         <h3 className="font-semibold text-amber-200">Admin Records Management</h3>
@@ -253,7 +253,7 @@ function AdminRecords() {
                                     setSearchTerm('');
                                 }}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedTable === tableName
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    ? 'bg-primary-500 text-white'
                                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
                                     }`}
                             >
@@ -266,7 +266,7 @@ function AdminRecords() {
                 {/* Search and Stats */}
                 <div className="flex flex-wrap gap-4 mb-6">
                     <div className="flex-1 min-w-[200px] relative">
-                        <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                        <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
                             placeholder={`Search in ${TABLE_DISPLAY_NAMES[selectedTable] || selectedTable}...`}
@@ -320,14 +320,14 @@ function AdminRecords() {
                                                 <div className="font-medium text-white">
                                                     {getRecordDisplayName(record)}
                                                 </div>
-                                                <div className="text-xs text-slate-500 font-mono">
+                                                <div className="text-xs text-slate-400 font-mono">
                                                     {record.id?.substring(0, 8)}...
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-sm text-slate-400">
                                                 {getRecordSummary(record)}
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-slate-500">
+                                            <td className="px-4 py-3 text-sm text-slate-400">
                                                 {formatDate(record.created_at)}
                                             </td>
                                             <td className="px-4 py-3 text-right">
@@ -370,15 +370,15 @@ function AdminRecords() {
                 {/* Detail View Modal */}
                 {detailModal.isOpen && detailModal.record && (
                     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                        <div className="bg-slate-900 border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                        <div className="bg-slate-900 border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                             {/* Header */}
                             <div className="sticky top-0 bg-slate-900 px-6 py-4 border-b border-white/10 flex items-start justify-between z-10">
                                 <div>
-                                    <span className="text-sm text-slate-500">{TABLE_DISPLAY_NAMES[selectedTable]}</span>
+                                    <span className="text-sm text-slate-400">{TABLE_DISPLAY_NAMES[selectedTable]}</span>
                                     <h3 className="text-xl font-bold text-white">
                                         {getRecordDisplayName(detailModal.record)}
                                     </h3>
-                                    <p className="text-xs text-slate-500 font-mono mt-1">ID: {detailModal.record.id}</p>
+                                    <p className="text-xs text-slate-400 font-mono mt-1">ID: {detailModal.record.id}</p>
                                 </div>
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
@@ -412,7 +412,7 @@ function AdminRecords() {
                                             <h4 className="text-lg font-semibold text-white mb-4">Status</h4>
                                             <div className="space-y-3">
                                                 <div>
-                                                    <p className="text-sm text-slate-500">Current Status</p>
+                                                    <p className="text-sm text-slate-400">Current Status</p>
                                                     <p className="font-medium text-white">
                                                         {detailModal.record.status === 'approved' || detailModal.record.status === 'active' ? (
                                                             <span className="text-success-400">✅ {detailModal.record.status}</span>
@@ -426,12 +426,12 @@ function AdminRecords() {
                                                     </p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-slate-500">Created At</p>
+                                                    <p className="text-sm text-slate-400">Created At</p>
                                                     <p className="font-medium text-white">{formatDate(detailModal.record.created_at)}</p>
                                                 </div>
                                                 {detailModal.record.updated_at && (
                                                     <div>
-                                                        <p className="text-sm text-slate-500">Last Updated</p>
+                                                        <p className="text-sm text-slate-400">Last Updated</p>
                                                         <p className="font-medium text-white">{formatDate(detailModal.record.updated_at)}</p>
                                                     </div>
                                                 )}
@@ -445,7 +445,7 @@ function AdminRecords() {
                                                 <div className="space-y-3">
                                                     {(detailModal.record.contact_number || detailModal.record.phone || detailModal.record.contact) && (
                                                         <div>
-                                                            <p className="text-sm text-slate-500">Phone Number</p>
+                                                            <p className="text-sm text-slate-400">Phone Number</p>
                                                             <a href={`tel:${detailModal.record.contact_number || detailModal.record.phone || detailModal.record.contact}`}
                                                                 className="font-medium text-primary-300 hover:text-primary-200">
                                                                 📞 {detailModal.record.contact_number || detailModal.record.phone || detailModal.record.contact}
@@ -454,7 +454,7 @@ function AdminRecords() {
                                                     )}
                                                     {detailModal.record.email && (
                                                         <div>
-                                                            <p className="text-sm text-slate-500">Email</p>
+                                                            <p className="text-sm text-slate-400">Email</p>
                                                             <a href={`mailto:${detailModal.record.email}`}
                                                                 className="font-medium text-primary-300 hover:text-primary-200">
                                                                 ✉️ {detailModal.record.email}
@@ -543,7 +543,7 @@ function AdminRecords() {
 
                                                     return (
                                                         <div key={key} className="border-b border-white/10 pb-2">
-                                                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
                                                                 {key.replace(/_/g, ' ')}
                                                             </p>
                                                             <div className="text-sm text-slate-200 mt-1">

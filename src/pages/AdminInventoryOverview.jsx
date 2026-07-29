@@ -194,11 +194,11 @@ function AdminInventoryOverview() {
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white text-2xl shadow-lg shadow-primary-500/30">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white text-2xl">
                             📦
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-white md:text-4xl">Inventory Overview</h1>
+                            <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Inventory Overview</h1>
                             <p className="mt-1 text-slate-300 text-sm">Stock levels across all relief camps</p>
                         </div>
                     </div>
@@ -208,13 +208,13 @@ function AdminInventoryOverview() {
                     <div className="flex gap-2">
                         <button
                             onClick={() => setFilter('all')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary-500 text-white' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                         >
                             All Items ({levels.length})
                         </button>
                         <button
                             onClick={() => setFilter('low')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'low' ? 'bg-danger-600 text-white shadow-md shadow-danger-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'low' ? 'bg-danger-600 text-white' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
                         >
                             ⚠ Low Stock ({lowStockCount})
                         </button>
@@ -229,9 +229,9 @@ function AdminInventoryOverview() {
                 {error && <div className="bg-danger-500/10 border border-danger-400/20 text-danger-300 px-4 py-3 rounded-lg mb-4">{error}</div>}
 
                 {loading ? (
-                    <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-12 text-center text-slate-400">Loading...</div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-12 text-center text-slate-400">Loading...</div>
                 ) : tree.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-12 text-center text-slate-400">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-12 text-center text-slate-400">
                         {filter === 'low' ? 'No items are below their reorder threshold.' : 'No inventory records yet.'}
                     </div>
                 ) : (
@@ -256,13 +256,13 @@ function ProvinceSection({ province, expanded, onToggle }) {
     const isEmpty = province.campCount === 0;
 
     return (
-        <section className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden">
+        <section className="rounded-xl border border-white/10 bg-white/[0.05] overflow-hidden">
             <button
                 onClick={() => onToggle(province.name)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${isEmpty ? 'text-slate-500' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${isEmpty ? 'text-slate-400' : ''}`}
             >
-                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
-                <h2 className={`font-bold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{province.name}</h2>
+                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                <h2 className={`font-bold ${isEmpty ? 'text-slate-400' : 'text-white'}`}>{province.name}</h2>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {province.lowCount > 0 && (
                         <span className="px-2 py-1 rounded-full bg-danger-500/15 text-danger-300 font-semibold">
@@ -307,14 +307,14 @@ function DistrictSection({ province, district, expanded, onToggle }) {
                 {isEmpty ? (
                     <span className="w-3.5 flex-shrink-0" />
                 ) : (
-                    <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+                    <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
                 )}
-                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-500' : 'text-white'}`}>{district.name}</h3>
+                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-400' : 'text-white'}`}>{district.name}</h3>
                 <span className="ml-auto flex items-center gap-3 text-xs">
                     {district.lowCount > 0 && (
                         <span className="text-danger-400 font-semibold">⚠ {district.lowCount} low</span>
                     )}
-                    <span className={isEmpty ? 'text-slate-500' : 'text-slate-400'}>
+                    <span className={isEmpty ? 'text-slate-400' : 'text-slate-400'}>
                         {isEmpty ? 'No camps' : `${district.campCount} ${district.campCount === 1 ? 'camp' : 'camps'} · ${district.itemCount} items`}
                     </span>
                 </span>
@@ -341,11 +341,11 @@ function CampBlock({ camp }) {
             </div>
 
             {camp.items.length === 0 ? (
-                <p className="px-4 py-3 text-xs text-slate-500">No inventory recorded for this camp yet.</p>
+                <p className="px-4 py-3 text-xs text-slate-400">No inventory recorded for this camp yet.</p>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="text-left text-slate-500 text-xs">
+                        <thead className="text-left text-slate-400 text-xs">
                             <tr>
                                 <th className="px-4 py-2 font-medium">Item</th>
                                 <th className="px-4 py-2 font-medium">Category</th>
@@ -361,7 +361,7 @@ function CampBlock({ camp }) {
                                     <td className={`px-4 py-2 text-right font-bold ${item.low ? 'text-danger-400' : 'text-white'}`}>
                                         {item.quantity_on_hand} {item.unit}
                                     </td>
-                                    <td className="px-4 py-2 text-slate-500 text-xs">
+                                    <td className="px-4 py-2 text-slate-400 text-xs">
                                         {item.last_movement_at ? new Date(item.last_movement_at).toLocaleString() : '-'}
                                     </td>
                                 </tr>
