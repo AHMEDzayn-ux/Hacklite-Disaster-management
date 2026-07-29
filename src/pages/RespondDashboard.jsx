@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '@/lib/leafletIconFix';
 import HeatmapLayer from '@/components/map/HeatmapLayer';
+import MapFrame from '@/components/map/MapFrame';
 import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
 import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
 import { defaultMapConfig, districtBounds, allDistricts } from '@/lib/mapConfig';
@@ -372,7 +373,8 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                     </div>
                 }
             >
-                <div className="rounded-2xl border border-white/15 overflow-hidden shadow-xl" style={{ height: 300 }}>
+                <div className="flex justify-center">
+                    <MapFrame height={420} className="rounded-2xl border border-white/15 overflow-hidden shadow-xl">
                     <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }} preferCanvas>
                         <TileLayer
                             attribution='&copy; OpenStreetMap'
@@ -406,6 +408,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                             </Marker>
                         ))}
                     </MapContainer>
+                    </MapFrame>
                 </div>
             </Card>
 

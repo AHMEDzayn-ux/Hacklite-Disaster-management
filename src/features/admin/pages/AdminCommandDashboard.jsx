@@ -7,6 +7,7 @@ import { redIcon, orangeIcon, greenIcon } from '@/lib/leafletIconFix';
 import { useAuth } from '@/features/auth/useAuth';
 import { supabase } from '@/lib/supabase';
 import HeatmapLayer from '@/components/map/HeatmapLayer';
+import MapFrame from '@/components/map/MapFrame';
 import AllocationReviewModal from '@/features/admin/components/AllocationReviewModal';
 import ShipmentStatusModal from '@/features/admin/components/ShipmentStatusModal';
 import {
@@ -206,7 +207,8 @@ function AdminCommandDashboard() {
 
             <main className="relative z-10 mx-auto max-w-[1800px] px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Map: heatmap + camp markers + route polylines */}
-                <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl" style={{ height: '600px' }}>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl flex justify-center">
+                    <MapFrame height={600}>
                     <MapContainer
                         center={defaultMapConfig.center}
                         zoom={defaultMapConfig.zoom}
@@ -250,10 +252,11 @@ function AdminCommandDashboard() {
                             );
                         })}
                     </MapContainer>
+                    </MapFrame>
                 </div>
 
                 {/* Side panel */}
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 content-start max-h-[600px] overflow-y-auto pr-1">
                     {/* Agent run status */}
                     <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                         <h3 className="flex items-center gap-1.5 font-bold text-white mb-2 text-sm"><IconClock className="h-4 w-4 text-primary-300" />Agent Status</h3>
@@ -360,7 +363,7 @@ function AdminCommandDashboard() {
                         </div>
                     </div>
 
-                    <Link to="/admin/inventory" className="block rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 hover:border-white/25 hover:bg-white/[0.08] text-sm font-semibold text-primary-300">
+                    <Link to="/admin/inventory" className="md:col-span-2 block rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 hover:border-white/25 hover:bg-white/[0.08] text-sm font-semibold text-primary-300">
                         📦 View Full Inventory Overview →
                     </Link>
                 </div>

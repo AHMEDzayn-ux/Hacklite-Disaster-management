@@ -17,13 +17,12 @@ function CampAdminLogin() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
+    const signIn = async (loginEmail, loginPassword) => {
         setLoading(true);
         setError('');
 
         try {
-            const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error: authError } = await supabase.auth.signInWithPassword({ email: loginEmail, password: loginPassword });
             if (authError) throw authError;
 
             // Confirm this account is a camp_admin from the session metadata (no
@@ -44,6 +43,17 @@ function CampAdminLogin() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        signIn(email, password);
+    };
+
+    const handleDemoLogin = () => {
+        setEmail('campadmin@demo.com');
+        setPassword('Demo@1234');
+        signIn('campadmin@demo.com', 'Demo@1234');
     };
 
     return (
@@ -117,6 +127,15 @@ function CampAdminLogin() {
                             className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-lg hover:shadow-amber-500/40 text-white font-bold py-3 px-4 rounded-lg shadow-md shadow-amber-500/25 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleDemoLogin}
+                            disabled={loading}
+                            className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-4 rounded-lg border border-white/20 disabled:opacity-50"
+                        >
+                            Use Demo Account
                         </button>
                     </form>
 

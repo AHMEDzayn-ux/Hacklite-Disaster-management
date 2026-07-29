@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
 import MapResizeFix from '@/components/map/MapResizeFix';
+import MapFrame from '@/components/map/MapFrame';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconUserSearch, IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconPhone, IconInfo, IconCheck } from '@/components/icons/Icons';
@@ -384,7 +385,9 @@ function MissingPersonsList({ role = 'responder' }) {
                             </div>
                         </div>
 
-                        <div className="h-[600px] rounded-2xl overflow-hidden border border-white/10">
+                        <div className="flex flex-col lg:flex-row gap-4 items-start">
+                        <div className="rounded-2xl overflow-hidden border border-white/10 w-full lg:w-auto">
+                            <MapFrame height={600}>
                             <MapContainer
                                 center={[7.8731, 80.7718]} // Center of Sri Lanka
                                 zoom={7}
@@ -493,30 +496,30 @@ function MissingPersonsList({ role = 'responder' }) {
                                     }).filter(Boolean)}
                                 </MarkerClusterGroup>
                             </MapContainer>
+                            </MapFrame>
+                        </div>
 
-                            {/* Map Legend and Info */}
-                            <div className="mt-2">
-                                <p className="flex items-center justify-center gap-1.5 text-sm text-slate-400 mb-2 text-center">
-                                    <IconInfo className="h-4 w-4" />
-                                    Records without valid coordinates are not displayed on the map. Switch to Card View to see all reports.
-                                </p>
-                                <div className="flex justify-center gap-4 text-sm text-slate-300">
-                                    <div className="flex items-center gap-2">
-                                        <span className="h-2.5 w-2.5 rounded-full bg-danger-500"></span>
-                                        <span>Active ({filteredPersons.filter(p => p.status === 'Active').length})</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="h-2.5 w-2.5 rounded-full bg-success-500"></span>
-                                        <span>Resolved ({filteredPersons.filter(p => p.status === 'Resolved').length})</span>
-                                    </div>
-                                    <div className="text-slate-400">
-                                        Total: {filteredPersons.filter(p => {
-                                            const location = p.last_seen_location || p.lastSeenLocation;
-                                            return location && location.lat && location.lng;
-                                        }).length} on map
-                                    </div>
-                                </div>
+                        {/* Map Legend and Info */}
+                        <div className="card p-4 w-full lg:w-64 lg:flex-shrink-0 space-y-4">
+                            <div className="flex items-center gap-2">
+                                <span className="h-4 w-4 rounded-full bg-danger-500 flex-shrink-0"></span>
+                                <span className="text-sm font-medium text-slate-200">Active ({filteredPersons.filter(p => p.status === 'Active').length})</span>
                             </div>
+                            <div className="flex items-center gap-2">
+                                <span className="h-4 w-4 rounded-full bg-success-500 flex-shrink-0"></span>
+                                <span className="text-sm font-medium text-slate-200">Resolved ({filteredPersons.filter(p => p.status === 'Resolved').length})</span>
+                            </div>
+                            <div className="text-sm text-slate-400">
+                                Total: {filteredPersons.filter(p => {
+                                    const location = p.last_seen_location || p.lastSeenLocation;
+                                    return location && location.lat && location.lng;
+                                }).length} on map
+                            </div>
+                            <p className="flex items-start gap-1.5 text-xs text-slate-400 pt-2 border-t border-white/10">
+                                <IconInfo className="h-4 w-4 flex-shrink-0" />
+                                Records without valid coordinates are not displayed on the map. Switch to Card View to see all reports.
+                            </p>
+                        </div>
                         </div>
                     </div>
                 )}

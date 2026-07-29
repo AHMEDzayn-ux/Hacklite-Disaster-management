@@ -10,15 +10,14 @@ function AdminLogin() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
+    const signIn = async (loginEmail, loginPassword) => {
         setLoading(true);
         setError('');
 
         try {
             const { data, error: authError } = await supabase.auth.signInWithPassword({
-                email,
-                password
+                email: loginEmail,
+                password: loginPassword
             });
 
             if (authError) {
@@ -36,6 +35,17 @@ function AdminLogin() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        signIn(email, password);
+    };
+
+    const handleDemoLogin = () => {
+        setEmail('admin@demo.com');
+        setPassword('Demo@1234');
+        signIn('admin@demo.com', 'Demo@1234');
     };
 
     return (
@@ -116,6 +126,15 @@ function AdminLogin() {
                             className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 text-white font-bold py-3 px-4 rounded-lg shadow-md shadow-primary-500/25 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleDemoLogin}
+                            disabled={loading}
+                            className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-4 rounded-lg border border-white/20 disabled:opacity-50"
+                        >
+                            Use Demo Account
                         </button>
                     </form>
 

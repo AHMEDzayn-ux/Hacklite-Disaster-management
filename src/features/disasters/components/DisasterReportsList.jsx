@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
 import MapResizeFix from '@/components/map/MapResizeFix';
+import MapFrame from '@/components/map/MapFrame';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconSiren, IconSearch, IconGrid, IconMap, IconMapPin, IconUsers, IconX, IconInfo } from '@/components/icons/Icons';
@@ -378,8 +379,9 @@ function DisasterReportsList({ role = 'responder' }) {
                             </div>
                         </div>
 
-                        <div className="card p-0 overflow-hidden">
-                            <div style={{ height: '600px' }}>
+                        <div className="flex flex-col lg:flex-row gap-4 items-start">
+                            <div className="card p-0 overflow-hidden w-full lg:w-auto">
+                                <MapFrame height={600}>
                                 <MapContainer
                                     center={[7.8731, 80.7718]}
                                     zoom={7}
@@ -450,23 +452,22 @@ function DisasterReportsList({ role = 'responder' }) {
                                         }).filter(Boolean)}
                                     </MarkerClusterGroup>
                                 </MapContainer>
+                                </MapFrame>
                             </div>
 
-                            <div className="p-4 bg-white/[0.03] border-t border-white/10">
-                                <p className="flex items-center justify-center gap-1.5 text-sm text-slate-400 mb-3">
-                                    <IconInfo className="h-4 w-4" />
+                            <div className="card p-4 w-full lg:w-64 lg:flex-shrink-0 space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-danger-500 rounded-full flex-shrink-0"></div>
+                                    <span className="text-sm font-medium text-slate-200">Active ({activeCount})</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 bg-success-500 rounded-full flex-shrink-0"></div>
+                                    <span className="text-sm font-medium text-slate-200">Resolved ({resolvedCount})</span>
+                                </div>
+                                <p className="flex items-start gap-1.5 text-xs text-slate-400 pt-2 border-t border-white/10">
+                                    <IconInfo className="h-4 w-4 flex-shrink-0" />
                                     Records without valid coordinates are not displayed on the map. Switch to Card View to see all reports.
                                 </p>
-                                <div className="flex flex-wrap gap-4 items-center justify-center">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 bg-danger-500 rounded-full"></div>
-                                        <span className="text-sm font-medium text-slate-200">Active ({activeCount})</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 bg-success-500 rounded-full"></div>
-                                        <span className="text-sm font-medium text-slate-200">Resolved ({resolvedCount})</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

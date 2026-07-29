@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { greenIcon, greyIcon } from '@/lib/leafletIconFix';
 import MapResizeFix from '@/components/map/MapResizeFix';
+import MapFrame from '@/components/map/MapFrame';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import { invalidateCache } from '@/lib/cacheManager';
 import { IconTent, IconSearch, IconGrid, IconMap, IconUsers, IconX, IconPhone } from '@/components/icons/Icons';
@@ -418,7 +419,9 @@ function CampsList() {
                                     </div>
                                 ) : (
                                     <>
-                                        <div style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
+                                        <div className="flex flex-col lg:flex-row gap-4 items-start p-3">
+                                        <div className="rounded-xl overflow-hidden border border-white/10 w-full lg:w-auto">
+                                            <MapFrame height="calc(100vh - 320px)" style={{ minHeight: 400 }}>
                                             <MapContainer
                                                 center={[7.8731, 80.7718]}
                                                 zoom={7}
@@ -494,12 +497,14 @@ function CampsList() {
                                                     })}
                                                 </MarkerClusterGroup>
                                             </MapContainer>
+                                            </MapFrame>
                                         </div>
 
                                         {/* Compact Legend */}
-                                        <div className="px-3 py-2 bg-white/[0.03] border-t border-white/10 flex items-center justify-center gap-4 text-xs text-slate-300">
-                                            <span className="flex items-center gap-1"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Active ({activeCount})</span>
-                                            <span className="flex items-center gap-1"><span className="w-3 h-3 bg-slate-500 rounded-full inline-block"></span> Closed ({closedCount})</span>
+                                        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 w-full lg:w-56 lg:flex-shrink-0 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
+                                            <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Active ({activeCount})</span>
+                                            <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-500 rounded-full inline-block"></span> Closed ({closedCount})</span>
+                                        </div>
                                         </div>
                                     </>
                                 )}
