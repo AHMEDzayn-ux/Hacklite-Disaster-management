@@ -18,13 +18,18 @@
 //   location      - device's approximate location at record time (optional, informational only)
 //   device_id     - identifies which gateway phone this came from (optional)
 //
-// Auth: same x-agent-cron-secret header every other agent function's
-// unattended path already uses (see _shared/agentAuth.ts) - Tasker can set a
-// static header value trivially, whereas computing an HMAC signature (like
-// the SMS gateway does) is impractical from Tasker without a crypto plugin.
+// Auth: INTENTIONALLY NONE. This endpoint is public by explicit request -
+// anyone who has the URL can upload a recording, no header/token required.
+// That means anyone on the internet can also trigger a real Gemini call and
+// (if it parses as one) a real row on the live disasters/missing_persons/
+// animal_rescues dashboard - including a deliberately fabricated report. The
+// only remaining guardrails are the file-type/size checks below; there is no
+// rate limiting. If abuse becomes a problem, reintroducing the
+// x-agent-cron-secret header check (still used internally to call
+// call-transcription-agent below, and by every other agent function) is the
+// straightforward fix.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { authenticateAgentCaller } from '../_shared/agentAuth.ts'
 import { isAllowedAudioExt, MAX_AUDIO_BYTES } from '../_shared/audio.ts'
 
 const corsHeaders = {
@@ -71,14 +76,6 @@ Deno.serve(async (req) => {
     const agentCronSecret = Deno.env.get('AGENT_CRON_SECRET')
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    // Same dual auth path (admin JWT or x-agent-cron-secret) every other
-    // agent function uses - the gateway phone authenticates via the cron
-    // secret, since it has no Supabase session.
-    const authResult = await authenticateAgentCaller(req, supabase)
-    if (!authResult.ok) {
-      return jsonResponse({ success: false, error: authResult.reason }, 401)
-    }
 
     let formData: FormData
     try {
