@@ -58,6 +58,27 @@ function CampRequestForm() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const autofillTestData = () => {
+        setFormData(prev => ({
+            ...prev,
+            district: 'Colombo',
+            ds_division: 'Kelaniya',
+            village_area: 'Kelaniya North',
+            nearby_landmark: 'Near Kelaniya Temple',
+            estimated_capacity: '150',
+            urgency_level: 'high',
+            special_needs: '3 elderly residents, 2 infants, one person with a mobility disability.',
+            latitude: 6.9271,
+            longitude: 79.8612,
+            facilities_needed: ['Food', 'Drinking Water', 'Medical Assistance', 'Temporary Shelter'],
+            reason: 'Flash flooding has submerged homes in the area overnight. Around 40 families are displaced and need immediate shelter.',
+            requester_name: 'Priyantha Kumara',
+            requester_phone: '0771234567',
+            requester_email: 'priyantha.test@example.com',
+            additional_notes: 'Access road is partially blocked by debris; a 4x4 vehicle is recommended.'
+        }));
+    };
+
     const handleFacilityToggle = (facility) => {
         setFormData(prev => ({
             ...prev,
@@ -192,16 +213,25 @@ function CampRequestForm() {
                     >
                         ← Back
                     </button>
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                            <IconTent className="h-6 w-6" />
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                                <IconTent className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-white">Request a New Relief Camp</h1>
+                                <p className="text-slate-400 mt-1">
+                                    Submit a request for a new relief camp. Your request will be reviewed by authorities.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-white">Request a New Relief Camp</h1>
-                            <p className="text-slate-400 mt-1">
-                                Submit a request for a new relief camp. Your request will be reviewed by authorities.
-                            </p>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={autofillTestData}
+                            className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-primary-500/20 text-primary-300 hover:bg-primary-500/30 text-sm font-medium"
+                        >
+                            Test Fill
+                        </button>
                     </div>
                 </div>
 

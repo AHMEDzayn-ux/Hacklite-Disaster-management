@@ -312,7 +312,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
             </div>
 
             {view === 'overview' && <OverviewView A={A} layers={layers} setLayers={setLayers} navigate={navigate} range={range} />}
-            {view === 'analytics' && <AnalyticsView A={A} range={range} />}
+            {view === 'analytics' && <AnalyticsView A={A} />}
             {view === 'categories' && <CategoriesView A={A} />}
             {view === 'ai' && <AiView A={A} />}
         </div>
@@ -375,7 +375,16 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
             >
                 <div className="flex justify-center">
                     <MapFrame height={420} className="rounded-2xl border border-white/15 overflow-hidden shadow-xl">
-                    <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }} preferCanvas>
+                    <MapContainer
+                        center={defaultMapConfig.center}
+                        zoom={defaultMapConfig.zoom}
+                        minZoom={defaultMapConfig.minZoom}
+                        maxZoom={defaultMapConfig.maxZoom}
+                        maxBounds={defaultMapConfig.maxBounds}
+                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                        style={{ height: '100%', width: '100%' }}
+                        preferCanvas
+                    >
                         <TileLayer
                             attribution='&copy; OpenStreetMap'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -461,19 +470,15 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 // ANALYTICS: distribution, priority, trends, resolution, response, district, resources
 // ---------------------------------------------------------------------------
 
-function AnalyticsView({ A, range }) {
+function AnalyticsView({ A }) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card icon={IconGrid} title="Report Distribution">
                 <Donut data={A.distribution} centerLabel={A.kpi.totalReports} centerSub="reports" />
             </Card>
 
             <Card icon={IconBolt} title="Priority Breakdown (active disasters)">
                 <VBars data={A.priority} height={140} />
-            </Card>
-
-            <Card icon={IconBolt} title="Report Trend" right={<span className="text-xs text-slate-500">incoming / {RANGE_CONF[range].label}</span>}>
-                <TrendLine series={[{ label: 'New reports', color: CHART_COLORS[0], values: A.trend.incoming }]} labels={A.trend.labels} />
             </Card>
 
             <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-xs text-slate-500">incoming vs resolved</span>}>
@@ -494,7 +499,7 @@ function AnalyticsView({ A, range }) {
                 <HBars data={A.districtRanking} />
             </Card>
 
-            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-xs text-slate-500">from report text</span>} className="lg:col-span-2">
+            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-xs text-slate-500">from report text</span>}>
                 <HBars data={A.resourceDemand} labelWidth={110} />
             </Card>
         </div>

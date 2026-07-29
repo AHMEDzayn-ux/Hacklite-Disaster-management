@@ -21,18 +21,6 @@ export const TABLES = {
     DONATIONS: 'donations'
 };
 
-// Debounce utility for realtime updates
-const debounceMap = new Map();
-const debounce = (key, callback, delay = 300) => {
-    if (debounceMap.has(key)) {
-        clearTimeout(debounceMap.get(key));
-    }
-    debounceMap.set(key, setTimeout(() => {
-        callback();
-        debounceMap.delete(key);
-    }, delay));
-};
-
 // Create a new document
 export const createDocument = async (table, data) => {
     try {
@@ -138,18 +126,95 @@ export const deleteDocument = async (table, id) => {
     }
 };
 
-// Subscribe to real-time changes - progressive loading with caching and debouncing
+// Registry of live table subscriptions, keyed by table name. Every caller of
+// subscribeToTable() for the same table shares a single Supabase realtime
+// channel and a single in-memory dataset - previously each caller (dashboard,
+// list page, detail page, etc.) opened its OWN channel with the identical
+// topic name `${table}_changes`. Duplicate joins to the same topic race on
+// the socket, so realtime delivery landed unpredictably on only one of the
+// channels - the "sometimes it updates, sometimes it doesn't" behavior.
+const tableSubscriptions = new Map();
+
+// Apply a postgres_changes payload directly to the in-memory dataset instead
+// of refetching the whole table - this is what makes new reports show up
+// with no added network round trip (previously: wait for a 500ms debounce,
+// then re-select the entire table).
+const applyRealtimeChange = (data, payload) => {
+    const { eventType, new: newRow, old: oldRow } = payload;
+    if (eventType === 'INSERT') {
+        if (data.some(r => r.id === newRow.id)) return data;
+        return [newRow, ...data];
+    }
+    if (eventType === 'UPDATE') {
+        return data.map(r => (r.id === newRow.id ? { ...r, ...newRow } : r));
+    }
+    if (eventType === 'DELETE') {
+        return data.filter(r => r.id !== oldRow.id);
+    }
+    return data;
+};
+
+// Subscribe to real-time changes - progressive loading with caching, one
+// shared channel per table, and incremental (no-refetch) realtime updates.
 export const subscribeToTable = async (table, callback) => {
     const INITIAL_CHUNK = 30; // Show first 30 immediately
     const CHUNK_SIZE = 50; // Load remaining in 50-record batches
-    const DEBOUNCE_DELAY = 500; // Debounce realtime updates by 500ms
+    const BROADCAST_COALESCE_MS = 50; // Coalesce bursts of events into one render, not a latency hit
+
+    let entry = tableSubscriptions.get(table);
+    if (entry) {
+        // A channel for this table already exists - just attach this caller
+        // as another listener and replay the current data immediately.
+        entry.listeners.add(callback);
+        if (entry.ready) callback(entry.data, false);
+        return () => {
+            entry.listeners.delete(callback);
+            if (entry.listeners.size === 0) {
+                entry.channel.unsubscribe();
+                if (entry.broadcastTimer) clearTimeout(entry.broadcastTimer);
+                tableSubscriptions.delete(table);
+            }
+        };
+    }
+
+    entry = { data: [], listeners: new Set([callback]), channel: null, ready: false, broadcastTimer: null };
+    tableSubscriptions.set(table, entry);
+
+    const broadcast = (data, appendMode = false) => {
+        entry.listeners.forEach(cb => cb(data, appendMode));
+    };
+
+    const scheduleCacheWrite = () => {
+        if (entry.broadcastTimer) clearTimeout(entry.broadcastTimer);
+        entry.broadcastTimer = setTimeout(() => {
+            entry.broadcastTimer = null;
+            setCachedData(table, entry.data, entry.data.length);
+        }, BROADCAST_COALESCE_MS);
+    };
+
+    const startRealtimeChannel = () => {
+        entry.channel = supabase
+            .channel(`${table}_changes`)
+            .on('postgres_changes',
+                { event: '*', schema: 'public', table },
+                (payload) => {
+                    entry.data = applyRealtimeChange(entry.data, payload);
+                    broadcast(entry.data, false);
+                    invalidateCache(table);
+                    scheduleCacheWrite();
+                }
+            )
+            .subscribe();
+    };
 
     // Check cache first
     const cachedResult = getCachedData(table);
     if (cachedResult) {
         // Use cached data immediately - instant load!
-        callback(cachedResult.data || []);
-        
+        entry.data = cachedResult.data || [];
+        entry.ready = true;
+        broadcast(entry.data, false);
+
         // ALWAYS fetch fresh data in background to ensure we have the latest
         (async () => {
             try {
@@ -157,66 +222,31 @@ export const subscribeToTable = async (table, callback) => {
                     .from(table)
                     .select('*', { count: 'exact' })
                     .order('created_at', { ascending: false });
-                
+
                 if (error) {
                     console.error(`Error fetching fresh ${table}:`, error);
                     return;
                 }
-                
+
                 const allData = freshData || [];
-                // Only update if data is different
-                if (JSON.stringify(allData) !== JSON.stringify(cachedResult.data)) {
-                    console.log(`✓ Fresh data loaded for ${table} (${allData.length} items)`);
-                    callback(allData, false); // false = replace mode
+                if (JSON.stringify(allData) !== JSON.stringify(entry.data)) {
+                    entry.data = allData;
+                    broadcast(entry.data, false);
                     setCachedData(table, allData, count);
                 }
             } catch (err) {
                 console.error(`Background fetch error for ${table}:`, err);
             }
         })();
-        
-        // Still subscribe to real-time updates
-        const subscription = supabase
-            .channel(`${table}_changes`)
-            .on('postgres_changes', 
-                { event: '*', schema: 'public', table }, 
-                async () => {
-                    // Debounce updates to prevent UI thrashing
-                    debounce(`realtime_${table}`, async () => {
-                        // Invalidate cache on any change
-                        invalidateCache(table);
-                        
-                        // Refetch all data
-                        try {
-                            const { data: updatedData, count, error } = await supabase
-                                .from(table)
-                                .select('*', { count: 'exact' })
-                                .order('created_at', { ascending: false });
-                            
-                            if (error) {
-                                console.error(`Error refetching ${table}:`, error);
-                                return;
-                            }
-                            
-                            const allData = updatedData || [];
-                            callback(allData, false); // false = replace mode
-                            
-                            // Update cache
-                            setCachedData(table, allData, count);
-                        } catch (err) {
-                            console.error(`Realtime update error for ${table}:`, err);
-                        }
-                    }, DEBOUNCE_DELAY);
-                }
-            )
-            .subscribe();
+
+        startRealtimeChannel();
 
         return () => {
-            subscription.unsubscribe();
-            // Clear any pending debounced updates
-            if (debounceMap.has(`realtime_${table}`)) {
-                clearTimeout(debounceMap.get(`realtime_${table}`));
-                debounceMap.delete(`realtime_${table}`);
+            entry.listeners.delete(callback);
+            if (entry.listeners.size === 0) {
+                entry.channel.unsubscribe();
+                if (entry.broadcastTimer) clearTimeout(entry.broadcastTimer);
+                tableSubscriptions.delete(table);
             }
         };
     }
@@ -228,25 +258,27 @@ export const subscribeToTable = async (table, callback) => {
             .select('*', { count: 'exact' })
             .order('created_at', { ascending: false })
             .range(0, INITIAL_CHUNK - 1);
-        
+
         if (error) {
             console.error(`Error fetching ${table}:`, error);
-            callback([]);
-            return () => {};
+            entry.ready = true;
+            broadcast([]);
+            return () => {
+                entry.listeners.delete(callback);
+                if (entry.listeners.size === 0) tableSubscriptions.delete(table);
+            };
         }
 
         // Show first chunk immediately - user sees data right away!
-        callback(initialData || []);
-
-        // Array to collect all data for caching
-        let allData = [...(initialData || [])];
+        entry.data = initialData || [];
+        entry.ready = true;
+        broadcast(entry.data);
 
         // Load remaining data in background (if any)
         const totalRecords = count || 0;
         if (totalRecords > INITIAL_CHUNK) {
-            // Load remaining chunks without blocking
             let offset = INITIAL_CHUNK;
-            
+
             const loadRemainingChunks = async () => {
                 while (offset < totalRecords) {
                     try {
@@ -255,16 +287,18 @@ export const subscribeToTable = async (table, callback) => {
                             .select('*')
                             .order('created_at', { ascending: false })
                             .range(offset, offset + CHUNK_SIZE - 1);
-                        
+
                         if (chunkError) {
                             console.error(`Error loading chunk for ${table}:`, chunkError);
                             break;
                         }
-                        
+
                         if (nextChunk && nextChunk.length > 0) {
                             // Append new data as it arrives (no delay!)
-                            callback(nextChunk, true); // true = append mode
-                            allData = [...allData, ...nextChunk];
+                            const existingIds = new Set(entry.data.map(r => r.id));
+                            const newRows = nextChunk.filter(r => !existingIds.has(r.id));
+                            entry.data = [...entry.data, ...newRows];
+                            broadcast(nextChunk, true); // true = append mode
                             offset += nextChunk.length;
                         } else {
                             break;
@@ -274,66 +308,36 @@ export const subscribeToTable = async (table, callback) => {
                         break;
                     }
                 }
-                
+
                 // Cache all data after loading completes
-                setCachedData(table, allData, totalRecords);
+                setCachedData(table, entry.data, totalRecords);
             };
-            
+
             // Load in background without blocking UI
             loadRemainingChunks();
         } else {
             // Cache the initial data if it's all we have
-            setCachedData(table, allData, totalRecords);
+            setCachedData(table, entry.data, totalRecords);
         }
 
-        // Subscribe to real-time updates with debouncing
-        const subscription = supabase
-            .channel(`${table}_changes`)
-            .on('postgres_changes', 
-                { event: '*', schema: 'public', table }, 
-                async () => {
-                    // Debounce updates to prevent UI thrashing
-                    debounce(`realtime_${table}`, async () => {
-                        // Invalidate cache on any change
-                        invalidateCache(table);
-                        
-                        // Refetch all data on changes to ensure consistency
-                        try {
-                            const { data: updatedData, count, error: updateError } = await supabase
-                                .from(table)
-                                .select('*', { count: 'exact' })
-                                .order('created_at', { ascending: false });
-                            
-                            if (updateError) {
-                                console.error(`Error updating ${table}:`, updateError);
-                                return;
-                            }
-                            
-                            const freshData = updatedData || [];
-                            callback(freshData, false); // false = replace mode
-                            
-                            // Update cache with fresh data
-                            setCachedData(table, freshData, count);
-                        } catch (err) {
-                            console.error(`Realtime refresh error for ${table}:`, err);
-                        }
-                    }, DEBOUNCE_DELAY);
-                }
-            )
-            .subscribe();
+        startRealtimeChannel();
 
         return () => {
-            subscription.unsubscribe();
-            // Clear any pending debounced updates
-            if (debounceMap.has(`realtime_${table}`)) {
-                clearTimeout(debounceMap.get(`realtime_${table}`));
-                debounceMap.delete(`realtime_${table}`);
+            entry.listeners.delete(callback);
+            if (entry.listeners.size === 0) {
+                entry.channel.unsubscribe();
+                if (entry.broadcastTimer) clearTimeout(entry.broadcastTimer);
+                tableSubscriptions.delete(table);
             }
         };
     } catch (err) {
         console.error(`Fatal error subscribing to ${table}:`, err);
-        callback([]);
-        return () => {};
+        entry.ready = true;
+        broadcast([]);
+        return () => {
+            entry.listeners.delete(callback);
+            if (entry.listeners.size === 0) tableSubscriptions.delete(table);
+        };
     }
 };
 

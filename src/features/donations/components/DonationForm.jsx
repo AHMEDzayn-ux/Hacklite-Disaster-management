@@ -34,7 +34,7 @@ function DonationForm({ onSuccess }) {
     const [paymentError, setPaymentError] = useState(null);
     const [step, setStep] = useState(1); // 1: Amount, 2: Info, 3: Payment
 
-    const { register, handleSubmit, formState: { errors }, watch } = useForm({
+    const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
         defaultValues: {
             donor_name: '',
             donor_email: '',
@@ -46,6 +46,16 @@ function DonationForm({ onSuccess }) {
     });
 
     const isAnonymous = watch('is_anonymous');
+
+    const autofillTestData = () => {
+        setSelectedAmount(2500);
+        setCustomAmount('');
+        setValue('donor_name', 'Kasun Jayasuriya');
+        setValue('donor_email', 'kasun.test@example.com');
+        setValue('donor_phone', '0771234567');
+        setValue('donation_purpose', 'flood');
+        setValue('message', 'Hoping this helps get supplies out quickly.');
+    };
 
     const getCurrencySymbol = () => {
         const currency = CURRENCIES.find(c => c.code === selectedCurrency);
@@ -148,6 +158,21 @@ function DonationForm({ onSuccess }) {
         }
     };
 
+    const handleFormSubmit = (e) => {
+        if (step === 1) {
+            e.preventDefault();
+            if (!getFinalAmount() || getFinalAmount() < 1) return;
+            setStep(2);
+            return;
+        }
+        if (step === 2) {
+            e.preventDefault();
+            setStep(3);
+            return;
+        }
+        handleSubmit(onSubmit)(e);
+    };
+
     const renderStep1 = () => (
         <div>
             <h3 className="text-base font-bold text-white mb-3">Choose Your Impact</h3>
@@ -201,8 +226,7 @@ function DonationForm({ onSuccess }) {
             )}
 
             <button
-                type="button"
-                onClick={() => setStep(2)}
+                type="submit"
                 disabled={!getFinalAmount() || getFinalAmount() < 1}
                 className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm"
             >
@@ -213,7 +237,16 @@ function DonationForm({ onSuccess }) {
 
     const renderStep2 = () => (
         <div>
-            <h3 className="text-base font-bold text-white mb-3">Your Information</h3>
+            <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-white">Your Information</h3>
+                <button
+                    type="button"
+                    onClick={autofillTestData}
+                    className="text-xs px-2.5 py-1 rounded-md bg-primary-500/20 text-primary-300 hover:bg-primary-500/30"
+                >
+                    Test Fill
+                </button>
+            </div>
 
             {/* Anonymous Checkbox */}
             <div className="mb-3">
@@ -305,8 +338,7 @@ function DonationForm({ onSuccess }) {
                     Back
                 </button>
                 <button
-                    type="button"
-                    onClick={() => setStep(3)}
+                    type="submit"
                     className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-2.5 rounded-lg text-sm"
                 >
                     Continue to Payment
@@ -420,7 +452,7 @@ function DonationForm({ onSuccess }) {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleFormSubmit}>
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}

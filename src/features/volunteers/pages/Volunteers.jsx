@@ -49,6 +49,15 @@ function Volunteers() {
         setSkills(prev => prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]);
     };
 
+    const autofillTestData = () => {
+        setName('Nadeesha Wickramasinghe');
+        setPhone('0771234567');
+        setEmail('nadeesha.test@example.com');
+        setSkills(['rescue', 'first_aid']);
+        setDistrict('Colombo');
+        setLocation({ lat: 6.9271, lng: 79.8612, address: 'Colombo Fort, Colombo' });
+    };
+
     const handleRegister = async (e) => {
         e.preventDefault();
         setError('');
@@ -200,16 +209,25 @@ function Volunteers() {
             ></div>
 
             <div className="relative z-10 mx-auto max-w-2xl px-4 pt-4 pb-4 sm:px-8">
-                <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-                        <IconUsers className="h-5 w-5" />
+                <div className="mb-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
+                            <IconUsers className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-black text-white md:text-2xl">Volunteer Registration</h1>
+                            <p className="mt-0.5 text-sm text-slate-300">
+                                Register once - no password needed. The AI assignment matcher will propose the nearest task that fits your skills, and you can accept or decline.
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-xl font-black text-white md:text-2xl">Volunteer Registration</h1>
-                        <p className="mt-0.5 text-sm text-slate-300">
-                            Register once - no password needed. The AI assignment matcher will propose the nearest task that fits your skills, and you can accept or decline.
-                        </p>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={autofillTestData}
+                        className="flex-shrink-0 text-xs px-2.5 py-1 rounded-md bg-primary-500/20 text-primary-300 hover:bg-primary-500/30"
+                    >
+                        Test Fill
+                    </button>
                 </div>
 
                 {error && (

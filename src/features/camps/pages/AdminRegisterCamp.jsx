@@ -94,6 +94,31 @@ function AdminRegisterCamp() {
         setFormData(prev => ({ ...prev, [name]: value === '' ? '' : parseInt(value) || 0 }));
     };
 
+    const autofillTestData = () => {
+        setFormData(prev => ({
+            ...prev,
+            name: 'Central Relief Camp - Colombo',
+            type: 'temporary-shelter',
+            status: 'Active',
+            district: 'Colombo',
+            ds_division: 'Colombo DS Division',
+            village_area: 'Pettah',
+            nearby_landmark: 'Near Town Hall',
+            address: '123 Main Street, Pettah, Colombo',
+            capacity: 500,
+            current_occupancy: 0,
+            contact_person: 'Ruwan Perera',
+            contact_number: '0771234567',
+            contact_email: 'ruwan.test@example.com',
+            managed_by: 'Ruwan Perera',
+            facilities: ['Food', 'Drinking Water', 'Medical Services', 'Shelter'],
+            needs: ['Food', 'Blankets'],
+            special_needs: 'Wheelchair accessible entrance, elderly care area.',
+            additional_notes: 'Camp is set up in the community hall with backup generator power.'
+        }));
+        setCampLocation({ lat: 6.9271, lng: 79.8612 });
+    };
+
     const handleArrayToggle = (fieldName, item) => {
         setFormData(prev => ({
             ...prev,
@@ -226,15 +251,24 @@ function AdminRegisterCamp() {
                     >
                         ← {fromRequest ? 'Back to Requests' : 'Dashboard'}
                     </Link>
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                            <IconTent className="h-6 w-6" />
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                                <IconTent className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-white">
+                                    {fromRequest ? 'Approve & Register Camp' : 'Register New Camp'}
+                                </h1>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-white">
-                                {fromRequest ? 'Approve & Register Camp' : 'Register New Camp'}
-                            </h1>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={autofillTestData}
+                            className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-primary-500/20 text-primary-300 hover:bg-primary-500/30 text-sm font-medium"
+                        >
+                            Test Fill
+                        </button>
                     </div>
                 </div>
 

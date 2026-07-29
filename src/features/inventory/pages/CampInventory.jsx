@@ -66,6 +66,18 @@ function CampInventory() {
         setUnlocked({ campId: campId.trim(), accessCode: accessCode.trim().toUpperCase(), campName: camp?.name || 'Camp' });
     };
 
+    const autofillNewItem = () => {
+        setNewItemName('Bottled Water');
+        setNewItemCategory('water');
+        setQuantity('100');
+        setNotes('Delivered by relief truck');
+    };
+
+    const autofillAction = () => {
+        setQuantity('20');
+        setNotes('Routine restock');
+    };
+
     const openAction = (itemName, category, mode) => {
         setActionItem({ itemName, category, mode });
         setQuantity('');
@@ -243,7 +255,16 @@ function CampInventory() {
 
                 {/* Add a new item type */}
                 <div className="mt-6 card p-4">
-                    <h3 className="font-bold text-white mb-3">➕ Add New Item</h3>
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-bold text-white">➕ Add New Item</h3>
+                        <button
+                            type="button"
+                            onClick={autofillNewItem}
+                            className="text-xs px-2.5 py-1 rounded-md bg-primary-500/20 text-primary-300 hover:bg-primary-500/30"
+                        >
+                            Test Fill
+                        </button>
+                    </div>
                     <form onSubmit={submitNewItem} className="space-y-3">
                         <input
                             type="text"
@@ -282,9 +303,18 @@ function CampInventory() {
             {actionItem && (
                 <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-20 p-4">
                     <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-1">
-                            {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
-                        </h3>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                            <h3 className="text-xl font-bold text-white">
+                                {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={autofillAction}
+                                className="flex-shrink-0 text-xs px-2 py-1 rounded-md bg-primary-500/20 text-primary-300 hover:bg-primary-500/30"
+                            >
+                                Test Fill
+                            </button>
+                        </div>
                         <form onSubmit={submitAction} className="space-y-4 mt-4">
                             <input
                                 type="number"

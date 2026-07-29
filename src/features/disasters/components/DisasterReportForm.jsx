@@ -5,6 +5,7 @@ import LocationPicker from '@/components/map/LocationPicker';
 import LiteModeBanner from '@/components/ui/LiteModeBanner';
 import { useConnectionQuality } from '@/lib/connectionQuality';
 import { isOnline, queueOfflineSubmission } from '@/lib/offlineManager';
+import { compressImage } from '@/lib/imageCompression';
 import {
     IconSiren,
     IconCamera,
@@ -52,7 +53,7 @@ function DisasterReportForm() {
         setPhotoPreview(testPhotoDataURL);
     };
 
-    const handlePhotoChange = (e) => {
+    const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
@@ -61,11 +62,8 @@ function DisasterReportForm() {
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const compressed = await compressImage(file);
+            setPhotoPreview(compressed);
         }
     };
 

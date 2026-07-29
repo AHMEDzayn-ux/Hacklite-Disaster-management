@@ -5,6 +5,7 @@ import LocationPicker from '@/components/map/LocationPicker';
 import LiteModeBanner from '@/components/ui/LiteModeBanner';
 import { useConnectionQuality } from '@/lib/connectionQuality';
 import { isOnline, queueOfflineSubmission } from '@/lib/offlineManager';
+import { compressImage } from '@/lib/imageCompression';
 import { IconCamera, IconCheck, IconArrowRight } from '@/components/icons/Icons';
 
 function MissingPersonForm() {
@@ -36,7 +37,7 @@ function MissingPersonForm() {
         setPhotoPreview(testPhotoDataURL);
     };
 
-    const handlePhotoChange = (e) => {
+    const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
             // Check file size (max 5MB)
@@ -46,12 +47,8 @@ function MissingPersonForm() {
                 return;
             }
 
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPhotoPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const compressed = await compressImage(file);
+            setPhotoPreview(compressed);
         }
     };
 

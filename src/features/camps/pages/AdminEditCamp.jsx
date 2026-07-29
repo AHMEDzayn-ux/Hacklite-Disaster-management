@@ -163,6 +163,27 @@ function AdminEditCamp() {
         }
     };
 
+    const autofillTestData = () => {
+        setFormData(prev => ({
+            ...prev,
+            name: prev.name || 'Central Relief Camp - Colombo',
+            type: prev.type || 'temporary-shelter',
+            status: 'Active',
+            district: prev.district || 'Colombo',
+            ds_division: prev.ds_division || 'Colombo DS Division',
+            capacity: prev.capacity || 500,
+            current_occupancy: prev.current_occupancy || 0,
+            contact_person: 'Ruwan Perera',
+            contact_number: '0771234567',
+            contact_email: 'ruwan.test@example.com',
+            address: prev.address || '123 Main Street, Pettah, Colombo',
+            village_area: prev.village_area || 'Pettah',
+            nearby_landmark: prev.nearby_landmark || 'Near Town Hall',
+            special_needs: 'Wheelchair accessible entrance, elderly care area.',
+            notes: 'Camp is set up in the community hall with backup generator power.'
+        }));
+    };
+
     const handleLocationSelect = (location) => {
         setFormData(prev => ({
             ...prev,
@@ -307,13 +328,22 @@ function AdminEditCamp() {
                     <Link to="/admin/manage-camps" className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 w-fit">
                         ← Back to Camps
                     </Link>
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                            <IconTent className="h-6 w-6" />
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                                <IconTent className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-white">Edit Camp</h1>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-white">Edit Camp</h1>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={autofillTestData}
+                            className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-primary-500/20 text-primary-300 hover:bg-primary-500/30 text-sm font-medium"
+                        >
+                            Test Fill
+                        </button>
                     </div>
                 </div>
 

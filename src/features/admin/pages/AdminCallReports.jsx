@@ -125,6 +125,11 @@ function AdminCallReports() {
         }
     };
 
+    const autofillTestData = () => {
+        setCallerPhone('0771234567');
+        setNotes('Taken by front desk - caller reported flooding near the market.');
+    };
+
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleString('en-US', {
@@ -188,6 +193,15 @@ function AdminCallReports() {
                 </div>
 
                 <form onSubmit={handleUpload} className="bg-white rounded-xl shadow-sm p-6 mb-8 space-y-4">
+                    <div className="flex justify-end -mb-2">
+                        <button
+                            type="button"
+                            onClick={autofillTestData}
+                            className="text-xs px-2.5 py-1 rounded-md bg-primary-50 text-primary-700 hover:bg-primary-100"
+                        >
+                            Test Fill
+                        </button>
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Audio file</label>
                         <input
