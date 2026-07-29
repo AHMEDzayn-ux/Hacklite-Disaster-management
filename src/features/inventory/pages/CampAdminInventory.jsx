@@ -234,9 +234,9 @@ function CampAdminInventory() {
                 }}
             ></div>
 
-            <header className="relative z-10 sticky top-0 flex items-center justify-between border-b border-white/10 bg-slate-950/90 backdrop-blur-xl px-4 py-4 shadow-lg shadow-black/30">
+            <header className="relative z-10 sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-4 shadow-sm backdrop-blur-sm dark:border-white/10 dark:bg-slate-950/95 dark:shadow-lg dark:shadow-black/30">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300">
                         <IconTent className="h-5 w-5" />
                     </div>
                     <div>
@@ -257,7 +257,7 @@ function CampAdminInventory() {
                     {sortedLevels.map((item) => {
                         const low = isLowStock(item.item_name, item.quantity_on_hand);
                         return (
-                            <div key={`${item.item_name}-${item.category}-${item.unit}`} className={`rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
+                            <div key={`${item.item_name}-${item.category}-${item.unit}`} className={`card border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
                                         <div className="font-bold text-slate-900 dark:text-white">{item.item_name}</div>
@@ -387,7 +387,7 @@ function CampAdminInventory() {
                 </div>
 
                 {/* Add a new item */}
-                <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
+                <div className="card mt-6 max-w-md">
                     <div className="flex items-center justify-between mb-3">
                         <h3 className="font-bold text-slate-900 dark:text-white">Add New Item</h3>
                         <button
@@ -446,7 +446,7 @@ function CampAdminInventory() {
                 <div className="fixed inset-0 z-20 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                            <h3 className="text-xl font-bold text-white">
                                 {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                             </h3>
                             <button
@@ -476,7 +476,7 @@ function CampAdminInventory() {
                             />
                             {error && <p className="text-danger-400 text-sm">{error}</p>}
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-slate-900 dark:text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
                                 <button type="submit" disabled={submitting} className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold rounded-lg transition-colors duration-150 py-3 font-bold">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>
