@@ -39,16 +39,8 @@ function AdminLogin() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
+        <div className="page-shell flex items-center justify-center px-4 font-sans">
             {/* Static colour glow - CSS gradient only, no image/filter/animation */}
-            <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                    backgroundImage:
-                        'radial-gradient(circle at 15% 10%, rgba(59,130,246,0.12), transparent 45%), radial-gradient(circle at 85% 90%, rgba(239,68,68,0.10), transparent 45%)',
-                }}
-            ></div>
-
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -61,7 +53,7 @@ function AdminLogin() {
                 {/* Back to Home */}
                 <button
                     onClick={() => navigate('/')}
-                    className="text-slate-400 hover:text-white mb-5 flex items-center gap-2 text-sm transition-colors"
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-5 flex items-center gap-2 text-sm transition-colors"
                 >
                     ← Back to Home
                 </button>
@@ -69,10 +61,10 @@ function AdminLogin() {
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
                     {/* Header */}
                     <div className="text-center mb-6">
-                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/15 text-primary-300 ring-1 ring-inset ring-primary-400/20">
+                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-slate-300 ring-1 ring-inset ring-white/10">
                             <IconShieldLock className="h-6 w-6" />
                         </div>
-                        <h1 className="text-xl font-bold text-primary-300">Admin Portal</h1>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Admin Portal</h1>
                         <p className="text-slate-400 text-sm mt-1">
                             Camp Management & Verification
                         </p>

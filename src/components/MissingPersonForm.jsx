@@ -111,7 +111,7 @@ function MissingPersonForm() {
     return (
         <div className="max-w-3xl mx-auto">
             <div className="card">
-                <h2 className="text-2xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                     Report Missing Person
                 </h2>
 
@@ -228,10 +228,10 @@ function MissingPersonForm() {
                                     {...register('gender', { required: 'Gender is required' })}
                                     className="input-field"
                                 >
-                                    <option value="">Select gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
+                                    <option value="" className="text-slate-900">Select gender</option>
+                                    <option value="male" className="text-slate-900">Male</option>
+                                    <option value="female" className="text-slate-900">Female</option>
+                                    <option value="other" className="text-slate-900">Other</option>
                                 </select>
                                 {errors.gender && (
                                     <span className="text-danger-500 text-sm mt-1 block">
@@ -388,7 +388,7 @@ function MissingPersonForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors"
+                            className="px-6 py-2 rounded-lg border border-white/20 bg-white/10 text-slate-900 dark:text-white hover:bg-white/20 transition-colors"
                         >
                             Clear
                         </button>

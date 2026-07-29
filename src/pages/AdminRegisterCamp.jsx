@@ -210,14 +210,14 @@ function AdminRegisterCamp() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans py-8 px-4">
+        <div className="page-shell py-8 px-4">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -231,16 +231,16 @@ function AdminRegisterCamp() {
                 <div className="mb-6">
                     <Link
                         to={fromRequest ? '/admin/review-requests' : '/admin/dashboard'}
-                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit"
+                        className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit"
                     >
                         ← {fromRequest ? 'Back to Requests' : 'Dashboard'}
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-xl md:text-2xl font-bold text-primary-400">
+                            <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
                                 {fromRequest ? 'Approve & Register Camp' : 'Register New Camp'}
                             </h1>
                         </div>
@@ -251,7 +251,7 @@ function AdminRegisterCamp() {
                 <div className="bg-white/[0.05] border border-white/10 rounded-xl p-6 md:p-8">
                     {/* Form Header */}
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                             {fromRequest ? 'Complete Camp Registration' : 'Camp Registration Form'}
                         </h2>
                         <p className="text-slate-400 text-sm mt-1">
@@ -263,8 +263,8 @@ function AdminRegisterCamp() {
 
                     {/* Request Context */}
                     {fromRequest && prefillData.reason && (
-                        <div className="mb-6 p-4 bg-primary-500/10 border-l-4 border-primary-400 rounded-r-lg">
-                            <p className="text-sm font-semibold text-white mb-1">Original Request Reason:</p>
+                        <div className="mb-6 p-4 bg-white/[0.03] border-l-4 border-white/20 rounded-r-lg">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Original Request Reason:</p>
                             <p className="text-sm text-slate-300">{prefillData.reason}</p>
                             {prefillData.urgency_level && (
                                 <p className="text-sm text-slate-300 mt-2">
@@ -277,7 +277,7 @@ function AdminRegisterCamp() {
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {/* === SECTION: Basic Information === */}
                         <section>
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Basic Information
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -307,7 +307,7 @@ function AdminRegisterCamp() {
                                         required
                                     >
                                         {CAMP_TYPES.map(type => (
-                                            <option key={type.value} value={type.value}>{type.label}</option>
+                                            <option key={type.value} value={type.value} className="text-slate-900">{type.label}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -321,9 +321,9 @@ function AdminRegisterCamp() {
                                         onChange={handleChange}
                                         className="input-field"
                                     >
-                                        <option value="Active">Active</option>
-                                        <option value="Closed">Closed</option>
-                                        <option value="Full">Full</option>
+                                        <option value="Active" className="text-slate-900">Active</option>
+                                        <option value="Closed" className="text-slate-900">Closed</option>
+                                        <option value="Full" className="text-slate-900">Full</option>
                                     </select>
                                 </div>
                             </div>
@@ -331,7 +331,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Location Details === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Location Details
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -346,9 +346,9 @@ function AdminRegisterCamp() {
                                         className="input-field"
                                         required
                                     >
-                                        <option value="">Select District</option>
+                                        <option value="" className="text-slate-900">Select District</option>
                                         {SRI_LANKA_DISTRICTS.map(d => (
-                                            <option key={d} value={d}>{d}</option>
+                                            <option key={d} value={d} className="text-slate-900">{d}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -432,7 +432,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Capacity === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Capacity
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -470,7 +470,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Contact Information === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Camp-in-Charge Contact
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -533,7 +533,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Facilities === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Available Facilities
                             </h3>
                             <p className="text-sm text-slate-400 mb-3">Select all facilities available at this camp</p>
@@ -556,7 +556,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Current Needs === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Current Needs
                             </h3>
                             <p className="text-sm text-slate-400 mb-3">Select items/resources currently needed at this camp</p>
@@ -579,7 +579,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Special Needs & Notes === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Additional Information
                             </h3>
                             <div className="space-y-4">
@@ -612,12 +612,12 @@ function AdminRegisterCamp() {
 
                         {/* === Camp Admin Login (optional) === */}
                         <section className="border-t border-white/10 pt-6">
-                            <div className="flex items-start gap-4 rounded-xl border border-primary-400/20 bg-primary-500/10 p-6">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
+                            <div className="flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-6">
+                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 text-slate-300">
                                     <IconTent className="h-5 w-5" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-white mb-1">Camp Admin Login (optional)</h3>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Camp Admin Login (optional)</h3>
                                     <p className="text-sm text-slate-300 mb-4">
                                         Enter an email to create a Camp Admin account for this camp. They can log in at the
                                         Camp Admin portal to add and distribute stock for this camp only. A password is
@@ -642,7 +642,7 @@ function AdminRegisterCamp() {
                             <button
                                 type="button"
                                 onClick={() => navigate(fromRequest ? '/admin/review-requests' : '/admin/dashboard')}
-                                className="flex-1 px-6 py-3 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium transition-colors"
+                                className="flex-1 px-6 py-3 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg font-medium transition-colors"
                             >
                                 Cancel
                             </button>
@@ -671,7 +671,7 @@ function AdminRegisterCamp() {
                             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success-500/20 text-success-400">
                                 <IconCheck className="h-6 w-6" />
                             </div>
-                            <h2 className="text-xl font-bold text-white">Camp Admin Created</h2>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Camp Admin Created</h2>
                             <p className="mt-1 text-sm text-slate-400">
                                 Save this password now — it is shown only once and cannot be recovered.
                             </p>
@@ -680,22 +680,22 @@ function AdminRegisterCamp() {
                         <div className="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
                             <div>
                                 <div className="text-xs text-slate-400">Camp</div>
-                                <div className="font-medium text-white">{campAdminResult.campName}</div>
+                                <div className="font-medium text-slate-900 dark:text-white">{campAdminResult.campName}</div>
                             </div>
                             <div>
                                 <div className="text-xs text-slate-400">Email</div>
-                                <div className="break-all font-mono text-sm text-white">{campAdminResult.email}</div>
+                                <div className="break-all font-mono text-sm text-slate-900 dark:text-white">{campAdminResult.email}</div>
                             </div>
                             <div>
                                 <div className="text-xs text-slate-400">Password</div>
-                                <div className="break-all font-mono text-lg font-bold tracking-wide text-white">{campAdminResult.password}</div>
+                                <div className="break-all font-mono text-lg font-bold tracking-wide text-slate-900 dark:text-white">{campAdminResult.password}</div>
                             </div>
                         </div>
 
                         <div className="mt-5 flex gap-3">
                             <button
                                 onClick={() => navigator.clipboard?.writeText(`Email: ${campAdminResult.email}\nPassword: ${campAdminResult.password}`)}
-                                className="flex-1 rounded-lg border border-white/20 bg-white/5 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+                                className="flex-1 rounded-lg border border-white/20 bg-white/5 py-3 font-semibold text-slate-900 dark:text-white transition-colors hover:bg-white/10"
                             >
                                 Copy
                             </button>

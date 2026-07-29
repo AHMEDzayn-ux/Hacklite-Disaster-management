@@ -83,7 +83,7 @@ export function Donut({ data, size = 132, thickness = 22, centerLabel, centerSub
                     <div key={i} className="flex items-center gap-2 text-xs">
                         <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: d.color }} />
                         <span className="text-slate-300 truncate">{d.label}</span>
-                        <span className="ml-auto font-semibold text-white">{d.value}</span>
+                        <span className="ml-auto font-semibold text-slate-900 dark:text-white">{d.value}</span>
                     </div>
                 ))}
             </div>
@@ -197,7 +197,7 @@ export function TrendLine({ series, labels, height = 168, area = true }) {
             </svg>
             {hover != null && (
                 <div
-                    className="absolute pointer-events-none bg-gray-900 border border-white/10 text-white text-[10px] rounded px-2 py-1 shadow-lg z-10 whitespace-nowrap"
+                    className="absolute pointer-events-none bg-gray-900 border border-white/10 text-slate-900 dark:text-white text-[10px] rounded px-2 py-1 shadow-lg z-10 whitespace-nowrap"
                     style={{ left: Math.min(Math.max(x(hover), 40), W - 90), top: 4, transform: 'translateX(-50%)' }}
                 >
                     <div className="font-semibold text-gray-300">{labels[hover]}</div>

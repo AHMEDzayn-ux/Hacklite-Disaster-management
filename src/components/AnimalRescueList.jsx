@@ -202,7 +202,7 @@ function AnimalRescueList({ role = 'responder' }) {
     // Show loading state while initializing
     if (isInitializing) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -214,7 +214,7 @@ function AnimalRescueList({ role = 'responder' }) {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -228,11 +228,11 @@ function AnimalRescueList({ role = 'responder' }) {
                 <div className="mb-5">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                                 <IconPawPrint className="h-5 w-5" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-primary-400">
+                                <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                                     {role === 'responder' ? 'Animal Rescue Operations' : 'Animal Rescue Reports'}
                                 </h1>
                                 <p className="mt-0.5 text-sm text-slate-400">
@@ -290,9 +290,9 @@ function AnimalRescueList({ role = 'responder' }) {
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className="input-field"
                             >
-                                <option value="all">All Status</option>
-                                <option value="active">Needs Rescue</option>
-                                <option value="rescued">Rescued</option>
+                                <option value="all" className="text-slate-900">All Status</option>
+                                <option value="active" className="text-slate-900">Needs Rescue</option>
+                                <option value="rescued" className="text-slate-900">Rescued</option>
                             </select>
                         </div>
                         <div>
@@ -302,9 +302,9 @@ function AnimalRescueList({ role = 'responder' }) {
                                 onChange={(e) => setDistrictFilter(e.target.value)}
                                 className="input-field"
                             >
-                                <option value="all">All Districts</option>
+                                <option value="all" className="text-slate-900">All Districts</option>
                                 {allDistricts.map(district => (
-                                    <option key={district} value={district}>{district}</option>
+                                    <option key={district} value={district} className="text-slate-900">{district}</option>
                                 ))}
                             </select>
                         </div>
@@ -333,7 +333,7 @@ function AnimalRescueList({ role = 'responder' }) {
                                 <div className="mb-4 flex justify-center text-primary-300">
                                     <IconPawPrint className="h-12 w-12" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-white mb-2">No Rescue Reports</h3>
+                                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Rescue Reports</h3>
                                 <p className="text-slate-400">No animal rescue reports match your filters.</p>
                             </div>
                         ) : (
@@ -374,7 +374,7 @@ function AnimalRescueList({ role = 'responder' }) {
                                             {/* Animal Info */}
                                             <div className="space-y-3">
                                                 <div className="flex items-start justify-between gap-2">
-                                                    <h3 className="text-lg font-bold text-white capitalize flex items-center gap-2">
+                                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2">
                                                         <span>{animalIcon}</span>
                                                         {rescue.animalType}
                                                         {rescue.breed && <span className="text-sm font-normal text-slate-400">({rescue.breed})</span>}

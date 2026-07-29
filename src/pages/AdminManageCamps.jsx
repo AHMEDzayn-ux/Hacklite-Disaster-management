@@ -139,14 +139,14 @@ function AdminManageCamps() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -158,7 +158,7 @@ function AdminManageCamps() {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 {/* Top bar */}
                 <div className="mb-6 flex items-center justify-between">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">
                         ← Dashboard
                     </Link>
                     {adminStatus.role === 'super_admin' && (
@@ -170,22 +170,22 @@ function AdminManageCamps() {
 
                 {/* Header */}
                 <div className="mb-8 flex items-center gap-5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconTent className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Manage Camps</h1>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white md:text-2xl">Manage Camps</h1>
                         <p className="mt-1 text-slate-300">View and manage all relief camps</p>
                     </div>
                 </div>
 
                 {/* Info Banner */}
-                <div className="mb-6 flex items-start gap-4 rounded-xl border border-primary-400/20 bg-primary-500/10 p-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
+                <div className="mb-6 flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 text-slate-300">
                         <IconShieldLock className="h-5 w-5" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-white">Secure Camp Management</h3>
+                        <h3 className="font-semibold text-slate-900 dark:text-white">Secure Camp Management</h3>
                         <p className="text-sm text-slate-300">
                             As an admin, you can view and mark camps as closed. Camp records are maintained for historical tracking.
                         </p>
@@ -226,7 +226,7 @@ function AdminManageCamps() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div className="card p-4">
                         <p className="text-sm text-slate-400">Total Camps</p>
-                        <p className="text-2xl font-bold text-white">{camps.length}</p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{camps.length}</p>
                     </div>
                     <div className="card p-4">
                         <p className="text-sm text-slate-400">Active</p>
@@ -256,7 +256,7 @@ function AdminManageCamps() {
                 ) : filteredCamps.length === 0 ? (
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-12 text-center">
                         <IconTent className="mx-auto mb-4 h-16 w-16 text-slate-600" />
-                        <h3 className="text-xl font-semibold text-white mb-2">No Camps Found</h3>
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Camps Found</h3>
                         <p className="text-slate-400">
                             {searchTerm ? 'Try a different search term.' : 'No camps match the selected filter.'}
                         </p>
@@ -268,7 +268,7 @@ function AdminManageCamps() {
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-lg font-bold text-white">{camp.camp_name}</h3>
+                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{camp.camp_name}</h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(camp.status)}`}>
                                                 {camp.status}
                                             </span>
@@ -319,7 +319,7 @@ function AdminManageCamps() {
                                         {adminStatus.isAdmin && (
                                             <Link
                                                 to={`/admin/edit-camp/${camp.id}`}
-                                                className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
+                                                className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/15 text-slate-900 dark:text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
                                                 title="Edit camp details"
                                             >
                                                 ✏️ Edit
@@ -356,9 +356,9 @@ function AdminManageCamps() {
                 {closeModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                         <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-6">
-                            <h3 className="text-xl font-bold text-white mb-4">Mark Camp as Closed</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Mark Camp as Closed</h3>
                             <p className="text-slate-300 mb-4">
-                                Are you sure you want to mark <strong className="text-white">{closeModal.camp?.name}</strong> as closed?
+                                Are you sure you want to mark <strong className="text-slate-900 dark:text-white">{closeModal.camp?.name}</strong> as closed?
                             </p>
                             <p className="text-sm text-slate-400 mb-6">
                                 The camp will be marked as closed but all records will be maintained for historical tracking.
@@ -374,7 +374,7 @@ function AdminManageCamps() {
                                 <button
                                     onClick={() => setCloseModal({ isOpen: false, camp: null })}
                                     disabled={isClosing}
-                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-6 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>

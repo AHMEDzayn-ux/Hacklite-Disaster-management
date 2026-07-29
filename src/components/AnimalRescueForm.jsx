@@ -105,8 +105,8 @@ function AnimalRescueForm() {
     return (
         <div className="max-w-3xl mx-auto">
             <div className="card">
-                <h1 className="mb-6 flex items-center gap-3 text-2xl font-bold text-white">
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                <h1 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconPawPrint className="h-5 w-5" />
                     </span>
                     Animal Rescue Report
@@ -185,14 +185,14 @@ function AnimalRescueForm() {
                                     {...register('animalType', { required: 'Animal type is required' })}
                                     className="input-field"
                                 >
-                                    <option value="">Select type</option>
-                                    <option value="dog">Dog</option>
-                                    <option value="cat">Cat</option>
-                                    <option value="cattle">Cattle (Cow/Buffalo)</option>
-                                    <option value="goat">Goat/Sheep</option>
-                                    <option value="bird">Bird</option>
-                                    <option value="wildlife">Other Wildlife</option>
-                                    <option value="other">Other</option>
+                                    <option value="" className="text-slate-900">Select type</option>
+                                    <option value="dog" className="text-slate-900">Dog</option>
+                                    <option value="cat" className="text-slate-900">Cat</option>
+                                    <option value="cattle" className="text-slate-900">Cattle (Cow/Buffalo)</option>
+                                    <option value="goat" className="text-slate-900">Goat/Sheep</option>
+                                    <option value="bird" className="text-slate-900">Bird</option>
+                                    <option value="wildlife" className="text-slate-900">Other Wildlife</option>
+                                    <option value="other" className="text-slate-900">Other</option>
                                 </select>
                                 {errors.animalType && (
                                     <span className="text-danger-400 text-sm mt-1 block">
@@ -280,12 +280,12 @@ function AnimalRescueForm() {
                                     {...register('condition', { required: 'Condition is required' })}
                                     className="input-field"
                                 >
-                                    <option value="">Select condition</option>
-                                    <option value="healthy">Healthy/Unharmed</option>
-                                    <option value="injured">Injured</option>
-                                    <option value="trapped">Trapped</option>
-                                    <option value="sick">Sick/Weak</option>
-                                    <option value="critical">Critical Condition</option>
+                                    <option value="" className="text-slate-900">Select condition</option>
+                                    <option value="healthy" className="text-slate-900">Healthy/Unharmed</option>
+                                    <option value="injured" className="text-slate-900">Injured</option>
+                                    <option value="trapped" className="text-slate-900">Trapped</option>
+                                    <option value="sick" className="text-slate-900">Sick/Weak</option>
+                                    <option value="critical" className="text-slate-900">Critical Condition</option>
                                 </select>
                                 {errors.condition && (
                                     <span className="text-danger-400 text-sm mt-1 block">
@@ -340,9 +340,9 @@ function AnimalRescueForm() {
                                     {...register('accessibility')}
                                     className="input-field"
                                 >
-                                    <option value="easy">Easy Access</option>
-                                    <option value="moderate">Moderate (needs tools)</option>
-                                    <option value="difficult">Difficult (special equipment needed)</option>
+                                    <option value="easy" className="text-slate-900">Easy Access</option>
+                                    <option value="moderate" className="text-slate-900">Moderate (needs tools)</option>
+                                    <option value="difficult" className="text-slate-900">Difficult (special equipment needed)</option>
                                 </select>
                             </div>
 
@@ -439,7 +439,7 @@ function AnimalRescueForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 border border-white/20 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                            className="px-6 py-2 border border-white/20 bg-white/10 text-slate-900 dark:text-white rounded-lg hover:bg-white/20 transition-colors"
                         >
                             Clear
                         </button>

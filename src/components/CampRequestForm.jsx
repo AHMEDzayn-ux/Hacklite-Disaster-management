@@ -137,7 +137,7 @@ function CampRequestForm() {
     // Success state
     if (submitted) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center px-4">
+            <div className="page-shell flex items-center justify-center px-4">
                 <div
                     className="absolute inset-0 pointer-events-none opacity-10"
                     style={{
@@ -149,7 +149,7 @@ function CampRequestForm() {
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-500/20 text-success-400">
                         <IconCheck className="h-8 w-8" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Request Submitted!</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Request Submitted!</h2>
                     <p className="text-slate-300 mb-6">
                         Your camp request has been submitted successfully.
                         It will be reviewed by authorities and you will be notified once approved.
@@ -163,7 +163,7 @@ function CampRequestForm() {
                         </button>
                         <button
                             onClick={() => navigate('/respond')}
-                            className="w-full px-4 py-2 border border-white/20 bg-white/10 text-white hover:bg-white/20 rounded-lg transition-colors"
+                            className="w-full px-4 py-2 border border-white/20 bg-white/10 text-slate-900 dark:text-white hover:bg-white/20 rounded-lg transition-colors"
                         >
                             Back to Dashboard
                         </button>
@@ -174,7 +174,7 @@ function CampRequestForm() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans py-8 px-4">
+        <div className="page-shell py-8 px-4">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -188,16 +188,16 @@ function CampRequestForm() {
                 <div className="mb-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
+                        className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 flex items-center gap-2 transition-colors"
                     >
                         ← Back
                     </button>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-primary-400">Request a New Relief Camp</h1>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Request a New Relief Camp</h1>
                             <p className="text-slate-400 mt-1">
                                 Submit a request for a new relief camp. Your request will be reviewed by authorities.
                             </p>
@@ -210,7 +210,7 @@ function CampRequestForm() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Information Section */}
                         <div>
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Basic Information
                             </h3>
 
@@ -227,9 +227,9 @@ function CampRequestForm() {
                                             className="input-field"
                                             required
                                         >
-                                            <option value="">Select District</option>
+                                            <option value="" className="text-slate-900">Select District</option>
                                             {districts.map(d => (
-                                                <option key={d} value={d}>{d}</option>
+                                                <option key={d} value={d} className="text-slate-900">{d}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -276,10 +276,10 @@ function CampRequestForm() {
                                         className="input-field"
                                         required
                                     >
-                                        <option value="low">🟢 Low - Can wait 1-2 days</option>
-                                        <option value="medium">🟡 Medium - Need within 24 hours</option>
-                                        <option value="high">🟠 High - Need within 12 hours</option>
-                                        <option value="critical">🔴 Critical - Immediate help needed</option>
+                                        <option value="low" className="text-slate-900">🟢 Low - Can wait 1-2 days</option>
+                                        <option value="medium" className="text-slate-900">🟡 Medium - Need within 24 hours</option>
+                                        <option value="high" className="text-slate-900">🟠 High - Need within 12 hours</option>
+                                        <option value="critical" className="text-slate-900">🔴 Critical - Immediate help needed</option>
                                     </select>
                                 </div>
                             </div>
@@ -287,7 +287,7 @@ function CampRequestForm() {
 
                         {/* Location Section */}
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Location Information
                             </h3>
 
@@ -300,7 +300,7 @@ function CampRequestForm() {
                                                 <IconInfo className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-white mb-1">Auto-Detect Your Location</p>
+                                                <p className="font-semibold text-slate-900 dark:text-white mb-1">Auto-Detect Your Location</p>
                                                 <p className="text-sm text-slate-300">Use your device's GPS for accurate location</p>
                                             </div>
                                         </div>
@@ -362,7 +362,7 @@ function CampRequestForm() {
 
                         {/* Facilities Needed */}
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Facilities Needed (Select All That Apply)
                             </h3>
                             <div className="flex flex-wrap gap-2">
@@ -384,7 +384,7 @@ function CampRequestForm() {
 
                         {/* Special Needs */}
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Special Needs
                             </h3>
                             <textarea
@@ -404,7 +404,7 @@ function CampRequestForm() {
 
                         {/* Reason */}
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Describe the Situation *
                             </h3>
                             <textarea
@@ -422,7 +422,7 @@ function CampRequestForm() {
 
                         {/* Your Information */}
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                 <IconUsers className="h-5 w-5 text-primary-400" />
                                 Requester Contact Information
                             </h3>
@@ -475,7 +475,7 @@ function CampRequestForm() {
 
                         {/* Additional Notes */}
                         <div className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                                 Additional Notes
                             </h3>
                             <textarea

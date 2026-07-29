@@ -169,14 +169,14 @@ function AdminRecords() {
         return (
             <div>
                 <p className="text-sm text-slate-400">{label}</p>
-                <p className="font-medium text-white capitalize">{value}</p>
+                <p className="font-medium text-slate-900 dark:text-white capitalize">{value}</p>
             </div>
         );
     };
 
     if (authLoading || !user || checkingAdmin) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
@@ -184,10 +184,10 @@ function AdminRecords() {
 
     if (!adminStatus.isAdmin) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="relative z-10 text-center">
                     <div className="text-6xl mb-4">🚫</div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Access Denied</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h2>
                     <p className="text-slate-400 mb-4">You are not authorized to access this page.</p>
                     <Link to="/admin/dashboard" className="text-primary-400 hover:underline">
                         Return to Dashboard
@@ -198,7 +198,7 @@ function AdminRecords() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -211,15 +211,15 @@ function AdminRecords() {
                 {/* Header */}
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">
                             ← Dashboard
                         </Link>
                         <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                                 <IconGrid className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Records Management</h1>
+                                <h1 className="text-xl font-bold text-slate-900 dark:text-white md:text-2xl">Records Management</h1>
                                 <p className="mt-1 text-slate-300 text-sm">View, inspect, and securely delete any record</p>
                             </div>
                         </div>
@@ -296,7 +296,7 @@ function AdminRecords() {
                 ) : filteredRecords.length === 0 ? (
                     <div className="card text-center py-12">
                         <div className="text-6xl mb-4">📭</div>
-                        <h3 className="text-xl font-semibold text-white mb-2">No Records Found</h3>
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Records Found</h3>
                         <p className="text-slate-400">
                             {searchTerm ? 'Try a different search term.' : `No records in ${TABLE_DISPLAY_NAMES[selectedTable] || selectedTable}.`}
                         </p>
@@ -317,7 +317,7 @@ function AdminRecords() {
                                     {filteredRecords.map((record) => (
                                         <tr key={record.id} className="border-b border-white/5 hover:bg-white/5">
                                             <td className="px-4 py-3">
-                                                <div className="font-medium text-white">
+                                                <div className="font-medium text-slate-900 dark:text-white">
                                                     {getRecordDisplayName(record)}
                                                 </div>
                                                 <div className="text-xs text-slate-400 font-mono">
@@ -375,14 +375,14 @@ function AdminRecords() {
                             <div className="sticky top-0 bg-slate-900 px-6 py-4 border-b border-white/10 flex items-start justify-between z-10">
                                 <div>
                                     <span className="text-sm text-slate-400">{TABLE_DISPLAY_NAMES[selectedTable]}</span>
-                                    <h3 className="text-xl font-bold text-white">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {getRecordDisplayName(detailModal.record)}
                                     </h3>
                                     <p className="text-xs text-slate-400 font-mono mt-1">ID: {detailModal.record.id}</p>
                                 </div>
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
-                                    className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
                                 >
                                     <IconX className="h-5 w-5" />
                                 </button>
@@ -396,7 +396,7 @@ function AdminRecords() {
                                         {/* Photo Section */}
                                         {(detailModal.record.photo || detailModal.record.image || detailModal.record.photo_url || detailModal.record.image_url) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-white mb-4">Photo</h4>
+                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Photo</h4>
                                                 <img
                                                     src={detailModal.record.photo || detailModal.record.image || detailModal.record.photo_url || detailModal.record.image_url}
                                                     alt={getRecordDisplayName(detailModal.record)}
@@ -409,11 +409,11 @@ function AdminRecords() {
 
                                         {/* Status Card */}
                                         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                            <h4 className="text-lg font-semibold text-white mb-4">Status</h4>
+                                            <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Status</h4>
                                             <div className="space-y-3">
                                                 <div>
                                                     <p className="text-sm text-slate-400">Current Status</p>
-                                                    <p className="font-medium text-white">
+                                                    <p className="font-medium text-slate-900 dark:text-white">
                                                         {detailModal.record.status === 'approved' || detailModal.record.status === 'active' ? (
                                                             <span className="text-success-400">✅ {detailModal.record.status}</span>
                                                         ) : detailModal.record.status === 'pending' ? (
@@ -427,12 +427,12 @@ function AdminRecords() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm text-slate-400">Created At</p>
-                                                    <p className="font-medium text-white">{formatDate(detailModal.record.created_at)}</p>
+                                                    <p className="font-medium text-slate-900 dark:text-white">{formatDate(detailModal.record.created_at)}</p>
                                                 </div>
                                                 {detailModal.record.updated_at && (
                                                     <div>
                                                         <p className="text-sm text-slate-400">Last Updated</p>
-                                                        <p className="font-medium text-white">{formatDate(detailModal.record.updated_at)}</p>
+                                                        <p className="font-medium text-slate-900 dark:text-white">{formatDate(detailModal.record.updated_at)}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -441,7 +441,7 @@ function AdminRecords() {
                                         {/* Contact Info Card */}
                                         {(detailModal.record.contact_number || detailModal.record.phone || detailModal.record.email || detailModal.record.contact) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-white mb-4">Contact Information</h4>
+                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Contact Information</h4>
                                                 <div className="space-y-3">
                                                     {(detailModal.record.contact_number || detailModal.record.phone || detailModal.record.contact) && (
                                                         <div>
@@ -470,7 +470,7 @@ function AdminRecords() {
                                     <div className="lg:col-span-2 space-y-6">
                                         {/* Primary Information Card */}
                                         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                            <h4 className="text-lg font-semibold text-white mb-4">
+                                            <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
                                                 {selectedTable === 'camps' ? 'Camp Information' :
                                                     selectedTable === 'camp_requests' ? 'Request Information' :
                                                         selectedTable === 'missing_persons' ? 'Person Information' :
@@ -497,7 +497,7 @@ function AdminRecords() {
                                         {/* Description Card */}
                                         {(detailModal.record.description || detailModal.record.notes || detailModal.record.additional_info || detailModal.record.reason) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-white mb-4">Description</h4>
+                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Description</h4>
                                                 <p className="text-slate-300 whitespace-pre-wrap">
                                                     {detailModal.record.description || detailModal.record.notes || detailModal.record.additional_info || detailModal.record.reason}
                                                 </p>
@@ -507,7 +507,7 @@ function AdminRecords() {
                                         {/* Facilities Card (for camps) */}
                                         {detailModal.record.facilities && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-white mb-4">Facilities</h4>
+                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Facilities</h4>
                                                 <div className="flex flex-wrap gap-2">
                                                     {(Array.isArray(detailModal.record.facilities)
                                                         ? detailModal.record.facilities
@@ -525,7 +525,7 @@ function AdminRecords() {
 
                                         {/* All Fields (Expandable) */}
                                         <details className="bg-white/5 border border-white/10 rounded-xl">
-                                            <summary className="p-4 cursor-pointer font-semibold text-white hover:bg-white/10 rounded-xl">
+                                            <summary className="p-4 cursor-pointer font-semibold text-slate-900 dark:text-white hover:bg-white/10 rounded-xl">
                                                 📋 View All Raw Fields
                                             </summary>
                                             <div className="px-4 pb-4 space-y-3 border-t border-white/10 mt-2 pt-4">
@@ -568,7 +568,7 @@ function AdminRecords() {
                             <div className="sticky bottom-0 bg-slate-900 px-6 py-4 border-t border-white/10 flex gap-3 justify-end">
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
                                 >
                                     Close
                                 </button>

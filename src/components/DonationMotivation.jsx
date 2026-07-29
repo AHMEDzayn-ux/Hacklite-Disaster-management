@@ -135,7 +135,7 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
                         </motion.div>
 
                         {/* Main Message */}
-                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+                        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">
                             {current.message}
                         </h3>
 

@@ -182,14 +182,14 @@ function AdminReviewRequests() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -201,15 +201,15 @@ function AdminReviewRequests() {
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 {/* Header */}
                 <div className="mb-6 flex items-center gap-4">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">
                         ← Dashboard
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-amber-400 md:text-2xl">Review Camp Requests</h1>
+                            <h1 className="text-xl font-bold text-slate-900 dark:text-white md:text-2xl">Review Camp Requests</h1>
                             <p className="mt-1 text-slate-300 text-sm">Approve or reject relief camp requests from the public</p>
                         </div>
                     </div>
@@ -239,7 +239,7 @@ function AdminReviewRequests() {
                 ) : requests.length === 0 ? (
                     <div className="card text-center py-12">
                         <div className="text-6xl mb-4">📭</div>
-                        <h3 className="text-xl font-semibold text-white mb-2">No Requests Found</h3>
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Requests Found</h3>
                         <p className="text-slate-400">No {filter !== 'all' ? filter : ''} camp requests at this time.</p>
                     </div>
                 ) : (
@@ -249,7 +249,7 @@ function AdminReviewRequests() {
                                 {/* Header with title and action buttons */}
                                 <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <h3 className="text-lg font-bold text-white">{request.camp_name}</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{request.camp_name}</h3>
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadge(request.status)}`}>
                                             {request.status}
                                         </span>
@@ -361,7 +361,7 @@ function AdminReviewRequests() {
                                                 setDeleteModal({ isOpen: true, request });
                                             }}
                                             disabled={isDeleting}
-                                            className="px-3 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+                                            className="px-3 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
                                         >
                                             🗑️ Delete Request
                                         </button>
@@ -376,9 +376,9 @@ function AdminReviewRequests() {
                 {rejectModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                         <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full">
-                            <h3 className="text-lg font-bold text-white mb-2">Reject Camp Request</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Reject Camp Request</h3>
                             <p className="text-sm text-slate-300 mb-4">
-                                Please provide a reason for rejecting "<strong className="text-white">{rejectModal.request?.camp_name}</strong>"
+                                Please provide a reason for rejecting "<strong className="text-slate-900 dark:text-white">{rejectModal.request?.camp_name}</strong>"
                             </p>
                             <textarea
                                 value={rejectionReason}
@@ -393,7 +393,7 @@ function AdminReviewRequests() {
                                         setRejectModal({ isOpen: false, request: null });
                                         setRejectionReason('');
                                     }}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>

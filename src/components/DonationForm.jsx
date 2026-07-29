@@ -155,7 +155,7 @@ function DonationForm({ onSuccess }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
         >
-            <h3 className="text-xl font-bold text-white mb-4">Choose Your Impact</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Choose Your Impact</h3>
 
             {/* Preset Amounts */}
             <div className="grid grid-cols-3 gap-3 mb-4">
@@ -222,7 +222,7 @@ function DonationForm({ onSuccess }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
         >
-            <h3 className="text-xl font-bold text-white mb-4">Your Information</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Your Information</h3>
 
             {/* Anonymous Checkbox */}
             <div className="mb-4">
@@ -330,13 +330,13 @@ function DonationForm({ onSuccess }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
         >
-            <h3 className="text-xl font-bold text-white mb-4">Payment Details</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Payment Details</h3>
 
             {/* Amount Summary */}
-            <div className="rounded-lg border border-primary-400/20 bg-primary-500/10 p-4 mb-6">
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 mb-6">
                 <div className="flex justify-between items-center">
                     <span className="text-slate-300 font-medium">Donation Amount:</span>
-                    <span className="text-2xl font-bold text-primary-300">
+                    <span className="text-2xl font-bold text-slate-900 dark:text-white">
                         {getCurrencySymbol()}{getFinalAmount().toLocaleString()}
                     </span>
                 </div>
@@ -402,7 +402,7 @@ function DonationForm({ onSuccess }) {
                 <button
                     type="submit"
                     disabled={isProcessing || !stripe}
-                    className="flex-1 bg-success-600 hover:bg-success-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-150 flex items-center justify-center gap-2"
+                    className="flex-1 bg-primary-600 hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-150 flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <>

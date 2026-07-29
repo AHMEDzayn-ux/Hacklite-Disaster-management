@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Layout from './components/Layout';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -44,7 +44,7 @@ const CampAdminInventory = lazy(() => import('./pages/CampAdminInventory'));
 // Loading fallback component
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-950">
+    <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="text-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
         <p className="mt-4 text-slate-400">Loading...</p>
@@ -56,37 +56,37 @@ function PageLoader() {
 function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Landing - Role Selection (No Navbar) - Eager loaded */}
             <Route path="/" element={<RoleSelection />} />
 
             {/* Report Interface (for victims/reporters) - Lazy loaded */}
-            <Route path="/report" element={<><Navbar userType="reporter" /><ReportDashboard /></>} />
-            <Route path="/missing-persons" element={<><Navbar userType="reporter" /><MissingPersons /></>} />
-            <Route path="/missing-persons/:id" element={<><Navbar userType="reporter" /><MissingPersonDetail role="reporter" /></>} />
-            <Route path="/disasters" element={<><Navbar userType="reporter" /><DisasterReports /></>} />
-            <Route path="/disasters/:id" element={<><Navbar userType="reporter" /><DisasterReportDetail role="reporter" /></>} />
-            <Route path="/animal-rescue" element={<><Navbar userType="reporter" /><AnimalRescue /></>} />
-            <Route path="/animal-rescue/:id" element={<><Navbar userType="reporter" /><AnimalRescueDetail role="reporter" /></>} />
-            <Route path="/emergency" element={<><Navbar userType="reporter" /><EmergencyContacts /></>} />
+            <Route path="/report" element={<Layout userType="reporter"><ReportDashboard /></Layout>} />
+            <Route path="/missing-persons" element={<Layout userType="reporter"><MissingPersons /></Layout>} />
+            <Route path="/missing-persons/:id" element={<Layout userType="reporter"><MissingPersonDetail role="reporter" /></Layout>} />
+            <Route path="/disasters" element={<Layout userType="reporter"><DisasterReports /></Layout>} />
+            <Route path="/disasters/:id" element={<Layout userType="reporter"><DisasterReportDetail role="reporter" /></Layout>} />
+            <Route path="/animal-rescue" element={<Layout userType="reporter"><AnimalRescue /></Layout>} />
+            <Route path="/animal-rescue/:id" element={<Layout userType="reporter"><AnimalRescueDetail role="reporter" /></Layout>} />
+            <Route path="/emergency" element={<Layout userType="reporter"><EmergencyContacts /></Layout>} />
 
             {/* Respond Interface (for helpers/responders) - Lazy loaded */}
-            <Route path="/respond" element={<><Navbar userType="responder" /><RespondDashboard /></>} />
-            <Route path="/missing-persons-list" element={<><Navbar userType="responder" /><Dashboard role="responder" /></>} />
-            <Route path="/missing-persons-list/:id" element={<><Navbar userType="responder" /><MissingPersonDetail role="responder" /></>} />
-            <Route path="/disasters-list" element={<><Navbar userType="responder" /><Dashboard role="responder" /></>} />
-            <Route path="/disasters-list/:id" element={<><Navbar userType="responder" /><DisasterReportDetail role="responder" /></>} />
-            <Route path="/animal-rescue-list" element={<><Navbar userType="responder" /><Dashboard role="responder" /></>} />
-            <Route path="/animal-rescue-list/:id" element={<><Navbar userType="responder" /><AnimalRescueDetail role="responder" /></>} />
-            <Route path="/camps" element={<><Navbar userType="responder" /><Camps /></>} />
-            <Route path="/camps/:id" element={<><Navbar userType="responder" /><CampDetail /></>} />
-            <Route path="/volunteers" element={<><Navbar userType="responder" /><Volunteers /></>} />
-            <Route path="/donations" element={<><Navbar userType="responder" /><Donations /></>} />
+            <Route path="/respond" element={<Layout userType="responder"><RespondDashboard /></Layout>} />
+            <Route path="/missing-persons-list" element={<Layout userType="responder"><Dashboard role="responder" /></Layout>} />
+            <Route path="/missing-persons-list/:id" element={<Layout userType="responder"><MissingPersonDetail role="responder" /></Layout>} />
+            <Route path="/disasters-list" element={<Layout userType="responder"><Dashboard role="responder" /></Layout>} />
+            <Route path="/disasters-list/:id" element={<Layout userType="responder"><DisasterReportDetail role="responder" /></Layout>} />
+            <Route path="/animal-rescue-list" element={<Layout userType="responder"><Dashboard role="responder" /></Layout>} />
+            <Route path="/animal-rescue-list/:id" element={<Layout userType="responder"><AnimalRescueDetail role="responder" /></Layout>} />
+            <Route path="/camps" element={<Layout userType="responder"><Camps /></Layout>} />
+            <Route path="/camps/:id" element={<Layout userType="responder"><CampDetail /></Layout>} />
+            <Route path="/volunteers" element={<Layout userType="responder"><Volunteers /></Layout>} />
+            <Route path="/donations" element={<Layout userType="responder"><Donations /></Layout>} />
 
             {/* Public Camp Request Form (NO AUTH REQUIRED) */}
-            <Route path="/request-camp" element={<><Navbar userType="responder" /><CampRequestForm /></>} />
+            <Route path="/request-camp" element={<Layout userType="responder"><CampRequestForm /></Layout>} />
 
             {/* Camp Inventory - public, code-gated (no login, no Navbar - mobile field tool) */}
             <Route path="/camp-inventory" element={<CampInventory />} />

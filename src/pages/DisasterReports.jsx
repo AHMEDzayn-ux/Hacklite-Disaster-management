@@ -3,7 +3,7 @@ import DisasterReportForm from '../components/DisasterReportForm';
 
 function DisasterReports() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{

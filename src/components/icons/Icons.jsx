@@ -298,3 +298,56 @@ export function IconHeart({ className }) {
         </svg>
     );
 }
+
+export function IconMenu({ className }) {
+    return (
+        <svg {...iconProps} strokeWidth={2} className={className}>
+            <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    );
+}
+
+export function IconBell({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M6 8a6 6 0 1 1 12 0c0 4 1.5 5.5 2 6.5H4c.5-1 2-2.5 2-6.5Z" />
+            <path d="M10 18.5a2 2 0 0 0 4 0" />
+        </svg>
+    );
+}
+
+export function IconSun({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.3M12 19.2v2.3M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.4 19.6 6 18M18 6l1.6-1.6" />
+        </svg>
+    );
+}
+
+export function IconMoon({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+        </svg>
+    );
+}
+
+export function IconLogOut({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="M16 17l5-5-5-5" />
+            <path d="M21 12H9" />
+        </svg>
+    );
+}
+
+export function IconPanelLeft({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <line x1="9" y1="4" x2="9" y2="20" />
+        </svg>
+    );
+}

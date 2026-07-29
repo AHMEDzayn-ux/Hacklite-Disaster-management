@@ -27,8 +27,8 @@ function DonationCounter() {
                     transition={{ delay: 0.2 }}
                     className="text-center mb-6"
                 >
-                    <h2 className="flex items-center justify-center gap-2 text-2xl md:text-3xl font-bold text-white mb-2">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-success-500 text-white">
+                    <h2 className="flex items-center justify-center gap-2 text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                             <IconHeart className="h-5 w-5" />
                         </span>
                         Total Contributions
@@ -45,7 +45,7 @@ function DonationCounter() {
                     transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
                     className="text-center mb-6"
                 >
-                    <div className="text-5xl md:text-7xl font-extrabold text-white mb-2">
+                    <div className="text-5xl md:text-7xl font-extrabold text-slate-900 dark:text-white mb-2">
                         LKR <CountUp
                             start={0}
                             end={totalRaised}
@@ -69,7 +69,7 @@ function DonationCounter() {
                     transition={{ delay: 0.6 }}
                     className="text-center bg-white/5 border border-white/10 rounded-lg p-4 mb-6"
                 >
-                    <p className="text-white font-semibold text-lg">
+                    <p className="text-slate-900 dark:text-white font-semibold text-lg">
                         🙏 Every Contribution Makes a Difference
                     </p>
                     <p className="text-slate-400 text-sm mt-1">
@@ -85,13 +85,13 @@ function DonationCounter() {
                     className="grid grid-cols-2 gap-6 pt-6 border-t border-white/10"
                 >
                     <div className="text-center">
-                        <div className="text-3xl font-extrabold text-white">
+                        <div className="text-3xl font-extrabold text-slate-900 dark:text-white">
                             {donationStats.successfulCount}
                         </div>
                         <div className="text-sm text-slate-400 mt-1">Successful Donations</div>
                     </div>
                     <div className="text-center">
-                        <div className="text-3xl font-extrabold text-white">
+                        <div className="text-3xl font-extrabold text-slate-900 dark:text-white">
                             LKR {totalRaised.toLocaleString()}
                         </div>
                         <div className="text-sm text-slate-400 mt-1">Total Raised</div>

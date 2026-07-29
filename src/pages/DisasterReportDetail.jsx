@@ -65,7 +65,7 @@ function DisasterReportDetail({ role: propRole }) {
     // Show loading while data is being fetched
     if (!isInitialized) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-12 text-center sm:px-6">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
                     <p className="text-slate-300">Loading...</p>
@@ -76,9 +76,9 @@ function DisasterReportDetail({ role: propRole }) {
 
     if (!disaster) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-12 text-center sm:px-6">
-                    <h1 className="text-2xl font-bold text-white mb-4">Report Not Found</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Report Not Found</h1>
                     <p className="text-slate-300 mb-6">The disaster report could not be found.</p>
                     <button onClick={() => navigate(-1)} className="btn-primary">← Go Back</button>
                 </div>
@@ -151,14 +151,14 @@ function DisasterReportDetail({ role: propRole }) {
     const canMarkResolved = role === 'responder' && disaster.status === 'Active';
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
             {/* Header - Single Row */}
             <div className="mb-3">
                 <div className="flex items-center gap-3">
                     <span className="text-3xl sm:text-4xl">{getDisasterIcon(disasterType)}</span>
                     <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-white capitalize leading-tight">
+                        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
                             {disasterType?.replace('-', ' ') || 'Unknown'} <span className="text-xs sm:text-sm text-slate-400 font-normal ml-2 sm:ml-3">ID: #{disaster.id} • {reportedAt ? formatDate(reportedAt) : 'N/A'}</span>
                         </h1>
                     </div>
@@ -177,15 +177,15 @@ function DisasterReportDetail({ role: propRole }) {
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
                             <div className="border-r border-white/10">
                                 <p className="text-xs text-slate-400 mb-1">People</p>
-                                <p className="text-base font-bold text-white">{peopleAffected || 'N/A'}</p>
+                                <p className="text-base font-bold text-slate-900 dark:text-white">{peopleAffected || 'N/A'}</p>
                             </div>
                             <div className="border-r border-white/10">
                                 <p className="text-xs text-slate-400 mb-1">Casualties</p>
-                                <p className="text-sm font-bold text-white">{getCasualtiesDisplay(casualties)}</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{getCasualtiesDisplay(casualties)}</p>
                             </div>
                             <div>
                                 <p className="text-xs text-slate-400 mb-1">Area</p>
-                                <p className="text-base font-bold text-white">{areaSize || 'N/A'}</p>
+                                <p className="text-base font-bold text-slate-900 dark:text-white">{areaSize || 'N/A'}</p>
                             </div>
                         </div>
                     </div>
@@ -211,11 +211,11 @@ function DisasterReportDetail({ role: propRole }) {
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <p className="text-xs text-slate-400 mb-0.5">Name</p>
-                                <p className="text-sm font-medium text-white">{reporterName || 'N/A'}</p>
+                                <p className="text-sm font-medium text-slate-900 dark:text-white">{reporterName || 'N/A'}</p>
                             </div>
                             <div>
                                 <p className="text-xs text-slate-400 mb-0.5">Phone</p>
-                                <p className="text-sm font-medium text-white">{contactNumber || 'N/A'}</p>
+                                <p className="text-sm font-medium text-slate-900 dark:text-white">{contactNumber || 'N/A'}</p>
                             </div>
                         </div>
                     </div>
@@ -233,7 +233,7 @@ function DisasterReportDetail({ role: propRole }) {
                             <div className="flex gap-2.5 items-start">
                                 <div className="w-7 h-7 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                                 <div className="flex-1">
-                                    <p className="text-sm font-semibold text-white">Submitted</p>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Submitted</p>
                                     <p className="text-xs text-slate-400">{reportedAt ? formatDate(reportedAt) : 'N/A'} • {reporterName || 'Anonymous'}</p>
                                 </div>
                             </div>
@@ -241,7 +241,7 @@ function DisasterReportDetail({ role: propRole }) {
                                 <div className="flex gap-2.5 items-start">
                                     <div className="w-7 h-7 rounded-full bg-success-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">✓</div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold text-white">Resolved</p>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Resolved</p>
                                         <p className="text-xs text-slate-400">{formatDate(resolvedAtDate)} • {resolvedByPerson || 'N/A'}</p>
                                         {responderNotesData && <p className="text-xs text-slate-400 italic mt-1">{responderNotesData}</p>}
                                     </div>
@@ -290,12 +290,12 @@ function DisasterReportDetail({ role: propRole }) {
                                 <div className="space-y-2.5">
                                     <div>
                                         <p className="text-xs text-slate-400 mb-1">Address</p>
-                                        <p className="text-sm text-white">{disaster.location?.address || 'N/A'}</p>
+                                        <p className="text-sm text-slate-900 dark:text-white">{disaster.location?.address || 'N/A'}</p>
                                     </div>
                                     {occurredDate && (
                                         <div>
                                             <p className="text-xs text-slate-400 mb-1">Occurred</p>
-                                            <p className="text-sm text-white">{formatDate(occurredDate)}</p>
+                                            <p className="text-sm text-slate-900 dark:text-white">{formatDate(occurredDate)}</p>
                                         </div>
                                     )}
                                 </div>
@@ -315,19 +315,19 @@ function DisasterReportDetail({ role: propRole }) {
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                     <p className="text-xs text-slate-400">🌡️ Temp</p>
-                                                    <p className="text-base font-bold text-white">{weather.temperature_2m}°C</p>
+                                                    <p className="text-base font-bold text-slate-900 dark:text-white">{weather.temperature_2m}°C</p>
                                                 </div>
                                                 <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                     <p className="text-xs text-slate-400">💧 Humidity</p>
-                                                    <p className="text-base font-bold text-white">{weather.relative_humidity_2m}%</p>
+                                                    <p className="text-base font-bold text-slate-900 dark:text-white">{weather.relative_humidity_2m}%</p>
                                                 </div>
                                                 <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                     <p className="text-xs text-slate-400">💨 Wind</p>
-                                                    <p className="text-sm font-bold text-white">{weather.wind_speed_10m} km/h</p>
+                                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{weather.wind_speed_10m} km/h</p>
                                                 </div>
                                                 <div className="bg-white/5 rounded p-1.5 border border-white/10">
                                                     <p className="text-xs text-slate-400">☁️ Sky</p>
-                                                    <p className="text-xs font-bold text-white">{getWeatherDescription(weather.weather_code)}</p>
+                                                    <p className="text-xs font-bold text-slate-900 dark:text-white">{getWeatherDescription(weather.weather_code)}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -386,7 +386,7 @@ function DisasterReportDetail({ role: propRole }) {
             {showConfirmDialog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
                     <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-4">
-                        <h3 className="text-lg font-bold text-white mb-2">Confirm Resolution</h3>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Confirm Resolution</h3>
                         <p className="text-sm text-slate-300 mb-3">Confirm that this disaster has been resolved.</p>
 
                         <div className="space-y-2.5 mb-4">
@@ -402,7 +402,7 @@ function DisasterReportDetail({ role: propRole }) {
 
                         <div className="flex gap-2">
                             <button onClick={confirmMarkResolved} className="btn-primary flex-1 text-sm py-2">Confirm</button>
-                            <button onClick={() => setShowConfirmDialog(false)} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm">Cancel</button>
+                            <button onClick={() => setShowConfirmDialog(false)} className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg text-sm">Cancel</button>
                         </div>
                     </div>
                 </div>

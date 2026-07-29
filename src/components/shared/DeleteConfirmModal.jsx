@@ -42,7 +42,7 @@ function DeleteConfirmModal({
                         <span className="text-2xl">⚠️</span>
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-white">Confirm Deletion</h3>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Confirm Deletion</h3>
                         <p className="text-sm text-slate-300">This action cannot be undone</p>
                     </div>
                 </div>
@@ -50,7 +50,7 @@ function DeleteConfirmModal({
                 {/* Item Info */}
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4">
                     <p className="text-sm text-slate-300 mb-1">You are about to delete:</p>
-                    <p className="font-semibold text-white">{itemName}</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">{itemName}</p>
                     <p className="text-xs text-slate-400 mt-1">Type: {itemType}</p>
                 </div>
 
@@ -71,7 +71,7 @@ function DeleteConfirmModal({
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             placeholder="Enter reason for deletion (required for audit log)"
-                            className="w-full px-3 py-2 bg-white/5 border border-white/20 text-white placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 h-20 resize-none"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/20 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-danger-500 focus:border-danger-500 h-20 resize-none"
                             disabled={isProcessing}
                         />
                     </div>
@@ -82,7 +82,7 @@ function DeleteConfirmModal({
                     <button
                         onClick={handleClose}
                         disabled={isProcessing}
-                        className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium transition-colors disabled:opacity-50"
+                        className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg font-medium transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>

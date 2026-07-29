@@ -56,22 +56,18 @@ const REPORT_OPTIONS = [
 
 const COLOR_STYLES = {
     danger: {
-        bar: 'from-danger-600 to-danger-400',
-        badge: 'bg-danger-500',
-        text: 'group-hover:text-danger-400',
+        badge: 'bg-danger-500 text-white',
         cta: 'text-danger-400',
     },
     primary: {
-        bar: 'from-primary-600 to-primary-400',
-        badge: 'bg-primary-500',
-        text: 'group-hover:text-primary-300',
+        badge: 'bg-white/10 text-slate-300',
         cta: 'text-primary-300',
     },
 };
 
 function ReportDashboard() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -82,11 +78,11 @@ function ReportDashboard() {
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-8 sm:px-10 lg:px-12">
                 <div className="mb-6 flex items-center gap-4 animate-fade-in-up">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconSiren className="h-6 w-6" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-danger-400 md:text-2xl">
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white md:text-2xl">
                             Report Emergency
                         </h1>
                         <p className="mt-1 text-slate-300">
@@ -101,13 +97,12 @@ function ReportDashboard() {
                         return (
                             <Link key={to} to={to} className="group animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
                                 <div className="relative h-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.05] p-5 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.08]">
-                                    <div className={`absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b ${styles.bar}`}></div>
                                     <div className="flex items-start gap-4">
-                                        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-white transition-transform duration-200 group-hover:scale-105 ${styles.badge}`}>
+                                        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${styles.badge}`}>
                                             <Icon className="h-6 w-6" />
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className={`mb-1 text-lg font-bold text-white transition-colors ${styles.text}`}>
+                                            <h3 className="mb-1 text-lg font-bold text-slate-900 dark:text-white">
                                                 {title}
                                             </h3>
                                             <p className="mb-3 text-sm leading-snug text-slate-300">
@@ -126,12 +121,12 @@ function ReportDashboard() {
                 </div>
 
                 {/* Important Notice */}
-                <div className="mt-6 flex items-start gap-4 rounded-xl border border-primary-400/20 bg-primary-500/10 p-5 animate-fade-in-up [animation-delay:300ms]">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
+                <div className="mt-6 flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-5 animate-fade-in-up [animation-delay:300ms]">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconCloud className="h-5 w-5" />
                     </div>
                     <div>
-                        <h4 className="mb-1 font-bold text-white">Works Offline</h4>
+                        <h4 className="mb-1 font-bold text-slate-900 dark:text-white">Works Offline</h4>
                         <p className="text-sm text-slate-300">
                             All forms work without internet. Your report will be saved and submitted automatically when connection is restored.
                         </p>
@@ -139,16 +134,16 @@ function ReportDashboard() {
                 </div>
 
                 {/* SMS Alternative */}
-                <div className="mt-4 flex items-start gap-4 rounded-xl border border-amber-400/20 bg-amber-500/10 p-5 animate-fade-in-up [animation-delay:360ms]">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300">
+                <div className="mt-4 flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-5 animate-fade-in-up [animation-delay:360ms]">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconMessageSquare className="h-5 w-5" />
                     </div>
                     <div>
-                        <h4 className="mb-1 font-bold text-white">Can't Use App? Send SMS</h4>
+                        <h4 className="mb-1 font-bold text-slate-900 dark:text-white">Can't Use App? Send SMS</h4>
                         <p className="mb-1 text-sm text-slate-300">
-                            Text your report to: <span className="font-bold text-white">1234</span>
+                            Text your report to: <span className="font-bold text-slate-900 dark:text-white">1234</span>
                         </p>
-                        
+
                     </div>
                 </div>
             </div>

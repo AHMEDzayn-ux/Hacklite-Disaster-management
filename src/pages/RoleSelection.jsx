@@ -40,16 +40,8 @@ function RoleSelection() {
     const navigate = useNavigate();
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             {/* Static colour glow - CSS gradient only, no image/filter/animation */}
-            <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-2/3"
-                style={{
-                    backgroundImage:
-                        'radial-gradient(circle at 78% 30%, rgba(239,68,68,0.14), transparent 55%), radial-gradient(circle at 55% 85%, rgba(34,197,94,0.08), transparent 50%)',
-                }}
-            ></div>
-
             {/* Subtle dot-grid texture */}
             <div
                 className="absolute inset-0 pointer-events-none opacity-[0.08]"
@@ -63,7 +55,7 @@ function RoleSelection() {
             <div className="absolute top-4 right-4 z-20 flex items-center gap-2 sm:top-6 sm:right-6 sm:gap-3 lg:top-8 lg:right-10 animate-fade-in-up">
                 <button
                     onClick={() => navigate('/camp-admin/login')}
-                    className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-slate-300 transition-colors duration-150 hover:border-white/30 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-4 sm:py-2.5 sm:text-sm"
+                    className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-slate-300 transition-colors duration-150 hover:border-white/30 hover:text-slate-900 dark:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-4 sm:py-2.5 sm:text-sm"
                 >
                     <IconTent className="h-4 w-4" />
                     <span className="hidden sm:inline">Camp Admin</span>
@@ -89,20 +81,20 @@ function RoleSelection() {
 
                     {/* Hero heading */}
                     <h1
-                        className="mb-2.5 flex flex-col items-start gap-0.5 text-[clamp(1.75rem,1.2rem+2vw,3rem)] font-black leading-[1.1] tracking-tight text-white animate-fade-in-up"
+                        className="mb-2.5 flex flex-col items-start gap-0.5 text-[clamp(1.75rem,1.2rem+2vw,3rem)] font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white animate-fade-in-up"
                         style={{ animationDelay: '0.05s' }}
                     >
                         <span className="flex items-center gap-2.5 pb-0.5">
                             <IconSiren className="h-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] w-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] flex-shrink-0 text-danger-400" />
                             Disaster
                         </span>
-                        <span className="block bg-gradient-to-r from-white to-slate-400 bg-clip-text pb-1.5 text-transparent">
+                        <span className="block bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text pb-1.5 text-transparent">
                             Management System
                         </span>
                     </h1>
 
                     <p
-                        className="mb-1.5 text-lg font-semibold text-white md:text-xl animate-fade-in-up"
+                        className="mb-1.5 text-lg font-semibold text-slate-900 dark:text-white md:text-xl animate-fade-in-up"
                         style={{ animationDelay: '0.1s' }}
                     >
                         Sri Lanka Emergency Response Platform
@@ -118,7 +110,7 @@ function RoleSelection() {
                         {/* Reporter/Victim Card */}
                         <div
                             onClick={() => navigate('/report')}
-                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-danger-400/40 hover:shadow-[0_12px_32px_-16px_rgba(239,68,68,0.25)] animate-fade-in-up"
+                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-white/25 animate-fade-in-up"
                             style={{ animationDelay: '0.2s' }}
                         >
                             <div className="flex items-start justify-between gap-3">
@@ -130,7 +122,7 @@ function RoleSelection() {
                                 </span>
                             </div>
 
-                            <h2 className="mb-1 mt-2.5 text-base font-bold text-white">Report Emergency</h2>
+                            <h2 className="mb-1 mt-2.5 text-base font-bold text-slate-900 dark:text-white">Report Emergency</h2>
                             <p className="mb-3 text-xs leading-relaxed text-slate-400">
                                 I need to report a missing person, disaster, or request help
                             </p>
@@ -156,7 +148,7 @@ function RoleSelection() {
                         {/* Responder/Helper Card */}
                         <div
                             onClick={() => navigate('/respond')}
-                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-success-400/40 hover:shadow-[0_12px_32px_-16px_rgba(34,197,94,0.25)] animate-fade-in-up"
+                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-white/25 animate-fade-in-up"
                             style={{ animationDelay: '0.25s' }}
                         >
                             <div className="flex items-start justify-between gap-3">
@@ -168,7 +160,7 @@ function RoleSelection() {
                                 </span>
                             </div>
 
-                            <h2 className="mb-1 mt-2.5 text-base font-bold text-white">Respond &amp; Help</h2>
+                            <h2 className="mb-1 mt-2.5 text-base font-bold text-slate-900 dark:text-white">Respond &amp; Help</h2>
                             <p className="mb-3 text-xs leading-relaxed text-slate-400">
                                 I want to help, volunteer, or coordinate rescue efforts
                             </p>
@@ -203,7 +195,7 @@ function RoleSelection() {
                         <div className="flex flex-1 items-center justify-between gap-4">
                             <div>
                                 <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Emergency Hotline</p>
-                                <p className="text-lg font-extrabold text-white md:text-xl">119 | 117</p>
+                                <p className="text-lg font-extrabold text-slate-900 dark:text-white md:text-xl">119 | 117</p>
                             </div>
                         </div>
                     </div>
@@ -220,7 +212,7 @@ function RoleSelection() {
                                     <Icon className="h-3.5 w-3.5" />
                                 </span>
                                 <div className="min-w-0">
-                                    <p className="text-xs font-semibold text-white">{title}</p>
+                                    <p className="text-xs font-semibold text-slate-900 dark:text-white">{title}</p>
                                     <p className="truncate text-[11px] leading-snug text-slate-500">{desc}</p>
                                 </div>
                             </div>

@@ -146,14 +146,14 @@ function AdminCommandDashboard() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -165,8 +165,8 @@ function AdminCommandDashboard() {
             <header className="relative z-10 border-b border-white/10 bg-white/[0.03] animate-fade-in-up">
                 <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-4">
-                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-white transition-colors text-sm">← Dashboard</Link>
-                        <h1 className="flex items-center gap-2 text-xl font-bold text-danger-400">
+                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm">← Dashboard</Link>
+                        <h1 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                             <IconSiren className="h-5 w-5 text-danger-400" />
                             Emergency Command Dashboard
                         </h1>
@@ -248,7 +248,7 @@ function AdminCommandDashboard() {
                 <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1 animate-fade-in-up [animation-delay:120ms]">
                     {/* Agent run status */}
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                        <h3 className="flex items-center gap-1.5 font-bold text-white mb-2 text-sm"><IconClock className="h-4 w-4 text-primary-300" />Agent Status</h3>
+                        <h3 className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white mb-2 text-sm"><IconClock className="h-4 w-4 text-primary-300" />Agent Status</h3>
                         <div className="space-y-1 text-xs">
                             {Object.entries(runHistory).map(([name, run]) => (
                                 <div key={name} className="flex justify-between items-center">
@@ -263,12 +263,12 @@ function AdminCommandDashboard() {
 
                     {/* Pending allocation plans */}
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                        <h3 className="font-bold text-white mb-2 text-sm">📦 Pending Resource Allocations ({allocationPlans.length})</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">📦 Pending Resource Allocations ({allocationPlans.length})</h3>
                         <div className="space-y-2">
                             {allocationPlans.length === 0 && <p className="text-xs text-slate-400">No pending recommendations.</p>}
                             {allocationPlans.map(plan => (
                                 <div key={plan.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
-                                    <p className="font-medium text-white">{plan.quantity} {plan.resource_category} units</p>
+                                    <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.resource_category} units</p>
                                     <p className="text-slate-400">{plan.from_camp?.name || 'Unknown'} → {plan.to_camp?.name || 'Unknown'} ({plan.distance_km?.toFixed(1)}km)</p>
                                     {plan.solver_metadata?.recommendation_text && (
                                         <p className="text-slate-400 italic mt-1">{plan.solver_metadata.recommendation_text}</p>
@@ -283,7 +283,7 @@ function AdminCommandDashboard() {
 
                     {/* Shipments in transit: approved -> dispatched -> delivered */}
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                        <h3 className="font-bold text-white mb-2 text-sm">🚚 Shipments In Transit ({inFlightPlans.length})</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">🚚 Shipments In Transit ({inFlightPlans.length})</h3>
                         <div className="space-y-2">
                             {inFlightPlans.length === 0 && <p className="text-xs text-slate-400">No shipments awaiting dispatch or delivery.</p>}
                             {inFlightPlans.map(plan => {
@@ -291,7 +291,7 @@ function AdminCommandDashboard() {
                                 return (
                                     <div key={plan.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
                                         <div className="flex items-center justify-between mb-1">
-                                            <p className="font-medium text-white">{plan.quantity} {plan.resource_category} units</p>
+                                            <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.resource_category} units</p>
                                             <span className={`px-2 py-0.5 rounded-full font-bold capitalize ${shipmentStatusBadge(plan.status)}`}>{plan.status}</span>
                                         </div>
                                         <p className="text-slate-400">{plan.from_camp?.name || 'Unknown'} → {plan.to_camp?.name || 'Unknown'}</p>
@@ -314,7 +314,7 @@ function AdminCommandDashboard() {
 
                     {/* Incident priority queue */}
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                        <h3 className="flex items-center gap-1.5 font-bold text-white mb-2 text-sm"><IconBolt className="h-4 w-4 text-primary-300" />Incident Priority Queue</h3>
+                        <h3 className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white mb-2 text-sm"><IconBolt className="h-4 w-4 text-primary-300" />Incident Priority Queue</h3>
                         <div className="space-y-2">
                             {priorityQueue.slice(0, 8).map(item => (
                                 <Link
@@ -323,7 +323,7 @@ function AdminCommandDashboard() {
                                     className="block border border-white/10 bg-white/5 hover:bg-white/10 rounded-lg p-2 text-xs transition-colors"
                                 >
                                     <div className="flex justify-between items-center">
-                                        <span className="font-medium text-white">#{item.rank} {item.disasters?.disaster_type}</span>
+                                        <span className="font-medium text-slate-900 dark:text-white">#{item.rank} {item.disasters?.disaster_type}</span>
                                         <span className={`px-2 py-0.5 rounded-full font-bold ${riskColor(item.priority_score)}`}>{item.priority_score?.toFixed(0)}</span>
                                     </div>
                                     <p className="text-slate-400 truncate">{item.disasters?.description}</p>
@@ -335,12 +335,12 @@ function AdminCommandDashboard() {
 
                     {/* SITREP feed */}
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                        <h3 className="flex items-center gap-1.5 font-bold text-white mb-2 text-sm"><IconGlobe className="h-4 w-4 text-primary-300" />SITREP Feed</h3>
+                        <h3 className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white mb-2 text-sm"><IconGlobe className="h-4 w-4 text-primary-300" />SITREP Feed</h3>
                         <div className="space-y-2">
                             {situationReports.map(report => (
                                 <div key={report.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
                                     <div className="flex justify-between items-center mb-1">
-                                        <span className="font-bold text-white">{report.district}</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">{report.district}</span>
                                         <span className={`px-2 py-0.5 rounded-full font-bold ${riskColor(report.risk_score)}`}>
                                             risk {report.risk_score?.toFixed(0)} ({report.risk_trend})
                                         </span>

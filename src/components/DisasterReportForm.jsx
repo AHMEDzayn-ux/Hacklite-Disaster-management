@@ -124,10 +124,10 @@ function DisasterReportForm() {
         <div className="mx-auto max-w-3xl">
             <div className="card">
                 <div className="mb-6 flex items-center gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconSiren className="h-6 w-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white">
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                         Report Disaster
                     </h1>
                 </div>
@@ -160,16 +160,16 @@ function DisasterReportForm() {
                                     {...register('disasterType', { required: 'Disaster type is required' })}
                                     className="input-field"
                                 >
-                                    <option value="">Select type</option>
-                                    <option value="flood">Flood</option>
-                                    <option value="landslide">Landslide</option>
-                                    <option value="fire">Fire</option>
-                                    <option value="earthquake">Earthquake</option>
-                                    <option value="cyclone">Cyclone/Storm</option>
-                                    <option value="drought">Drought</option>
-                                    <option value="tsunami">Tsunami</option>
-                                    <option value="building-collapse">Building Collapse</option>
-                                    <option value="other">Other</option>
+                                    <option value="" className="text-slate-900">Select type</option>
+                                    <option value="flood" className="text-slate-900">Flood</option>
+                                    <option value="landslide" className="text-slate-900">Landslide</option>
+                                    <option value="fire" className="text-slate-900">Fire</option>
+                                    <option value="earthquake" className="text-slate-900">Earthquake</option>
+                                    <option value="cyclone" className="text-slate-900">Cyclone/Storm</option>
+                                    <option value="drought" className="text-slate-900">Drought</option>
+                                    <option value="tsunami" className="text-slate-900">Tsunami</option>
+                                    <option value="building-collapse" className="text-slate-900">Building Collapse</option>
+                                    <option value="other" className="text-slate-900">Other</option>
                                 </select>
                                 {errors.disasterType && (
                                     <span className="text-danger-500 text-sm mt-1 block">
@@ -186,11 +186,11 @@ function DisasterReportForm() {
                                     {...register('severity', { required: 'Severity is required' })}
                                     className="input-field"
                                 >
-                                    <option value="">Select severity</option>
-                                    <option value="low">Low - Minor damage</option>
-                                    <option value="moderate">Moderate - Significant damage</option>
-                                    <option value="high">High - Severe damage</option>
-                                    <option value="critical">Critical - Life threatening</option>
+                                    <option value="" className="text-slate-900">Select severity</option>
+                                    <option value="low" className="text-slate-900">Low - Minor damage</option>
+                                    <option value="moderate" className="text-slate-900">Moderate - Significant damage</option>
+                                    <option value="high" className="text-slate-900">High - Severe damage</option>
+                                    <option value="critical" className="text-slate-900">Critical - Life threatening</option>
                                 </select>
                                 {errors.severity && (
                                     <span className="text-danger-500 text-sm mt-1 block">
@@ -256,11 +256,11 @@ function DisasterReportForm() {
                                     {...register('peopleAffected')}
                                     className="input-field"
                                 >
-                                    <option value="0">None/Unknown</option>
-                                    <option value="1-10">1-10 people</option>
-                                    <option value="11-50">11-50 people</option>
-                                    <option value="51-100">51-100 people</option>
-                                    <option value="100+">More than 100</option>
+                                    <option value="0" className="text-slate-900">None/Unknown</option>
+                                    <option value="1-10" className="text-slate-900">1-10 people</option>
+                                    <option value="11-50" className="text-slate-900">11-50 people</option>
+                                    <option value="51-100" className="text-slate-900">51-100 people</option>
+                                    <option value="100+" className="text-slate-900">More than 100</option>
                                 </select>
                             </div>
 
@@ -272,10 +272,10 @@ function DisasterReportForm() {
                                     {...register('casualties')}
                                     className="input-field"
                                 >
-                                    <option value="none">None known</option>
-                                    <option value="minor">Minor injuries</option>
-                                    <option value="serious">Serious injuries</option>
-                                    <option value="fatalities">Fatalities reported</option>
+                                    <option value="none" className="text-slate-900">None known</option>
+                                    <option value="minor" className="text-slate-900">Minor injuries</option>
+                                    <option value="serious" className="text-slate-900">Serious injuries</option>
+                                    <option value="fatalities" className="text-slate-900">Fatalities reported</option>
                                 </select>
                             </div>
                         </div>
@@ -362,10 +362,10 @@ function DisasterReportForm() {
                                     {...register('areaSize')}
                                     className="input-field"
                                 >
-                                    <option value="small">Small (single building/area)</option>
-                                    <option value="medium">Medium (multiple buildings)</option>
-                                    <option value="large">Large (neighborhood/village)</option>
-                                    <option value="massive">Massive (entire district)</option>
+                                    <option value="small" className="text-slate-900">Small (single building/area)</option>
+                                    <option value="medium" className="text-slate-900">Medium (multiple buildings)</option>
+                                    <option value="large" className="text-slate-900">Large (neighborhood/village)</option>
+                                    <option value="massive" className="text-slate-900">Massive (entire district)</option>
                                 </select>
                             </div>
                         </div>
@@ -475,7 +475,7 @@ function DisasterReportForm() {
                                 reset();
                                 setPhotoPreview(null);
                             }}
-                            className="px-6 py-2 border border-white/20 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                            className="px-6 py-2 border border-white/20 bg-white/10 text-slate-900 dark:text-white rounded-lg hover:bg-white/20 transition-colors"
                         >
                             Clear
                         </button>

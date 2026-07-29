@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../utils/leafletIconFix';
 import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '../utils/leafletIconFix';
 import HeatmapLayer from '../components/shared/HeatmapLayer';
 import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '../components/shared/Charts';
 import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '../store';
-import { defaultMapConfig, districtBounds, allDistricts } from '../utils/mapConfig';
+import { defaultMapConfig, sriLankaFitBounds, districtBounds, allDistricts } from '../utils/mapConfig';
 import DisasterReportsList from '../components/DisasterReportsList';
 import MissingPersonsList from '../components/MissingPersonsList';
 import AnimalRescueList from '../components/AnimalRescueList';
@@ -193,7 +193,7 @@ function Card({ title, icon: Icon, right, children, className = '' }) {
             {(title || right) && (
                 <div className="flex items-center justify-between mb-3 gap-2">
                     {title && (
-                        <h3 className="flex items-center gap-1.5 font-semibold text-white text-sm truncate min-w-0">
+                        <h3 className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white text-sm truncate min-w-0">
                             {Icon && <Icon className="h-4 w-4 text-primary-300 flex-shrink-0" />}
                             <span className="truncate">{title}</span>
                         </h3>
@@ -210,8 +210,6 @@ const ICON_BADGE = {
     primary: 'bg-primary-500/15 text-primary-300',
     danger: 'bg-danger-500/15 text-danger-300',
     success: 'bg-success-500/15 text-success-300',
-    orange: 'bg-orange-500/15 text-orange-300',
-    emerald: 'bg-emerald-500/15 text-emerald-300',
     slate: 'bg-white/10 text-slate-300',
 };
 
@@ -220,18 +218,18 @@ function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor =
         <button
             type="button"
             onClick={onClick}
-            className={`group rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left w-full transition-colors duration-150 ${onClick ? 'hover:border-white/25 hover:bg-white/[0.06]' : 'cursor-default hover:border-white/20'}`}
+            title={sub || undefined}
+            className={`group flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-left w-full transition-colors duration-150 ${onClick ? 'hover:border-white/25 hover:bg-white/[0.06]' : 'cursor-default hover:border-white/20'}`}
         >
-            <div className="flex items-start justify-between gap-2">
-                <p className={`text-2xl font-extrabold leading-none ${accent}`}>{value}</p>
-                {Icon && (
-                    <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${ICON_BADGE[iconColor]}`}>
-                        <Icon className="h-4 w-4" />
-                    </span>
-                )}
+            {Icon && (
+                <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md ${ICON_BADGE[iconColor]}`}>
+                    <Icon className="h-3.5 w-3.5" />
+                </span>
+            )}
+            <div className="min-w-0">
+                <p className={`text-lg font-extrabold leading-none ${accent}`}>{value}</p>
+                <p className="text-[10px] font-medium text-slate-400 truncate mt-0.5 leading-tight">{label}</p>
             </div>
-            <p className="text-xs font-medium text-slate-400 mt-1.5 leading-tight">{label}</p>
-            {sub && <p className="text-[11px] text-slate-500 mt-0.5 leading-tight truncate">{sub}</p>}
         </button>
     );
 }
@@ -279,7 +277,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     return (
         <div className="space-y-3">
             {/* Global filter bar */}
-            <div className="rounded-xl border border-white/10 bg-slate-950/95 p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20 animate-fade-in-up">
+            <div className="rounded-xl border border-white/10 bg-white/95 dark:bg-slate-950/95 p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20 animate-fade-in-up">
                 <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
                     {Object.keys(RANGE_CONF).map(r => (
                         <button
@@ -294,7 +292,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                 <select
                     value={district}
                     onChange={e => setDistrict(e.target.value)}
-                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
+                    className="text-xs bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
                 >
                     <option value="all" className="bg-slate-900 text-white">All districts</option>
                     {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
@@ -324,157 +322,184 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 // OVERVIEW: mission KPIs, AI summary, live map, needs-attention, timeline
 // ---------------------------------------------------------------------------
 
+// Fits the map to Sri Lanka's coastline on mount using Leaflet's own
+// fitBounds() rather than a guessed center/zoom, so the island fills the
+// viewport regardless of the container's actual rendered size.
+function FitSriLanka() {
+    const map = useMap();
+    useEffect(() => {
+        map.fitBounds(sriLankaFitBounds, { padding: [4,4] });
+    }, [map]);
+    return null;
+}
+
 function OverviewView({ A, layers, setLayers, navigate, range }) {
     return (
         <div className="space-y-3">
-            {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-fade-in-up">
-                <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
-                <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
-                <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
-                <KPI value={A.kpi.activeMissing} label="Missing Persons" sub="active cases" accent="text-orange-400" icon={IconUserSearch} iconColor="orange" />
-                <KPI value={A.kpi.activeAnimals} label="Animal Rescues" sub="pending" accent="text-emerald-400" icon={IconPawPrint} iconColor="emerald" />
-                <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-white" icon={IconClock} iconColor="slate" />
-            </div>
-
-            {/* AI operational summary */}
-            <Card icon={IconInfo} title="AI Operational Summary" className="animate-fade-in-up" right={<span className="text-[10px] text-slate-400">derived live · {RANGE_CONF[range].label}</span>}>
-                <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
-                {A.summary.chips.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2.5">
-                        {A.summary.chips.map((c, i) => (
-                            <span key={i} className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
-                        ))}
-                    </div>
-                )}
-            </Card>
-
-            {/* Live incident map */}
-            <Card
-                icon={IconMap}
-                title="Live Incident Map"
-                className="animate-fade-in-up [animation-delay:80ms]"
-                right={
-                    <div className="flex flex-wrap gap-1">
-                        {['disaster', 'missing', 'animal', 'camp'].map(k => (
-                            <button
-                                key={k}
-                                onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                                className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full border transition-colors duration-150 ${layers[k] ? 'text-white border-white/40' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
-                                style={layers[k] ? { background: KIND_META[k].color } : undefined}
-                            >
-                                <span className="text-xs leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
-                            className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full border transition-colors duration-150 ${layers.heat ? 'bg-orange-600 text-white border-white/40' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
-                        >
-                            <span className="text-xs leading-none">🔥</span> Heat
-                        </button>
-                    </div>
-                }
-            >
-                <div className="rounded-xl border border-white/15 overflow-hidden" style={{ height: 380 }}>
-                    <MapContainer
-                        center={defaultMapConfig.center}
-                        zoom={defaultMapConfig.zoom}
-                        minZoom={defaultMapConfig.minZoom}
-                        maxZoom={defaultMapConfig.maxZoom}
-                        maxBounds={defaultMapConfig.maxBounds}
-                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                        style={{ height: '100%', width: '100%' }}
-                        preferCanvas
+            {/* Map (narrower — Sri Lanka's own bounds are tall/narrow, so it doesn't
+                need half the width to read as prominent) + operational rail */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 lg:h-[clamp(500px,calc(100vh-190px),820px)]">
+                {/* Live incident map */}
+                <div className="lg:col-span-2 lg:sticky lg:top-16 lg:self-start lg:h-full animate-fade-in-up [animation-delay:80ms]">
+                    <Card
+                        icon={IconMap}
+                        title="Live Incident Map"
+                        className="h-full flex flex-col"
+                        right={
+                            <div className="flex flex-wrap gap-1">
+                                {['disaster', 'missing', 'animal', 'camp'].map(k => (
+                                    <button
+                                        key={k}
+                                        onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
+                                        className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full border transition-colors duration-150 ${layers[k] ? 'text-white border-white/40' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                                        style={layers[k] ? { background: KIND_META[k].color } : undefined}
+                                    >
+                                        <span className="text-xs leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
+                                    className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full border transition-colors duration-150 ${layers.heat ? 'bg-orange-600 text-white border-white/40' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
+                                >
+                                    <span className="text-xs leading-none">🔥</span> Heat
+                                </button>
+                            </div>
+                        }
                     >
-                        <TileLayer
-                            attribution='&copy; OpenStreetMap'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        {layers.heat && <HeatmapLayer points={A.map.heat} />}
-                        {['disaster', 'missing', 'animal'].map(k => layers[k] && A.map.markers[k].map(m => (
-                            <Marker key={`${k}-${m.id}`} position={[m.lat, m.lng]} icon={KIND_META[k].marker}>
-                                <Popup>
-                                    <div className="text-xs">
-                                        <p className="font-bold">{KIND_META[k].icon} {m.title}</p>
-                                        {m.severity && <p>Severity: <strong className="capitalize">{m.severity}</strong></p>}
-                                        {m.condition && <p>Condition: <strong className="capitalize">{m.condition}</strong></p>}
-                                        <p className="text-gray-500">{m.address || m.district || 'Location on map'}</p>
-                                        <p className="text-gray-500">Waiting: {timeAgo(m.created_at)} · {m.active ? 'Active' : 'Resolved'}</p>
-                                        {m.description && <p className="text-gray-600 mt-1 line-clamp-2">{m.description}</p>}
-                                        <button onClick={() => navigate(m.link)} className="mt-1 text-primary-600 font-semibold">Open report →</button>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        )))}
-                        {layers.camp && A.map.markers.camp.map(c => (
-                            <Marker key={`camp-${c.id}`} position={[c.lat, c.lng]} icon={c.full ? greyIcon : blueIcon}>
-                                <Popup>
-                                    <div className="text-xs">
-                                        <p className="font-bold">⛺ {c.title}</p>
-                                        <p className="text-gray-500">{c.district}</p>
-                                        <p>Occupancy: <strong>{c.occ}/{c.cap}</strong> ({c.pct}%)</p>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        ))}
-                    </MapContainer>
+                        <div className="flex-1 min-h-[380px] rounded-xl border border-white/15 overflow-hidden">
+                            <MapContainer
+                                center={defaultMapConfig.center}
+                                zoom={defaultMapConfig.zoom}
+                                zoomSnap={0.25}
+                                minZoom={defaultMapConfig.minZoom}
+                                maxZoom={defaultMapConfig.maxZoom}
+                                maxBounds={defaultMapConfig.maxBounds}
+                                maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                                style={{ height: '100%', width: '100%' }}
+                                preferCanvas
+                            >
+                                <FitSriLanka />
+                                <TileLayer
+                                    attribution='&copy; OpenStreetMap'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                {layers.heat && <HeatmapLayer points={A.map.heat} />}
+                                {['disaster', 'missing', 'animal'].map(k => layers[k] && A.map.markers[k].map(m => (
+                                    <Marker key={`${k}-${m.id}`} position={[m.lat, m.lng]} icon={KIND_META[k].marker}>
+                                        <Popup>
+                                            <div className="text-xs">
+                                                <p className="font-bold">{KIND_META[k].icon} {m.title}</p>
+                                                {m.severity && <p>Severity: <strong className="capitalize">{m.severity}</strong></p>}
+                                                {m.condition && <p>Condition: <strong className="capitalize">{m.condition}</strong></p>}
+                                                <p className="text-gray-500">{m.address || m.district || 'Location on map'}</p>
+                                                <p className="text-gray-500">Waiting: {timeAgo(m.created_at)} · {m.active ? 'Active' : 'Resolved'}</p>
+                                                {m.description && <p className="text-gray-600 mt-1 line-clamp-2">{m.description}</p>}
+                                                <button onClick={() => navigate(m.link)} className="mt-1 text-primary-600 font-semibold">Open report →</button>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                )))}
+                                {layers.camp && A.map.markers.camp.map(c => (
+                                    <Marker key={`camp-${c.id}`} position={[c.lat, c.lng]} icon={c.full ? greyIcon : blueIcon}>
+                                        <Popup>
+                                            <div className="text-xs">
+                                                <p className="font-bold">⛺ {c.title}</p>
+                                                <p className="text-gray-500">{c.district}</p>
+                                                <p>Occupancy: <strong>{c.occ}/{c.cap}</strong> ({c.pct}%)</p>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                ))}
+                            </MapContainer>
+                        </div>
+                    </Card>
                 </div>
-            </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {/* Needs attention */}
-                <Card icon={IconBolt} title="Needs Immediate Attention" className="animate-fade-in-up [animation-delay:140ms]">
-                    {A.urgentFeed.length === 0 ? (
-                        <p className="text-sm text-slate-400 py-6 text-center">Nothing urgent in this scope right now.</p>
-                    ) : (
-                        <div className="divide-y divide-white/10 -mx-1">
-                            {A.urgentFeed.map(item => (
-                                <div
-                                    key={`${item.kind}-${item.id}`}
-                                    onClick={() => navigate(item.link)}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.link); } }}
-                                    role="button"
-                                    tabIndex={0}
-                                    className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
-                                >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <span className="text-base flex-shrink-0">{item.icon}</span>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-semibold text-white truncate">{item.title}</p>
-                                            <p className="text-[11px] text-slate-400 truncate">{item.subtitle}</p>
+                {/* Operational rail: AI summary + compact KPIs + attention + timeline */}
+                <div className="lg:col-span-3 flex flex-col gap-3 lg:h-full min-h-0">
+                    {/* AI operational summary */}
+                    <Card icon={IconInfo} title="AI Operational Summary" className="flex-shrink-0 animate-fade-in-up" right={<span className="text-[10px] text-slate-400">derived live · {RANGE_CONF[range].label}</span>}>
+                        <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
+                        {A.summary.chips.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-2.5">
+                                {A.summary.chips.map((c, i) => (
+                                    <span key={i} className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
+                                ))}
+                            </div>
+                        )}
+                    </Card>
+
+                    {/* Compact KPI cards */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-shrink-0 animate-fade-in-up">
+                        <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-white" icon={IconBolt} iconColor="slate" />
+                        <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
+                        <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
+                        <KPI value={A.kpi.activeMissing} label="Missing Persons" sub="active cases" accent="text-white" icon={IconUserSearch} iconColor="slate" />
+                        <KPI value={A.kpi.activeAnimals} label="Animal Rescues" sub="pending" accent="text-white" icon={IconPawPrint} iconColor="slate" />
+                        <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-white" icon={IconClock} iconColor="slate" />
+                    </div>
+
+                    {/* Needs attention */}
+                    <Card icon={IconBolt} title="Needs Immediate Attention" className="flex-1 min-h-[160px] flex flex-col animate-fade-in-up [animation-delay:140ms]">
+                        {A.urgentFeed.length === 0 ? (
+                            <p className="text-sm text-slate-400 py-6 text-center">Nothing urgent in this scope right now.</p>
+                        ) : (
+                            <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-white/10 -mx-1">
+                                {A.urgentFeed.map(item => {
+                                    const isCritical = item.icon === '🚨';
+                                    const isHigh = item.icon === '⚠️';
+                                    const dotColor = isCritical ? 'bg-danger-500' : isHigh ? 'bg-amber-400' : 'bg-primary-400';
+                                    const badge = item.kind === 'disaster'
+                                        ? { text: isCritical ? 'Critical' : 'High', tone: isCritical ? 'bg-danger-500/15 text-danger-300' : 'bg-amber-500/15 text-amber-300' }
+                                        : { text: 'Missing', tone: 'bg-primary-500/15 text-primary-300' };
+                                    return (
+                                        <div
+                                            key={`${item.kind}-${item.id}`}
+                                            onClick={() => navigate(item.link)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.link); } }}
+                                            role="button"
+                                            tabIndex={0}
+                                            className="py-1.5 px-1 flex items-center gap-2 cursor-pointer hover:bg-white/5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
+                                        >
+                                            <span className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${dotColor}`} />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{item.title}</p>
+                                                <p className="text-[11px] text-slate-400 truncate">{item.subtitle}</p>
+                                            </div>
+                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${badge.tone}`}>{badge.text}</span>
+                                            <span className="text-[10px] font-medium text-slate-400 flex-shrink-0 w-14 text-right">{item.meta}</span>
                                         </div>
-                                    </div>
-                                    <span className="text-[10px] font-medium text-slate-400 flex-shrink-0">{item.meta}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </Card>
 
-                {/* Live activity timeline */}
-                <Card icon={IconClock} title="Live Activity Timeline" className="animate-fade-in-up [animation-delay:180ms]">
-                    {A.timeline.length === 0 ? (
-                        <p className="text-sm text-slate-400 py-6 text-center">No recent activity.</p>
-                    ) : (
-                        <div className="relative pl-4 max-h-[340px] overflow-y-auto">
-                            <span className="absolute left-1 top-1 bottom-1 w-px bg-white/10" />
-                            {A.timeline.map((ev, i) => (
-                                <div
-                                    key={i}
-                                    onClick={() => ev.link && navigate(ev.link)}
-                                    onKeyDown={(e) => { if (ev.link && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); navigate(ev.link); } }}
-                                    role={ev.link ? 'button' : undefined}
-                                    tabIndex={ev.link ? 0 : undefined}
-                                    className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400' : ''}`}
-                                >
-                                    <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
-                                    <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
-                                    <p className="text-[10px] text-slate-400">{ev.time}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
+                    {/* Live activity timeline */}
+                    <Card icon={IconClock} title="Live Activity Timeline" className="flex-1 min-h-[160px] flex flex-col animate-fade-in-up [animation-delay:180ms]">
+                        {A.timeline.length === 0 ? (
+                            <p className="text-sm text-slate-400 py-6 text-center">No recent activity.</p>
+                        ) : (
+                            <div className="flex-1 min-h-0 overflow-y-auto relative pl-4">
+                                <span className="absolute left-1 top-1 bottom-1 w-px bg-white/10" />
+                                {A.timeline.map((ev, i) => (
+                                    <div
+                                        key={i}
+                                        onClick={() => ev.link && navigate(ev.link)}
+                                        onKeyDown={(e) => { if (ev.link && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); navigate(ev.link); } }}
+                                        role={ev.link ? 'button' : undefined}
+                                        tabIndex={ev.link ? 0 : undefined}
+                                        className={`relative pb-2 ${ev.link ? 'cursor-pointer group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400' : ''}`}
+                                    >
+                                        <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
+                                        <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
+                                        <p className="text-[10px] text-slate-400">{ev.time}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Card>
+                </div>
             </div>
         </div>
     );
@@ -588,7 +613,7 @@ function AiView({ A }) {
                 {A.hotspots.map((h, i) => (
                     <div key={i} className="rounded-xl border border-white/10 bg-white/[0.05] p-3">
                         <p className="text-[11px] font-medium text-slate-400">{h.icon} {h.label}</p>
-                        <p className="text-lg font-bold text-white mt-1 truncate">{h.value}</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 truncate">{h.value}</p>
                         <p className="text-[11px] text-slate-400 truncate">{h.detail}</p>
                     </div>
                 ))}
@@ -620,7 +645,7 @@ function AiView({ A }) {
                             {A.duplicates.map((d, i) => (
                                 <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-white">{d.icon} {d.title}</p>
+                                        <p className="text-xs font-semibold text-slate-900 dark:text-white">{d.icon} {d.title}</p>
                                         <span className="text-[10px] font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
                                     </div>
                                     <p className="text-[11px] text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
@@ -640,7 +665,7 @@ function AiView({ A }) {
                         {A.recommendations.map((r, i) => (
                             <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2.5 flex flex-col">
                                 <div className="flex items-start justify-between gap-2">
-                                    <p className="text-xs font-semibold text-white">{r.icon} {r.action}</p>
+                                    <p className="text-xs font-semibold text-slate-900 dark:text-white">{r.icon} {r.action}</p>
                                     <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
                                 </div>
                                 <p className="text-[11px] text-slate-400 mt-1 flex-1">{r.reason}</p>
@@ -988,7 +1013,7 @@ function RespondDashboard() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -1000,22 +1025,22 @@ function RespondDashboard() {
             <div className="relative z-10 mx-auto max-w-[1800px] px-4 py-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between flex-wrap gap-2.5 mb-4 animate-fade-in-up">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-success-500 text-white ring-1 ring-inset ring-white/15">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 text-slate-300 ring-1 ring-inset ring-white/15">
                             <IconLifeBuoy className="h-5 w-5" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h1 className="text-xl md:text-2xl font-bold text-success-400 leading-tight">Responder Operations Center</h1>
+                                <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Responder Operations Center</h1>
                                 <span className="h-2 w-2 flex-shrink-0 rounded-full bg-success-500"></span>
                             </div>
                             <p className="text-slate-400 text-xs mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                        <Link to="/volunteers" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-success-500">
+                        <Link to="/volunteers" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-primary-500">
                             <IconUsers className="h-3.5 w-3.5" /> Volunteer
                         </Link>
-                        <Link to="/donations" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-success-500">
+                        <Link to="/donations" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-primary-500">
                             <IconHeart className="h-3.5 w-3.5" /> Donate
                         </Link>
                         <Link to="/request-camp" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-primary-500">

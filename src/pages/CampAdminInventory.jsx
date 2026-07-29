@@ -138,14 +138,14 @@ function CampAdminInventory() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="page-shell flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans pb-24">
+        <div className="page-shell pb-24">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -156,15 +156,15 @@ function CampAdminInventory() {
 
             <header className="relative z-10 sticky top-0 flex items-center justify-between border-b border-white/10 bg-slate-950/95 px-4 py-4 shadow-lg shadow-black/30">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconTent className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold text-white">{campName} Inventory</h1>
+                        <h1 className="text-lg font-bold text-slate-900 dark:text-white">{campName} Inventory</h1>
                         <p className="text-xs text-slate-400">Camp Admin</p>
                     </div>
                 </div>
-                <button onClick={() => { signOut(); navigate('/'); }} className="text-xs text-slate-400 hover:text-white underline transition-colors">
+                <button onClick={() => { signOut(); navigate('/'); }} className="text-xs text-slate-400 hover:text-slate-900 dark:hover:text-white underline transition-colors">
                     Sign out
                 </button>
             </header>
@@ -180,7 +180,7 @@ function CampAdminInventory() {
                             <div key={`${item.item_name}-${item.category}-${item.unit}`} className={`rounded-xl border border-white/10 bg-white/[0.05] p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
-                                        <div className="font-bold text-white">{item.item_name}</div>
+                                        <div className="font-bold text-slate-900 dark:text-white">{item.item_name}</div>
                                         <div className="text-xs text-slate-400">{CATEGORY_LABELS[item.category] || item.category}</div>
                                     </div>
                                     <div className={`text-2xl font-extrabold ${low ? 'text-danger-400' : 'text-white'}`}>
@@ -212,7 +212,7 @@ function CampAdminInventory() {
 
                 {/* Add a new item */}
                 <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.05] p-4">
-                    <h3 className="font-bold text-white mb-3">Add New Item</h3>
+                    <h3 className="font-bold text-slate-900 dark:text-white mb-3">Add New Item</h3>
                     <form onSubmit={submitNewItem} className="space-y-3">
                         <input
                             type="text"
@@ -227,7 +227,7 @@ function CampAdminInventory() {
                                 onChange={(e) => setNewItemCategory(e.target.value)}
                                 className="input-field flex-1"
                             >
-                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>)}
+                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
                             </select>
                             <input
                                 type="text"
@@ -260,7 +260,7 @@ function CampAdminInventory() {
             {actionItem && (
                 <div className="fixed inset-0 z-20 flex items-end sm:items-center justify-center bg-black/60 p-4">
                     <div className="w-full max-w-sm rounded-xl border border-white/10 bg-slate-900 p-6">
-                        <h3 className="text-xl font-bold text-white mb-1">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
                             {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                         </h3>
                         <form onSubmit={submitAction} className="space-y-4 mt-4">
@@ -282,7 +282,7 @@ function CampAdminInventory() {
                             />
                             {error && <p className="text-danger-400 text-sm">{error}</p>}
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-slate-900 dark:text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
                                 <button type="submit" disabled={submitting} className="flex-1 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white py-3 rounded-xl font-bold transition-colors duration-150">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>

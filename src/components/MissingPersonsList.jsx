@@ -153,7 +153,7 @@ function MissingPersonsList({ role = 'responder' }) {
     // Show loading state while initializing
     if (isInitializing) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -165,7 +165,7 @@ function MissingPersonsList({ role = 'responder' }) {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -177,11 +177,11 @@ function MissingPersonsList({ role = 'responder' }) {
             <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-6 sm:px-10">
                 {/* Header */}
                 <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconUserSearch className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-primary-400">Missing Persons</h1>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Missing Persons</h1>
                         <p className="mt-0.5 text-sm text-slate-400">Reported missing persons in Sri Lanka</p>
                     </div>
                 </div>
@@ -231,9 +231,9 @@ function MissingPersonsList({ role = 'responder' }) {
                                 onChange={(e) => setDistrictFilter(e.target.value)}
                                 className="input-field"
                             >
-                                <option value="all">All Districts</option>
+                                <option value="all" className="text-slate-900">All Districts</option>
                                 {allDistricts.map(district => (
-                                    <option key={district} value={district}>
+                                    <option key={district} value={district} className="text-slate-900">
                                         {district}
                                     </option>
                                 ))}
@@ -292,7 +292,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                     {/* Details */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between mb-2">
-                                            <h3 className="text-lg font-bold text-white truncate">{person.name || 'Unknown'}</h3>
+                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">{person.name || 'Unknown'}</h3>
                                             <span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusBadge(person.status).className}`}>
                                                 {getStatusBadge(person.status).text}
                                             </span>

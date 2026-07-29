@@ -3,7 +3,7 @@ import { IconTent } from '../components/icons/Icons';
 
 function CampManagement() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -14,10 +14,10 @@ function CampManagement() {
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 <div className="mb-6 flex items-center gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconTent className="h-6 w-6" />
                     </div>
-                    <h1 className="text-xl md:text-2xl font-bold text-primary-400">Camp Management</h1>
+                    <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Camp Management</h1>
                 </div>
                 <div className="card">
                     <p className="text-slate-400">Relief camp management system - Coming soon</p>

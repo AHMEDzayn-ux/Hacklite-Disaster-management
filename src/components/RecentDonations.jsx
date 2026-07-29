@@ -89,8 +89,8 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
             {/* Recent Donations List */}
             <div className="rounded-xl border border-white/10 bg-white/[0.05] overflow-hidden">
-                <div className="bg-gradient-to-r from-success-700/80 to-success-900/80 p-4 border-b border-white/10">
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <div className="bg-white/[0.05] p-4 border-b border-white/10">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <IconHeart className="h-5 w-5" /> Recent Donations
                     </h3>
                     <p className="text-slate-300 text-sm">Live updates from our generous donors</p>
@@ -112,7 +112,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
                                         <span className="text-lg">
                                             {donation.is_anonymous ? '🙏' : '👤'}
                                         </span>
-                                        <span className="font-semibold text-white">
+                                        <span className="font-semibold text-slate-900 dark:text-white">
                                             {formatDonorName(donation)}
                                         </span>
                                     </div>
@@ -159,13 +159,13 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
             {/* Ticker Mode (Optional) */}
             {showTicker && recentDonations.length > 3 && (
-                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-success-700/80 to-success-900/80 overflow-hidden">
+                <div className="rounded-lg border border-white/10 bg-white/[0.05] overflow-hidden">
                     <div className="ticker-container py-3">
                         <div className="ticker-content flex gap-8 items-center">
                             {[...recentDonations, ...recentDonations].map((donation, index) => (
                                 <div
                                     key={`${donation.id}-${index}`}
-                                    className="flex items-center gap-3 text-white whitespace-nowrap"
+                                    className="flex items-center gap-3 text-slate-900 dark:text-white whitespace-nowrap"
                                 >
                                     <span>🎁</span>
                                     <span className="font-semibold">

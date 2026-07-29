@@ -26,7 +26,7 @@ function Donations() {
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -42,11 +42,11 @@ function Donations() {
                     transition={{ duration: 0.3 }}
                     className="mb-8 flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-center sm:text-left"
                 >
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-success-500 text-white">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconHeart className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-success-400 mb-1">Support Disaster Relief</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">Support Disaster Relief</h1>
                         <p className="text-slate-300 max-w-2xl mx-auto sm:mx-0">
                             Every donation is recorded in a public, auditable ledger. Payments are processed securely via Stripe.
                         </p>

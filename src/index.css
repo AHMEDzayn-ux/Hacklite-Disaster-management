@@ -18,11 +18,13 @@ html, body {
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100;
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
   }
 }
 
 @layer components {
+  /* Buttons keep white text in both themes - they sit on a saturated fill,
+     not the page background, so they don't need a light-mode variant. */
   .btn-primary {
     @apply bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150;
   }
@@ -35,13 +37,86 @@ html, body {
     @apply bg-success-600 hover:bg-success-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150;
   }
 
+  .btn-outline {
+    @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-semibold py-2.5 px-4 rounded-lg transition-colors duration-150 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10;
+  }
+
   .card {
-    @apply bg-white/[0.03] border border-white/10 text-slate-100 rounded-xl p-4 sm:p-5;
+    @apply bg-white border border-slate-200 text-slate-900 rounded-xl p-4 shadow-sm sm:p-5 dark:bg-white/[0.03] dark:border-white/10 dark:text-slate-100 dark:shadow-none;
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 bg-white/5 border border-white/15 text-white placeholder:text-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors;
+    @apply w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400 transition-colors dark:bg-white/5 dark:border-white/15 dark:text-white dark:placeholder:text-slate-400 dark:focus:ring-primary-500/50 dark:focus:border-primary-400/50;
   }
+
+  /* Shared full-page wrapper: flat neutral in light mode, the existing
+     subtle monochrome gradient in dark mode. */
+  .page-shell {
+    @apply relative min-h-screen overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950;
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * Theme remap for the small set of translucent/secondary utility classes
+ * every page already uses for panel backgrounds, borders and body text.
+ * These were written once for the dark theme; rather than hand-editing
+ * every element across ~50 files, this remaps them to sensible light-mode
+ * values and restores the original dark-mode values under .dark. This is
+ * intentionally scoped to classes that are ONLY ever used for secondary
+ * text / card surfaces / borders in this codebase - never for text sitting
+ * on a solid color fill (buttons, badges), so it can't break contrast there.
+ * --------------------------------------------------------------------- */
+@layer utilities {
+  .text-slate-200 { color: #334155; }
+  .dark .text-slate-200 { color: #e2e8f0; }
+
+  .text-slate-300 { color: #475569; }
+  .dark .text-slate-300 { color: #cbd5e1; }
+
+  .text-slate-400 { color: #64748b; }
+  .dark .text-slate-400 { color: #94a3b8; }
+
+  .placeholder\:text-slate-400::placeholder { color: #94a3b8; }
+  .dark .placeholder\:text-slate-400::placeholder { color: #94a3b8; }
+
+  .border-white\/10 { border-color: rgb(226 232 240); }
+  .dark .border-white\/10 { border-color: rgb(255 255 255 / 0.1); }
+
+  .border-white\/15 { border-color: rgb(203 213 225); }
+  .dark .border-white\/15 { border-color: rgb(255 255 255 / 0.15); }
+
+  .border-white\/20 { border-color: rgb(203 213 225); }
+  .dark .border-white\/20 { border-color: rgb(255 255 255 / 0.2); }
+
+  .bg-white\/5 { background-color: rgb(248 250 252); }
+  .dark .bg-white\/5 { background-color: rgb(255 255 255 / 0.05); }
+
+  .bg-white\/10 { background-color: rgb(241 245 249); }
+  .dark .bg-white\/10 { background-color: rgb(255 255 255 / 0.1); }
+
+  .bg-white\/\[0\.02\] { background-color: rgb(248 250 252); }
+  .dark .bg-white\/\[0\.02\] { background-color: rgb(255 255 255 / 0.02); }
+
+  .bg-white\/\[0\.03\] { background-color: rgb(248 250 252); }
+  .dark .bg-white\/\[0\.03\] { background-color: rgb(255 255 255 / 0.03); }
+
+  .bg-white\/\[0\.05\] { background-color: rgb(248 250 252); }
+  .dark .bg-white\/\[0\.05\] { background-color: rgb(255 255 255 / 0.05); }
+
+  .bg-white\/\[0\.06\] { background-color: rgb(241 245 249); }
+  .dark .bg-white\/\[0\.06\] { background-color: rgb(255 255 255 / 0.06); }
+
+  .bg-white\/\[0\.08\] { background-color: rgb(241 245 249); }
+  .dark .bg-white\/\[0\.08\] { background-color: rgb(255 255 255 / 0.08); }
+
+  .hover\:bg-white\/5:hover { background-color: rgb(248 250 252); }
+  .dark .hover\:bg-white\/5:hover { background-color: rgb(255 255 255 / 0.05); }
+
+  .hover\:bg-white\/10:hover { background-color: rgb(241 245 249); }
+  .dark .hover\:bg-white\/10:hover { background-color: rgb(255 255 255 / 0.1); }
+
+  .hover\:bg-white\/20:hover { background-color: rgb(226 232 240); }
+  .dark .hover\:bg-white\/20:hover { background-color: rgb(255 255 255 / 0.2); }
 }
 
 /* Override Tailwind container centering so content fits viewport horizontally */

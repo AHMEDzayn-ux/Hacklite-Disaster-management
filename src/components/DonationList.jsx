@@ -111,30 +111,30 @@ function DonationList() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-white/10 bg-gradient-to-br from-primary-600/20 to-indigo-700/20 p-6"
+                className="rounded-xl border border-white/10 bg-white/[0.05] p-6"
             >
-                <h3 className="text-white text-lg font-bold mb-4 text-center">
+                <h3 className="text-slate-900 dark:text-white text-lg font-bold mb-4 text-center">
                     📊 Donation Statistics
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Total Raised</div>
-                        <div className="text-2xl font-bold text-white">LKR {stats.total.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">LKR {stats.total.toLocaleString()}</div>
                         <div className="text-xs text-slate-400 mt-1">{stats.count} donations</div>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Average</div>
-                        <div className="text-2xl font-bold text-white">LKR {stats.average.toFixed(0)}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">LKR {stats.average.toFixed(0)}</div>
                         <div className="text-xs text-slate-400 mt-1">per contributor</div>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Largest</div>
-                        <div className="text-2xl font-bold text-white">LKR {stats.max.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">LKR {stats.max.toLocaleString()}</div>
                         <div className="text-xs text-slate-400 mt-1">single gift</div>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
                         <div className="text-xs text-slate-400 mb-1">Total Donors</div>
-                        <div className="text-2xl font-bold text-white">{stats.count}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.count}</div>
                         <div className="text-xs text-slate-400 mt-1">generous people</div>
                     </div>
                 </div>
@@ -167,11 +167,11 @@ function DonationList() {
                             onChange={(e) => setFilterStatus(e.target.value)}
                             className="input-field"
                         >
-                            <option value="all">All Statuses</option>
-                            <option value="succeeded">Completed</option>
-                            <option value="pending">Pending</option>
-                            <option value="failed">Failed</option>
-                            <option value="refunded">Refunded</option>
+                            <option value="all" className="text-slate-900">All Statuses</option>
+                            <option value="succeeded" className="text-slate-900">Completed</option>
+                            <option value="pending" className="text-slate-900">Pending</option>
+                            <option value="failed" className="text-slate-900">Failed</option>
+                            <option value="refunded" className="text-slate-900">Refunded</option>
                         </select>
                     </div>
 
@@ -185,9 +185,9 @@ function DonationList() {
                             onChange={(e) => setFilterPurpose(e.target.value)}
                             className="input-field"
                         >
-                            <option value="all">All Purposes</option>
+                            <option value="all" className="text-slate-900">All Purposes</option>
                             {uniquePurposes.map(purpose => (
-                                <option key={purpose} value={purpose}>{purpose}</option>
+                                <option key={purpose} value={purpose} className="text-slate-900">{purpose}</option>
                             ))}
                         </select>
                     </div>
@@ -202,10 +202,10 @@ function DonationList() {
                             onChange={(e) => setSortBy(e.target.value)}
                             className="input-field"
                         >
-                            <option value="date-desc">Newest First</option>
-                            <option value="date-asc">Oldest First</option>
-                            <option value="amount-desc">Highest Amount</option>
-                            <option value="amount-asc">Lowest Amount</option>
+                            <option value="date-desc" className="text-slate-900">Newest First</option>
+                            <option value="date-asc" className="text-slate-900">Oldest First</option>
+                            <option value="amount-desc" className="text-slate-900">Highest Amount</option>
+                            <option value="amount-asc" className="text-slate-900">Lowest Amount</option>
                         </select>
                     </div>
                 </div>
@@ -260,7 +260,7 @@ function DonationList() {
                                     >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div>
-                                                <div className="font-semibold text-white">
+                                                <div className="font-semibold text-slate-900 dark:text-white">
                                                     {donation.is_anonymous ? '🙏 Anonymous' : donation.donor_name || 'Anonymous'}
                                                 </div>
                                                 {!donation.is_anonymous && (
@@ -306,11 +306,11 @@ function DonationList() {
             </div>
 
             {/* Transparency Note */}
-            <div className="rounded-xl border border-primary-400/20 bg-primary-500/10 p-4">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                 <div className="flex items-start gap-3">
                     <IconInfo className="w-6 h-6 text-primary-300 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
-                        <h4 className="font-semibold text-white mb-1">
+                        <h4 className="font-semibold text-slate-900 dark:text-white mb-1">
                             100% Transparency Guarantee
                         </h4>
                         <p className="text-sm text-slate-300">

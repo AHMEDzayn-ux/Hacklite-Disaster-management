@@ -4,7 +4,7 @@ import { IconUserSearch } from '../components/icons/Icons';
 
 function MissingPersons() {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="page-shell">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -15,11 +15,11 @@ function MissingPersons() {
 
             <div className="relative z-10 mx-auto max-w-3xl px-6 py-8 sm:px-8 sm:py-10">
                 <div className="mb-6 flex flex-col items-center gap-3 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary-500 text-white">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 text-slate-300">
                         <IconUserSearch className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-primary-400">Missing Persons</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Missing Persons</h1>
                         <p className="mt-2 text-lg text-slate-300">
                             Report missing persons to help locate them during disasters
                         </p>
