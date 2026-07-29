@@ -86,30 +86,30 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-12 h-12 bg-primary-500/20 rounded-full flex items-center justify-center text-2xl">📦</div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Review Resource Allocation Plan</h3>
+                                <h3 className="text-lg font-bold text-white">Review Resource Allocation Plan</h3>
                                 <p className="text-sm text-slate-400">AI recommendation — nothing has moved yet</p>
                             </div>
                         </div>
 
                         <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4 space-y-3">
-                            <p className="font-semibold text-slate-900 dark:text-white capitalize">{plan.quantity} units of {plan.resource_category}{plan.item_name ? ` (${plan.item_name})` : ''}</p>
+                            <p className="font-semibold text-white capitalize">{plan.quantity} units of {plan.resource_category}{plan.item_name ? ` (${plan.item_name})` : ''}</p>
 
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div className="bg-white/5 rounded p-2 border border-white/10">
                                     <p className="text-xs text-slate-400">FROM</p>
-                                    <p className="font-medium text-slate-900 dark:text-white">{plan.from_camp?.name || 'Unknown camp'}</p>
+                                    <p className="font-medium text-white">{plan.from_camp?.name || 'Unknown camp'}</p>
                                     <p className="text-xs text-slate-400">{plan.from_camp?.district}</p>
                                     <p className="text-xs mt-1 text-slate-300">
-                                        Current stock: {loadingStock ? '…' : <span className="font-semibold text-slate-900 dark:text-white">{stock.from} units</span>}
+                                        Current stock: {loadingStock ? '…' : <span className="font-semibold text-white">{stock.from} units</span>}
                                         {!loadingStock && <span className="text-danger-400"> → {Math.max(0, stock.from - plan.quantity)} after</span>}
                                     </p>
                                 </div>
                                 <div className="bg-white/5 rounded p-2 border border-white/10">
                                     <p className="text-xs text-slate-400">TO</p>
-                                    <p className="font-medium text-slate-900 dark:text-white">{plan.to_camp?.name || 'Unknown camp'}</p>
+                                    <p className="font-medium text-white">{plan.to_camp?.name || 'Unknown camp'}</p>
                                     <p className="text-xs text-slate-400">{plan.to_camp?.district}</p>
                                     <p className="text-xs mt-1 text-slate-300">
-                                        Current stock: {loadingStock ? '…' : <span className="font-semibold text-slate-900 dark:text-white">{stock.to} units</span>}
+                                        Current stock: {loadingStock ? '…' : <span className="font-semibold text-white">{stock.to} units</span>}
                                         {!loadingStock && <span className="text-success-400"> → {stock.to + plan.quantity} after</span>}
                                     </p>
                                 </div>
@@ -139,7 +139,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                         </div>
 
                         <div className="flex gap-3 justify-end">
-                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50 transition-colors">Cancel</button>
+                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50 transition-colors">Cancel</button>
                             <button onClick={() => handleDecision('reject')} disabled={processing} className="btn-danger disabled:opacity-50">Reject</button>
                             <button onClick={() => handleDecision('approve')} disabled={processing} className="btn-success disabled:opacity-50">
                                 {processing ? 'Processing…' : 'Approve & Transfer'}
@@ -162,7 +162,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                     <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-success-500/20 text-success-400">
                                         <IconCheck className="h-7 w-7" />
                                     </div>
-                                    <p className="font-bold text-slate-900 dark:text-white">Transfer recorded</p>
+                                    <p className="font-bold text-white">Transfer recorded</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                                     <div className="bg-danger-500/10 border border-danger-400/20 rounded p-2 text-center">
@@ -183,7 +183,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 text-slate-300">
                                     <IconX className="h-7 w-7" />
                                 </div>
-                                <p className="font-bold text-slate-900 dark:text-white mb-1">Plan rejected</p>
+                                <p className="font-bold text-white mb-1">Plan rejected</p>
                                 <p className="text-sm text-slate-300">No inventory was moved. Logged to the audit trail as <code>REJECT_ALLOCATION_PLAN</code>.</p>
                             </div>
                         )}

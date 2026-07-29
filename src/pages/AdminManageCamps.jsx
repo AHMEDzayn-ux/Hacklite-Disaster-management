@@ -356,9 +356,9 @@ function AdminManageCamps() {
                 {closeModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                         <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-6">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Mark Camp as Closed</h3>
+                            <h3 className="text-xl font-bold text-white mb-4">Mark Camp as Closed</h3>
                             <p className="text-slate-300 mb-4">
-                                Are you sure you want to mark <strong className="text-slate-900 dark:text-white">{closeModal.camp?.name}</strong> as closed?
+                                Are you sure you want to mark <strong className="text-white">{closeModal.camp?.name}</strong> as closed?
                             </p>
                             <p className="text-sm text-slate-400 mb-6">
                                 The camp will be marked as closed but all records will be maintained for historical tracking.
@@ -374,7 +374,7 @@ function AdminManageCamps() {
                                 <button
                                     onClick={() => setCloseModal({ isOpen: false, camp: null })}
                                     disabled={isClosing}
-                                    className="px-6 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>

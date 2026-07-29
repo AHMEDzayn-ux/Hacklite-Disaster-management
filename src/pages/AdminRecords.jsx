@@ -281,7 +281,7 @@ function AdminRecords() {
                         </span>
                         <button
                             onClick={fetchRecords}
-                            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors text-sm font-medium"
+                            className="px-4 py-2 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 rounded-lg transition-colors text-sm font-medium"
                         >
                             🔄 Refresh
                         </button>
@@ -334,7 +334,7 @@ function AdminRecords() {
                                                 <div className="flex gap-2 justify-end">
                                                     <button
                                                         onClick={() => setDetailModal({ isOpen: true, record })}
-                                                        className="px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors"
+                                                        className="px-3 py-1.5 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 rounded-lg text-sm font-medium transition-colors"
                                                     >
                                                         👁️ View
                                                     </button>
@@ -375,14 +375,14 @@ function AdminRecords() {
                             <div className="sticky top-0 bg-slate-900 px-6 py-4 border-b border-white/10 flex items-start justify-between z-10">
                                 <div>
                                     <span className="text-sm text-slate-400">{TABLE_DISPLAY_NAMES[selectedTable]}</span>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    <h3 className="text-xl font-bold text-white">
                                         {getRecordDisplayName(detailModal.record)}
                                     </h3>
                                     <p className="text-xs text-slate-400 font-mono mt-1">ID: {detailModal.record.id}</p>
                                 </div>
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
-                                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                    className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
                                 >
                                     <IconX className="h-5 w-5" />
                                 </button>
@@ -396,7 +396,7 @@ function AdminRecords() {
                                         {/* Photo Section */}
                                         {(detailModal.record.photo || detailModal.record.image || detailModal.record.photo_url || detailModal.record.image_url) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Photo</h4>
+                                                <h4 className="text-lg font-semibold text-white mb-4">Photo</h4>
                                                 <img
                                                     src={detailModal.record.photo || detailModal.record.image || detailModal.record.photo_url || detailModal.record.image_url}
                                                     alt={getRecordDisplayName(detailModal.record)}
@@ -409,11 +409,11 @@ function AdminRecords() {
 
                                         {/* Status Card */}
                                         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                            <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Status</h4>
+                                            <h4 className="text-lg font-semibold text-white mb-4">Status</h4>
                                             <div className="space-y-3">
                                                 <div>
                                                     <p className="text-sm text-slate-400">Current Status</p>
-                                                    <p className="font-medium text-slate-900 dark:text-white">
+                                                    <p className="font-medium text-white">
                                                         {detailModal.record.status === 'approved' || detailModal.record.status === 'active' ? (
                                                             <span className="text-success-400">✅ {detailModal.record.status}</span>
                                                         ) : detailModal.record.status === 'pending' ? (
@@ -427,12 +427,12 @@ function AdminRecords() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm text-slate-400">Created At</p>
-                                                    <p className="font-medium text-slate-900 dark:text-white">{formatDate(detailModal.record.created_at)}</p>
+                                                    <p className="font-medium text-white">{formatDate(detailModal.record.created_at)}</p>
                                                 </div>
                                                 {detailModal.record.updated_at && (
                                                     <div>
                                                         <p className="text-sm text-slate-400">Last Updated</p>
-                                                        <p className="font-medium text-slate-900 dark:text-white">{formatDate(detailModal.record.updated_at)}</p>
+                                                        <p className="font-medium text-white">{formatDate(detailModal.record.updated_at)}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -441,7 +441,7 @@ function AdminRecords() {
                                         {/* Contact Info Card */}
                                         {(detailModal.record.contact_number || detailModal.record.phone || detailModal.record.email || detailModal.record.contact) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Contact Information</h4>
+                                                <h4 className="text-lg font-semibold text-white mb-4">Contact Information</h4>
                                                 <div className="space-y-3">
                                                     {(detailModal.record.contact_number || detailModal.record.phone || detailModal.record.contact) && (
                                                         <div>
@@ -470,7 +470,7 @@ function AdminRecords() {
                                     <div className="lg:col-span-2 space-y-6">
                                         {/* Primary Information Card */}
                                         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                            <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                                            <h4 className="text-lg font-semibold text-white mb-4">
                                                 {selectedTable === 'camps' ? 'Camp Information' :
                                                     selectedTable === 'camp_requests' ? 'Request Information' :
                                                         selectedTable === 'missing_persons' ? 'Person Information' :
@@ -497,7 +497,7 @@ function AdminRecords() {
                                         {/* Description Card */}
                                         {(detailModal.record.description || detailModal.record.notes || detailModal.record.additional_info || detailModal.record.reason) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Description</h4>
+                                                <h4 className="text-lg font-semibold text-white mb-4">Description</h4>
                                                 <p className="text-slate-300 whitespace-pre-wrap">
                                                     {detailModal.record.description || detailModal.record.notes || detailModal.record.additional_info || detailModal.record.reason}
                                                 </p>
@@ -507,7 +507,7 @@ function AdminRecords() {
                                         {/* Facilities Card (for camps) */}
                                         {detailModal.record.facilities && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                                                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Facilities</h4>
+                                                <h4 className="text-lg font-semibold text-white mb-4">Facilities</h4>
                                                 <div className="flex flex-wrap gap-2">
                                                     {(Array.isArray(detailModal.record.facilities)
                                                         ? detailModal.record.facilities
@@ -525,7 +525,7 @@ function AdminRecords() {
 
                                         {/* All Fields (Expandable) */}
                                         <details className="bg-white/5 border border-white/10 rounded-xl">
-                                            <summary className="p-4 cursor-pointer font-semibold text-slate-900 dark:text-white hover:bg-white/10 rounded-xl">
+                                            <summary className="p-4 cursor-pointer font-semibold text-white hover:bg-white/10 rounded-xl">
                                                 📋 View All Raw Fields
                                             </summary>
                                             <div className="px-4 pb-4 space-y-3 border-t border-white/10 mt-2 pt-4">
@@ -568,7 +568,7 @@ function AdminRecords() {
                             <div className="sticky bottom-0 bg-slate-900 px-6 py-4 border-t border-white/10 flex gap-3 justify-end">
                                 <button
                                     onClick={() => setDetailModal({ isOpen: false, record: null })}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
                                 >
                                     Close
                                 </button>

@@ -25,8 +25,10 @@ html, body {
 @layer components {
   /* Buttons keep white text in both themes - they sit on a saturated fill,
      not the page background, so they don't need a light-mode variant. */
+  /* Primary action: dark border/outline, not a colored fill - inverts to a
+     solid dark fill on hover for feedback, but never uses blue. */
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150;
+    @apply border-2 border-slate-900 bg-white text-slate-900 hover:bg-slate-900 hover:text-white font-bold py-2 px-4 rounded-lg transition-colors duration-150 dark:border-white dark:bg-transparent dark:text-white dark:hover:bg-white dark:hover:text-slate-900;
   }
 
   .btn-danger {

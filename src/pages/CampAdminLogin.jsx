@@ -110,7 +110,7 @@ function CampAdminLogin() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150 disabled:opacity-50"
+                            className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold py-2.5 px-4 rounded-lg transition-colors duration-150 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>

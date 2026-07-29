@@ -74,18 +74,16 @@ function Navbar({ userType = 'reporter' }) {
                     {/* Desktop nav links */}
                     <div className="ml-auto hidden items-center gap-0.5 xl:flex">
                         {navLinks.map((link) => {
-                            const LinkIcon = link.icon;
                             const active = isActive(link.path);
                             return (
                                 <Link
                                     key={link.path}
                                     to={link.path}
-                                    className={`group relative flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 ${active
+                                    className={`group relative flex items-center whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 ${active
                                         ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300'
                                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white'
                                         }`}
                                 >
-                                    <LinkIcon className="h-3.5 w-3.5 flex-shrink-0" />
                                     {link.label}
                                 </Link>
                             );
@@ -98,12 +96,10 @@ function Navbar({ userType = 'reporter' }) {
                         >
                             {isReporter ? (
                                 <>
-                                    <IconLifeBuoy className="h-3.5 w-3.5" />
                                     <span>Respond Mode</span>
                                 </>
                             ) : (
                                 <>
-                                    <IconMegaphone className="h-3.5 w-3.5" />
                                     <span>Report Mode</span>
                                 </>
                             )}
@@ -196,18 +192,16 @@ function Navbar({ userType = 'reporter' }) {
                 {isOpen && (
                     <div className="space-y-1.5 border-t border-slate-200 py-4 dark:border-white/10 xl:hidden">
                         {navLinks.map((link) => {
-                            const LinkIcon = link.icon;
                             return (
                                 <Link
                                     key={link.path}
                                     to={link.path}
                                     onClick={() => setIsOpen(false)}
-                                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold transition-colors ${isActive(link.path)
+                                    className={`flex items-center rounded-xl px-4 py-3 text-base font-semibold transition-colors ${isActive(link.path)
                                         ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-300'
                                         : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10'
                                         }`}
                                 >
-                                    <LinkIcon className="h-5 w-5 flex-shrink-0" />
                                     {link.label}
                                 </Link>
                             );
@@ -216,9 +210,8 @@ function Navbar({ userType = 'reporter' }) {
                         <Link
                             to={isReporter ? '/respond' : '/report'}
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white dark:bg-white dark:text-slate-900"
+                            className="flex items-center rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white dark:bg-white dark:text-slate-900"
                         >
-                            {isReporter ? <IconLifeBuoy className="h-5 w-5" /> : <IconMegaphone className="h-5 w-5" />}
                             {isReporter ? 'Respond Mode' : 'Report Mode'}
                         </Link>
 

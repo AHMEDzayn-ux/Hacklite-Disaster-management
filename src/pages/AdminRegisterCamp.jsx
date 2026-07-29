@@ -671,7 +671,7 @@ function AdminRegisterCamp() {
                             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success-500/20 text-success-400">
                                 <IconCheck className="h-6 w-6" />
                             </div>
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Camp Admin Created</h2>
+                            <h2 className="text-xl font-bold text-white">Camp Admin Created</h2>
                             <p className="mt-1 text-sm text-slate-400">
                                 Save this password now — it is shown only once and cannot be recovered.
                             </p>
@@ -680,22 +680,22 @@ function AdminRegisterCamp() {
                         <div className="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
                             <div>
                                 <div className="text-xs text-slate-400">Camp</div>
-                                <div className="font-medium text-slate-900 dark:text-white">{campAdminResult.campName}</div>
+                                <div className="font-medium text-white">{campAdminResult.campName}</div>
                             </div>
                             <div>
                                 <div className="text-xs text-slate-400">Email</div>
-                                <div className="break-all font-mono text-sm text-slate-900 dark:text-white">{campAdminResult.email}</div>
+                                <div className="break-all font-mono text-sm text-white">{campAdminResult.email}</div>
                             </div>
                             <div>
                                 <div className="text-xs text-slate-400">Password</div>
-                                <div className="break-all font-mono text-lg font-bold tracking-wide text-slate-900 dark:text-white">{campAdminResult.password}</div>
+                                <div className="break-all font-mono text-lg font-bold tracking-wide text-white">{campAdminResult.password}</div>
                             </div>
                         </div>
 
                         <div className="mt-5 flex gap-3">
                             <button
                                 onClick={() => navigator.clipboard?.writeText(`Email: ${campAdminResult.email}\nPassword: ${campAdminResult.password}`)}
-                                className="flex-1 rounded-lg border border-white/20 bg-white/5 py-3 font-semibold text-slate-900 dark:text-white transition-colors hover:bg-white/10"
+                                className="flex-1 rounded-lg border border-white/20 bg-white/5 py-3 font-semibold text-white transition-colors hover:bg-white/10"
                             >
                                 Copy
                             </button>

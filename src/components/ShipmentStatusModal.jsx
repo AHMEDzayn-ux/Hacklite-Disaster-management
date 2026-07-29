@@ -64,7 +64,7 @@ function ShipmentStatusModal({ plan, routeInfo, onClose, onUpdated }) {
             <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full">
                 {!result ? (
                     <>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Update Shipment Status</h3>
+                        <h3 className="text-lg font-bold text-white mb-1">Update Shipment Status</h3>
                         <p className="text-sm text-slate-300 mb-4">{plan.quantity} units of {plan.resource_category} — {plan.from_camp?.name} → {plan.to_camp?.name}</p>
 
                         <StatusTracker current={plan.status} />
@@ -113,7 +113,7 @@ function ShipmentStatusModal({ plan, routeInfo, onClose, onUpdated }) {
                         )}
 
                         <div className="flex gap-3 justify-end">
-                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50 transition-colors">Cancel</button>
+                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50 transition-colors">Cancel</button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={processing || (nextAction === 'deliver' && !receivedByName.trim())}
@@ -128,7 +128,7 @@ function ShipmentStatusModal({ plan, routeInfo, onClose, onUpdated }) {
                         <div className={`mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full ${result.error ? 'bg-danger-500/20 text-danger-400' : nextAction === 'dispatch' ? 'bg-primary-500/20 text-primary-300' : 'bg-success-500/20 text-success-400'}`}>
                             {result.error ? <IconX className="h-7 w-7" /> : <IconCheck className="h-7 w-7" />}
                         </div>
-                        <p className="font-bold text-slate-900 dark:text-white mb-1">
+                        <p className="font-bold text-white mb-1">
                             {result.error ? 'Update failed' : nextAction === 'dispatch' ? 'Marked as dispatched' : 'Marked as delivered'}
                         </p>
                         <p className="text-sm text-slate-300 mb-4">

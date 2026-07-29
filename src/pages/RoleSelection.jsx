@@ -85,7 +85,7 @@ function RoleSelection() {
                         style={{ animationDelay: '0.05s' }}
                     >
                         <span className="flex items-center gap-2.5 pb-0.5">
-                            <IconSiren className="h-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] w-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] flex-shrink-0 text-danger-400" />
+                            <IconSiren className="h-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] w-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] flex-shrink-0 text-slate-700 dark:text-slate-300" />
                             Disaster
                         </span>
                         <span className="block bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text pb-1.5 text-transparent">
@@ -110,27 +110,27 @@ function RoleSelection() {
                         {/* Reporter/Victim Card */}
                         <div
                             onClick={() => navigate('/report')}
-                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-white/25 animate-fade-in-up"
+                            className="group relative cursor-pointer rounded-xl border border-danger-300 bg-danger-50/40 p-4 transition-transform duration-200 hover:-translate-y-0.5 dark:border-danger-500/30 dark:bg-danger-500/[0.04] animate-fade-in-up"
                             style={{ animationDelay: '0.2s' }}
                         >
                             <div className="flex items-start justify-between gap-3">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-danger-500 text-white ring-1 ring-inset ring-white/15">
+                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-danger-500 text-white ring-1 ring-inset ring-danger-400/40">
                                     <IconMegaphone className="h-5 w-5" />
                                 </div>
-                                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-white/25 transition-all duration-200 group-hover:translate-x-0.5 group-hover:bg-danger-500/15 group-hover:text-danger-300">
+                                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/15 text-danger-500 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-danger-300">
                                     <IconArrowRight className="h-3.5 w-3.5" />
                                 </span>
                             </div>
 
                             <h2 className="mb-1 mt-2.5 text-base font-bold text-slate-900 dark:text-white">Report Emergency</h2>
-                            <p className="mb-3 text-xs leading-relaxed text-slate-400">
+                            <p className="mb-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                 I need to report a missing person, disaster, or request help
                             </p>
 
                             <div className="mb-3.5 grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
                                 {REPORT_ITEMS.map((item) => (
-                                    <div key={item} className="flex items-center gap-1.5 text-xs text-slate-300">
-                                        <IconCheck className="h-3 w-3 flex-shrink-0 text-danger-400" />
+                                    <div key={item} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+                                        <IconCheck className="h-3 w-3 flex-shrink-0 text-danger-500 dark:text-danger-400" />
                                         <span className="truncate">{item}</span>
                                     </div>
                                 ))}
@@ -138,7 +138,7 @@ function RoleSelection() {
 
                             <button
                                 onClick={() => navigate('/report')}
-                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-danger-600 py-2 text-sm font-bold text-white transition-colors duration-150 hover:bg-danger-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 py-2 text-sm font-bold text-white transition-colors duration-200 hover:bg-danger-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger-400 dark:bg-white dark:text-slate-900 dark:hover:bg-danger-500 dark:hover:text-white"
                             >
                                 Report Emergency
                                 <IconArrowRight className="h-3.5 w-3.5" />
@@ -148,27 +148,27 @@ function RoleSelection() {
                         {/* Responder/Helper Card */}
                         <div
                             onClick={() => navigate('/respond')}
-                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-white/25 animate-fade-in-up"
+                            className="group relative cursor-pointer rounded-xl border border-success-300 bg-success-50/40 p-4 transition-transform duration-200 hover:-translate-y-0.5 dark:border-success-500/30 dark:bg-success-500/[0.04] animate-fade-in-up"
                             style={{ animationDelay: '0.25s' }}
                         >
                             <div className="flex items-start justify-between gap-3">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-success-500 text-white ring-1 ring-inset ring-white/15">
+                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-success-500 text-white ring-1 ring-inset ring-success-400/40">
                                     <IconLifeBuoy className="h-5 w-5" />
                                 </div>
-                                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-white/25 transition-all duration-200 group-hover:translate-x-0.5 group-hover:bg-success-500/15 group-hover:text-success-300">
+                                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-success-500/15 text-success-500 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-success-300">
                                     <IconArrowRight className="h-3.5 w-3.5" />
                                 </span>
                             </div>
 
                             <h2 className="mb-1 mt-2.5 text-base font-bold text-slate-900 dark:text-white">Respond &amp; Help</h2>
-                            <p className="mb-3 text-xs leading-relaxed text-slate-400">
+                            <p className="mb-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                 I want to help, volunteer, or coordinate rescue efforts
                             </p>
 
                             <div className="mb-3.5 grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
                                 {RESPOND_ITEMS.map((item) => (
-                                    <div key={item} className="flex items-center gap-1.5 text-xs text-slate-300">
-                                        <IconCheck className="h-3 w-3 flex-shrink-0 text-success-400" />
+                                    <div key={item} className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+                                        <IconCheck className="h-3 w-3 flex-shrink-0 text-success-500 dark:text-success-400" />
                                         <span className="truncate">{item}</span>
                                     </div>
                                 ))}
@@ -176,7 +176,7 @@ function RoleSelection() {
 
                             <button
                                 onClick={() => navigate('/respond')}
-                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-success-600 py-2 text-sm font-bold text-white transition-colors duration-150 hover:bg-success-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 py-2 text-sm font-bold text-white transition-colors duration-200 hover:bg-success-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-success-400 dark:bg-white dark:text-slate-900 dark:hover:bg-success-500 dark:hover:text-white"
                             >
                                 I Want to Help
                                 <IconArrowRight className="h-3.5 w-3.5" />
@@ -189,8 +189,8 @@ function RoleSelection() {
                         className="mt-3.5 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 animate-fade-in-up"
                         style={{ animationDelay: '0.3s' }}
                     >
-                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-danger-500/15 ring-1 ring-inset ring-danger-400/20">
-                            <IconPhone className="h-4 w-4 text-danger-300" />
+                        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 ring-1 ring-inset ring-slate-200 dark:bg-white/10 dark:ring-white/10">
+                            <IconPhone className="h-4 w-4 text-slate-600 dark:text-slate-300" />
                         </span>
                         <div className="flex flex-1 items-center justify-between gap-4">
                             <div>

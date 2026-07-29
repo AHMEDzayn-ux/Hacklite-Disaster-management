@@ -308,7 +308,7 @@ function CampRequestForm() {
                                             type="button"
                                             onClick={detectLocation}
                                             disabled={gpsDetecting}
-                                            className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-medium disabled:opacity-50 flex-shrink-0"
+                                            className="px-4 py-2 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 rounded-lg text-sm font-medium disabled:opacity-50 flex-shrink-0"
                                         >
                                             {gpsDetecting ? 'Detecting...' : 'Detect GPS'}
                                         </button>
