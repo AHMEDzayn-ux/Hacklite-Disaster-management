@@ -52,6 +52,7 @@ const ACTION_CARDS = [
     {
         to: '/admin/command',
         icon: IconSiren,
+        color: 'danger',
         title: 'Command Dashboard',
         desc: 'AI situation map, priority queue, resource allocation',
         cta: 'Open Dashboard',
@@ -60,6 +61,7 @@ const ACTION_CARDS = [
         to: '/admin/inventory',
         icon: null,
         emoji: '📦',
+        color: 'primary',
         title: 'Inventory',
         desc: 'Cross-camp stock levels and low-stock alerts',
         cta: 'View Inventory',
