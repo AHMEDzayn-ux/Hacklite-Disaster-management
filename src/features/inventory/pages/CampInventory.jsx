@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchCampInventoryLevels, recordInventoryTransaction, INVENTORY_CATEGORIES } from '@/features/inventory/services/inventoryService';
+import { fetchCampInventoryLevels, recordInventoryTransaction, fetchResourceItems, CATEGORY_LABELS } from '@/features/inventory/services/inventoryService';
 import { supabase } from '@/lib/supabase';
+import ItemSelect from '@/features/inventory/components/ItemSelect';
 import { IconGrid } from '@/components/icons/Icons';
 
 /**
@@ -10,11 +11,6 @@ import { IconGrid } from '@/components/icons/Icons';
  * login, just a short code shared by the camp coordinator. Large tap targets,
  * one-field quantity entry, low-stock items pinned to the top in red.
  */
-
-const CATEGORY_LABELS = {
-    food: '🍚 Food', water: '💧 Water', medical: '⚕️ Medical', shelter: '⛺ Shelter',
-    clothing: '👕 Clothing', hygiene: '🧼 Hygiene', other: '📦 Other'
-};
 
 function CampInventory() {
     const [campId, setCampId] = useState('');
@@ -26,21 +22,25 @@ function CampInventory() {
     const [error, setError] = useState('');
     const [actionItem, setActionItem] = useState(null); // { itemName, category, mode }
     const [quantity, setQuantity] = useState('');
-    const [newItemName, setNewItemName] = useState('');
-    const [newItemCategory, setNewItemCategory] = useState('food');
+    const [newItemId, setNewItemId] = useState('');
+    const [catalog, setCatalog] = useState([]);
     const [notes, setNotes] = useState('');
     const [recordedByName, setRecordedByName] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
     const loadLevels = useCallback(async (cid, code) => {
         setLoading(true);
-        const result = await fetchCampInventoryLevels(cid, code);
+        const [result, catalogResult] = await Promise.all([
+            fetchCampInventoryLevels(cid, code),
+            fetchResourceItems(),
+        ]);
         if (result.success) {
             setLevels(result.levels || []);
             setThresholds(result.thresholds || {});
         } else {
             setError(result.error || 'Failed to load inventory');
         }
+        if (catalogResult.success) setCatalog(catalogResult.items || []);
         setLoading(false);
     }, []);
 
@@ -67,8 +67,8 @@ function CampInventory() {
     };
 
     const autofillNewItem = () => {
-        setNewItemName('Bottled Water');
-        setNewItemCategory('water');
+        const sample = catalog.find(i => i.name === 'Bottled Water') || catalog[0];
+        setNewItemId(sample?.id || '');
         setQuantity('100');
         setNotes('Delivered by relief truck');
     };
@@ -78,8 +78,8 @@ function CampInventory() {
         setNotes('Routine restock');
     };
 
-    const openAction = (itemName, category, mode) => {
-        setActionItem({ itemName, category, mode });
+    const openAction = (item, mode) => {
+        setActionItem({ itemId: item.item_id, itemName: item.item_name, unit: item.unit, mode });
         setQuantity('');
         setNotes('');
     };
@@ -89,8 +89,9 @@ function CampInventory() {
         if (!actionItem || !quantity || Number(quantity) <= 0) return;
         setSubmitting(true);
         const result = await recordInventoryTransaction(unlocked.campId, unlocked.accessCode, {
+            itemId: actionItem.itemId,
             itemName: actionItem.itemName,
-            category: actionItem.category,
+            unit: actionItem.unit,
             transactionType: actionItem.mode,
             quantity: Number(quantity),
             recordedByName: recordedByName || 'Volunteer',
@@ -107,11 +108,10 @@ function CampInventory() {
 
     const submitNewItem = async (e) => {
         e.preventDefault();
-        if (!newItemName.trim() || !quantity || Number(quantity) <= 0) return;
+        if (!newItemId || !quantity || Number(quantity) <= 0) return;
         setSubmitting(true);
         const result = await recordInventoryTransaction(unlocked.campId, unlocked.accessCode, {
-            itemName: newItemName.trim(),
-            category: newItemCategory,
+            itemId: newItemId,
             transactionType: 'received',
             quantity: Number(quantity),
             recordedByName: recordedByName || 'Volunteer',
@@ -119,7 +119,7 @@ function CampInventory() {
         });
         setSubmitting(false);
         if (result.success) {
-            setNewItemName('');
+            setNewItemId('');
             setQuantity('');
             setNotes('');
             loadLevels(unlocked.campId, unlocked.accessCode);
@@ -233,13 +233,13 @@ function CampInventory() {
                                 {low && <div className="text-xs text-danger-400 font-semibold mb-2">⚠ Below threshold ({thresholds[item.item_name]})</div>}
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => openAction(item.item_name, item.category, 'received')}
+                                        onClick={() => openAction(item, 'received')}
                                         className="flex-1 bg-success-500/15 hover:bg-success-500/25 text-success-300 font-bold py-3 rounded-lg text-lg"
                                     >
                                         + Add Stock
                                     </button>
                                     <button
-                                        onClick={() => openAction(item.item_name, item.category, 'distributed')}
+                                        onClick={() => openAction(item, 'distributed')}
                                         className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold py-3 rounded-lg text-lg"
                                     >
                                         − Distribute
@@ -266,20 +266,12 @@ function CampInventory() {
                         </button>
                     </div>
                     <form onSubmit={submitNewItem} className="space-y-3">
-                        <input
-                            type="text"
-                            placeholder="Item name (e.g. Rice, Bottled Water)"
-                            value={newItemName}
-                            onChange={(e) => setNewItemName(e.target.value)}
+                        <ItemSelect
+                            catalog={catalog}
+                            value={newItemId}
+                            onChange={setNewItemId}
                             className="input-field text-lg py-3"
                         />
-                        <select
-                            value={newItemCategory}
-                            onChange={(e) => setNewItemCategory(e.target.value)}
-                            className="input-field text-lg py-3"
-                        >
-                            {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
-                        </select>
                         <input
                             type="number"
                             placeholder="Quantity received"

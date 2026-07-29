@@ -8,9 +8,11 @@ import {
     createResourceRequest,
     fetchResourceRequests,
     cancelResourceRequest,
-    INVENTORY_CATEGORIES,
+    fetchResourceItems,
     REQUEST_URGENCY_LEVELS,
+    CATEGORY_LABELS,
 } from '@/features/inventory/services/inventoryService';
+import ItemSelect from '@/features/inventory/components/ItemSelect';
 import { IconTent } from '@/components/icons/Icons';
 
 /**
@@ -25,11 +27,6 @@ import { IconTent } from '@/components/icons/Icons';
  * Engine considers, so this screen is what drives the shipment suggestions an
  * admin sees on the command dashboard.
  */
-
-const CATEGORY_LABELS = {
-    food: '🍚 Food', water: '💧 Water', medical: '⚕️ Medical', shelter: '⛺ Shelter',
-    clothing: '👕 Clothing', hygiene: '🧼 Hygiene', other: '📦 Other',
-};
 
 const URGENCY_STYLES = {
     low: 'bg-slate-500/20 text-slate-300',
@@ -51,13 +48,12 @@ function CampAdminInventory() {
     const [actionItem, setActionItem] = useState(null); // { itemName, category, unit, mode }
     const [quantity, setQuantity] = useState('');
     const [notes, setNotes] = useState('');
-    const [newItemName, setNewItemName] = useState('');
-    const [newItemCategory, setNewItemCategory] = useState('food');
-    const [newItemUnit, setNewItemUnit] = useState('units');
+    const [newItemId, setNewItemId] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
+    const [catalog, setCatalog] = useState([]);
     const [requests, setRequests] = useState([]);
-    const [reqForm, setReqForm] = useState({ itemName: '', category: 'food', unit: 'units', quantity: '', urgency: 'normal', notes: '' });
+    const [reqForm, setReqForm] = useState({ itemId: '', quantity: '', urgency: 'normal', notes: '' });
     const [reqSubmitting, setReqSubmitting] = useState(false);
 
     // Only camp_admins belong here.
@@ -70,9 +66,10 @@ function CampAdminInventory() {
     const load = useCallback(async () => {
         setLoading(true);
         setError('');
-        const [result, requestResult] = await Promise.all([
+        const [result, requestResult, catalogResult] = await Promise.all([
             fetchAllInventoryLevels(),
             fetchResourceRequests(),
+            fetchResourceItems(),
         ]);
         if (result.success) {
             setLevels(result.levels || []);
@@ -81,6 +78,7 @@ function CampAdminInventory() {
             setError(result.error || 'Failed to load inventory');
         }
         if (requestResult.success) setRequests(requestResult.requests || []);
+        if (catalogResult.success) setCatalog(catalogResult.items || []);
         setLoading(false);
     }, []);
 
@@ -100,9 +98,8 @@ function CampAdminInventory() {
     };
 
     const autofillNewItem = () => {
-        setNewItemName('Bottled Water');
-        setNewItemCategory('water');
-        setNewItemUnit('liters');
+        const sample = catalog.find(i => i.name === 'Bottled Water') || catalog[0];
+        setNewItemId(sample?.id || '');
         setQuantity('100');
         setNotes('Delivered by relief truck');
     };
@@ -113,7 +110,7 @@ function CampAdminInventory() {
     };
 
     const openAction = (item, mode) => {
-        setActionItem({ itemName: item.item_name, category: item.category, unit: item.unit, mode });
+        setActionItem({ itemId: item.item_id, itemName: item.item_name, unit: item.unit, mode });
         setQuantity('');
         setNotes('');
         setError('');
@@ -125,8 +122,8 @@ function CampAdminInventory() {
         setSubmitting(true);
         setError('');
         const result = await recordInventoryTransactionAsAdmin(campId, {
+            itemId: actionItem.itemId,
             itemName: actionItem.itemName,
-            category: actionItem.category,
             unit: actionItem.unit,
             transactionType: actionItem.mode,
             quantity: Number(quantity),
@@ -143,20 +140,18 @@ function CampAdminInventory() {
 
     const submitNewItem = async (e) => {
         e.preventDefault();
-        if (!newItemName.trim() || !quantity || Number(quantity) <= 0) return;
+        if (!newItemId || !quantity || Number(quantity) <= 0) return;
         setSubmitting(true);
         setError('');
         const result = await recordInventoryTransactionAsAdmin(campId, {
-            itemName: newItemName.trim(),
-            category: newItemCategory,
-            unit: newItemUnit.trim() || 'units',
+            itemId: newItemId,
             transactionType: 'received',
             quantity: Number(quantity),
             notes: notes || null,
         });
         setSubmitting(false);
         if (result.success) {
-            setNewItemName('');
+            setNewItemId('');
             setQuantity('');
             setNotes('');
             load();
@@ -167,9 +162,7 @@ function CampAdminInventory() {
 
     const requestItem = (item) => {
         setReqForm({
-            itemName: item.item_name,
-            category: item.category,
-            unit: item.unit || 'units',
+            itemId: item.item_id || '',
             quantity: '',
             urgency: isLowStock(item.item_name, item.quantity_on_hand) ? 'high' : 'normal',
             notes: '',
@@ -180,21 +173,19 @@ function CampAdminInventory() {
 
     const submitRequest = async (e) => {
         e.preventDefault();
-        if (!reqForm.itemName.trim() || !reqForm.quantity || Number(reqForm.quantity) <= 0) return;
+        if (!reqForm.itemId || !reqForm.quantity || Number(reqForm.quantity) <= 0) return;
         setReqSubmitting(true);
         setError('');
         const result = await createResourceRequest({
             campId,
-            itemName: reqForm.itemName.trim(),
-            category: reqForm.category,
-            unit: reqForm.unit.trim() || 'units',
+            itemId: reqForm.itemId,
             quantity: Number(reqForm.quantity),
             urgency: reqForm.urgency,
             notes: reqForm.notes || null,
         });
         setReqSubmitting(false);
         if (result.success) {
-            setReqForm({ itemName: '', category: 'food', unit: 'units', quantity: '', urgency: 'normal', notes: '' });
+            setReqForm({ itemId: '', quantity: '', urgency: 'normal', notes: '' });
             load();
         } else {
             setError(result.error || 'Failed to raise request');
@@ -329,29 +320,11 @@ function CampAdminInventory() {
                     )}
 
                     <form onSubmit={submitRequest} className="space-y-3">
-                        <input
-                            type="text"
-                            placeholder="Item needed (e.g. Rice, Bottled Water)"
-                            value={reqForm.itemName}
-                            onChange={(e) => setReqForm({ ...reqForm, itemName: e.target.value })}
-                            className="input-field"
+                        <ItemSelect
+                            catalog={catalog}
+                            value={reqForm.itemId}
+                            onChange={(itemId) => setReqForm({ ...reqForm, itemId })}
                         />
-                        <div className="flex gap-2">
-                            <select
-                                value={reqForm.category}
-                                onChange={(e) => setReqForm({ ...reqForm, category: e.target.value })}
-                                className="input-field flex-1"
-                            >
-                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
-                            </select>
-                            <input
-                                type="text"
-                                placeholder="Unit"
-                                value={reqForm.unit}
-                                onChange={(e) => setReqForm({ ...reqForm, unit: e.target.value })}
-                                className="input-field w-28"
-                            />
-                        </div>
                         <div className="flex gap-2">
                             <input
                                 type="number"
@@ -399,29 +372,11 @@ function CampAdminInventory() {
                         </button>
                     </div>
                     <form onSubmit={submitNewItem} className="space-y-3">
-                        <input
-                            type="text"
-                            placeholder="Item name (e.g. Rice, Bottled Water)"
-                            value={newItemName}
-                            onChange={(e) => setNewItemName(e.target.value)}
-                            className="input-field"
+                        <ItemSelect
+                            catalog={catalog}
+                            value={newItemId}
+                            onChange={setNewItemId}
                         />
-                        <div className="flex gap-2">
-                            <select
-                                value={newItemCategory}
-                                onChange={(e) => setNewItemCategory(e.target.value)}
-                                className="input-field flex-1"
-                            >
-                                {INVENTORY_CATEGORIES.map(c => <option key={c} value={c} className="text-slate-900">{CATEGORY_LABELS[c] || c}</option>)}
-                            </select>
-                            <input
-                                type="text"
-                                placeholder="Unit (kg, liters...)"
-                                value={newItemUnit}
-                                onChange={(e) => setNewItemUnit(e.target.value)}
-                                className="input-field w-28"
-                            />
-                        </div>
                         <input
                             type="number"
                             placeholder="Quantity received"

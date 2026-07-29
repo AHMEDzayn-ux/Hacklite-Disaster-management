@@ -263,14 +263,26 @@ That subtraction is what makes the 2-hourly re-run **idempotent** — a request 
 covered by an unactioned plan does not generate a duplicate suggestion, and existing
 plans are never deleted out from under an admin who is mid-review.
 
-### Matching is per *item*, not per category
+### Matching is per *item*, via a canonical catalog
 
-One solve per distinct requested item (matched on a normalized
-`lowercase(item) | category` key), not one per category. This matters because
+One solve per distinct requested item, not one per category. This matters because
 approval writes a real ledger transfer: a category-level plan would ship an item
 literally named `"food"` out of a camp that actually holds *Rice* and *Dhal*,
 corrupting stock at both ends. The plan also carries the source camp's `unit`, so the
 transfer reconciles against `camp_inventory_levels` (which groups by unit).
+
+Items are matched on **`item_id`**, a foreign key into the `resource_items` catalog —
+never on free-text spelling. Item names used to be typed by hand on both sides, so a
+camp stocking `"Water"` and a camp requesting `"Water"` only matched if the spelling
+*and* the hand-picked category happened to agree. In live data they didn't: two camps
+had `"Water"` filed under category `food`, so a request for water could never be
+sourced from it — the stock was invisible to the solver while sitting a few km away.
+
+Now every stock movement and every request resolves through the catalog server-side
+(`camp-inventory`'s `resolveCatalogItem`), which also *derives* `category` and the
+default `unit` from the catalog row. Two camps referring to the same item is a foreign
+key, not a coincidence of typing. `item_name` and `category` remain on the rows for
+display and history, but the catalog is the authority and they cannot disagree.
 
 ### Supply is only what a camp can safely spare
 
@@ -447,6 +459,7 @@ The "blackboard" tables (added by the `20260709*` migrations, see `AI_AGENTS_SET
 | `agent_runs` | every agent | One row per run: status, duration, items processed/failed, `gemini_calls`, `gemini_failures` |
 | `situation_reports` | Situation Awareness | Per-district damage index, risk score/trend, SITREP narrative |
 | `incident_priority_queue` | Incident Prioritization | Ranked active disasters + each score component |
+| `resource_items` | Reference data (seeded) | Canonical item catalog — stock and requests both reference it, so matching is by `item_id` not spelling |
 | `camp_resource_requests` | **Camp admins** (not an agent) | Explicit supply requests — the sole demand input to Resource Allocation |
 | `allocation_plans` | Resource Allocation | Proposed supply movements + solver metadata + lifecycle status, linked to `request_id` |
 | `route_plans` | Route Optimization | Road route geometry, distance, duration per plan / multi-stop |

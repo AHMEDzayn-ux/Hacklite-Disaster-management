@@ -58,11 +58,6 @@ const URGENCY_WEIGHT: Record<string, number> = { low: 1.0, normal: 1.25, high: 1
 
 const MIN_SHIPMENT_QUANTITY = 1 // ignore tiny/rounding-noise allocations
 
-/** Requests and stock are matched on this key, so "Rice" and " rice " are the same item. */
-function itemKey(itemName: string, category: string): string {
-  return `${itemName.trim().toLowerCase()}|${category}`
-}
-
 /**
  * A camp's threshold map is keyed by that camp's own spelling of the item,
  * which need not match the requesting camp's. Matching loosely here matters:
@@ -92,6 +87,7 @@ interface Camp {
 interface ResourceRequest {
   id: string
   camp_id: string
+  item_id: string
   item_name: string
   resource_category: ResourceCategory
   unit: string
@@ -132,12 +128,12 @@ Deno.serve(async (req: Request) => {
 
     const { data: openRequests } = await supabase
       .from('camp_resource_requests')
-      .select('id, camp_id, item_name, resource_category, unit, quantity_requested, quantity_fulfilled, urgency')
+      .select('id, camp_id, item_id, item_name, resource_category, unit, quantity_requested, quantity_fulfilled, urgency')
       .eq('status', 'open')
 
     const { data: levels } = await supabase
       .from('camp_inventory_levels')
-      .select('camp_id, item_name, category, unit, quantity_on_hand')
+      .select('camp_id, item_id, item_name, category, unit, quantity_on_hand')
 
     // Plans already in flight. These matter twice over, and differently:
     //  - For DEMAND: anything not yet delivered (pending/approved/dispatched)
@@ -148,7 +144,7 @@ Deno.serve(async (req: Request) => {
     //    left camp_inventory_levels - subtracting it again would double-count.
     const { data: inFlightPlans } = await supabase
       .from('allocation_plans')
-      .select('request_id, from_camp_id, item_name, resource_category, quantity, status')
+      .select('request_id, from_camp_id, item_id, quantity, status')
       .in('status', ['pending', 'approved', 'dispatched'])
 
     const campById = new Map<string, Camp>()
@@ -162,19 +158,22 @@ Deno.serve(async (req: Request) => {
       if (plan.request_id) {
         plannedForRequest.set(plan.request_id, (plannedForRequest.get(plan.request_id) ?? 0) + Number(plan.quantity))
       }
-      if (plan.status === 'pending' && plan.from_camp_id && plan.item_name) {
-        const key = `${plan.from_camp_id}|${itemKey(plan.item_name, plan.resource_category)}`
+      if (plan.status === 'pending' && plan.from_camp_id && plan.item_id) {
+        const key = `${plan.from_camp_id}|${plan.item_id}`
         committedFromCamp.set(key, (committedFromCamp.get(key) ?? 0) + Number(plan.quantity))
       }
     }
 
-    // onHand[campId|itemKey] = current stock of that exact item at that camp.
+    // onHand[campId|itemId] = current stock of that catalog item at that camp.
+    // Matching on item_id, not on spelling: two camps stocking the same item is
+    // now a foreign key, not a coincidence of how each of them typed it.
     // unitAtCamp tracks the unit that stock is held in, so the eventual ledger
     // transfer reconciles against camp_inventory_levels (which groups by unit).
     const onHand = new Map<string, number>()
     const unitAtCamp = new Map<string, string>()
     for (const row of levels ?? []) {
-      const key = `${row.camp_id}|${itemKey(row.item_name, row.category)}`
+      if (!row.item_id) continue // pre-catalog ledger row; nothing to match it to
+      const key = `${row.camp_id}|${row.item_id}`
       const running = onHand.get(key) ?? 0
       if (!unitAtCamp.has(key) || Number(row.quantity_on_hand) > running) {
         unitAtCamp.set(key, row.unit ?? 'units')
@@ -182,17 +181,17 @@ Deno.serve(async (req: Request) => {
       onHand.set(key, running + Number(row.quantity_on_hand))
     }
 
-    // Group open requests by the exact item being asked for - one solve each.
+    // Group open requests by catalog item - one transportation solve each.
     const requestsByItem = new Map<string, ResourceRequest[]>()
     for (const request of (openRequests ?? []) as ResourceRequest[]) {
       if (!campById.has(request.camp_id)) continue // no coordinates: can't route to it
-      const key = itemKey(request.item_name, request.resource_category)
-      const group = requestsByItem.get(key) ?? []
+      if (!request.item_id) continue // pre-catalog request
+      const group = requestsByItem.get(request.item_id) ?? []
       group.push(request)
-      requestsByItem.set(key, group)
+      requestsByItem.set(request.item_id, group)
     }
 
-    for (const [key, group] of requestsByItem) {
+    for (const [itemId, group] of requestsByItem) {
       try {
         const category = group[0].resource_category
         const displayItemName = group[0].item_name.trim()
@@ -223,7 +222,7 @@ Deno.serve(async (req: Request) => {
         for (const camp of campById.values()) {
           if (requestingCampIds.has(camp.id)) continue
 
-          const stock = onHand.get(`${camp.id}|${key}`) ?? 0
+          const stock = onHand.get(`${camp.id}|${itemId}`) ?? 0
           if (stock <= MIN_SHIPMENT_QUANTITY) continue
 
           // Reserve: whichever is larger of what the camp configured for itself
@@ -232,7 +231,7 @@ Deno.serve(async (req: Request) => {
           const perOccupant = (camp.current_occupancy ?? 0) * (PER_OCCUPANT_MINIMUM[category] ?? 0)
           const reserve = Math.max(configured, perOccupant)
 
-          const committed = committedFromCamp.get(`${camp.id}|${key}`) ?? 0
+          const committed = committedFromCamp.get(`${camp.id}|${itemId}`) ?? 0
           const spare = Math.max(0, stock - reserve - committed)
           if (spare <= MIN_SHIPMENT_QUANTITY) continue
 
@@ -317,8 +316,9 @@ Deno.serve(async (req: Request) => {
             from_camp_id: source.id,
             to_camp_id: request.camp_id,
             resource_category: category,
+            item_id: itemId,
             item_name: displayItemName,
-            unit: unitAtCamp.get(`${source.id}|${key}`) ?? request.unit ?? 'units',
+            unit: unitAtCamp.get(`${source.id}|${itemId}`) ?? request.unit ?? 'units',
             quantity: qty,
             distance_km: distanceKm[i][j],
             status: 'pending',
@@ -341,7 +341,7 @@ Deno.serve(async (req: Request) => {
         }
       } catch (itemError) {
         itemsFailed++
-        console.error(`Allocation failed for item ${key}:`, itemError)
+        console.error(`Allocation failed for item ${itemId}:`, itemError)
       }
     }
 

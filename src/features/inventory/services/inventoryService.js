@@ -57,6 +57,31 @@ export const regenerateInventoryAccessCode = (campId) =>
     invokeInventoryAsAdmin({ action: 'regenerate-code', campId });
 
 /**
+ * The canonical relief-item catalog. Stock entry and requests both pick from
+ * this, so two camps referring to the same item resolve to the same item_id -
+ * which is what lets the allocation agent match them at all.
+ *
+ * Read straight from the table rather than the edge function: the catalog is
+ * public reference data, and the code-gated volunteer screen needs it too
+ * without an admin session.
+ */
+export const fetchResourceItems = async () => {
+    try {
+        const { data, error } = await supabase
+            .from('resource_items')
+            .select('id, name, category, default_unit')
+            .eq('is_active', true)
+            .order('category')
+            .order('name');
+        if (error) throw error;
+        return { success: true, items: data || [] };
+    } catch (error) {
+        console.error('resource_items fetch error:', error);
+        return { success: false, error: error.message, items: [] };
+    }
+};
+
+/**
  * Camp admin path: raise a supply request. These requests are the only demand
  * signal the Resource Allocation Engine considers - the agent no longer infers
  * need from stock thresholds.
@@ -71,6 +96,9 @@ export const fetchResourceRequests = (campId) =>
 export const cancelResourceRequest = (requestId) =>
     invokeInventoryAsAdmin({ action: 'cancel-request', requestId });
 
-export const INVENTORY_CATEGORIES = ['food', 'water', 'medical', 'shelter', 'clothing', 'hygiene', 'other'];
-
 export const REQUEST_URGENCY_LEVELS = ['low', 'normal', 'high', 'critical'];
+
+export const CATEGORY_LABELS = {
+    food: '🍚 Food', water: '💧 Water', medical: '⚕️ Medical', shelter: '⛺ Shelter',
+    clothing: '👕 Clothing', hygiene: '🧼 Hygiene', other: '📦 Other',
+};

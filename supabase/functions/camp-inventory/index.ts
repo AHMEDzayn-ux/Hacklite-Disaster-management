@@ -26,15 +26,14 @@ function generateAccessCode(): string {
   return code
 }
 
-const RESOURCE_CATEGORIES = ['food', 'water', 'medical', 'shelter', 'clothing', 'hygiene', 'other']
 const URGENCY_LEVELS = ['low', 'normal', 'high', 'critical']
 
 interface RequestBody {
-  action: 'record' | 'get-levels' | 'regenerate-code' | 'create-request' | 'list-requests' | 'cancel-request'
+  action: 'record' | 'get-levels' | 'regenerate-code' | 'create-request' | 'list-requests' | 'cancel-request' | 'list-items'
   campId: string
   accessCode?: string
+  itemId?: string
   itemName?: string
-  category?: string
   unit?: string
   transactionType?: 'received' | 'distributed' | 'adjusted'
   quantity?: number
@@ -42,6 +41,42 @@ interface RequestBody {
   notes?: string
   urgency?: string
   requestId?: string
+}
+
+interface CatalogItem {
+  id: string
+  name: string
+  category: string
+  default_unit: string
+}
+
+/**
+ * Every stock movement and request resolves through the catalog, so a camp can
+ * never invent its own spelling or category for an item. This is what lets the
+ * allocation agent match on item_id instead of hoping two camps typed the same
+ * thing - a request for "Water" now finds stock a camp filed years ago,
+ * regardless of what that camp called it at the time.
+ *
+ * itemName is accepted as a fallback for older clients, but only as a lookup
+ * key against the catalog - never as a new free-text name.
+ */
+async function resolveCatalogItem(supabase: any, body: RequestBody): Promise<CatalogItem | { error: string }> {
+  if (body.itemId) {
+    const { data } = await supabase
+      .from('resource_items').select('id, name, category, default_unit').eq('id', body.itemId).maybeSingle()
+    if (!data) return { error: 'Unknown item - pick one from the catalog' }
+    return data
+  }
+
+  if (body.itemName) {
+    const { data } = await supabase
+      .from('resource_items').select('id, name, category, default_unit')
+      .ilike('name', body.itemName.trim()).maybeSingle()
+    if (!data) return { error: `"${body.itemName}" is not in the item catalog - pick an existing item` }
+    return data
+  }
+
+  return { error: 'itemId is required' }
 }
 
 // 'admin'      - full admin/super_admin, any camp
@@ -151,6 +186,14 @@ Deno.serve(async (req: Request) => {
     return json(200, { success: true, levels: data, thresholds: camp?.inventory_thresholds ?? {} })
   }
 
+  if (body.action === 'list-items') {
+    const { data, error } = await supabase
+      .from('resource_items').select('id, name, category, default_unit')
+      .eq('is_active', true).order('category').order('name')
+    if (error) return json(500, { error: 'Failed to fetch item catalog', details: error.message })
+    return json(200, { success: true, items: data })
+  }
+
   // A camp asking for supplies. These requests are the only demand signal the
   // Resource Allocation Engine considers, so they are written here under the
   // same camp scoping as inventory: a camp_admin can only ever request for its
@@ -158,15 +201,10 @@ Deno.serve(async (req: Request) => {
   if (body.action === 'create-request') {
     if (access.kind === 'code') return json(403, { error: 'An access code cannot raise supply requests - a camp admin login is required' })
 
-    const { itemName, category, unit, quantity, urgency, notes, recordedByName } = body
+    const { quantity, urgency, notes, recordedByName } = body
     const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
 
-    if (!campId || !itemName || !category || quantity == null) {
-      return json(400, { error: 'campId, itemName, category, and quantity are required' })
-    }
-    if (!RESOURCE_CATEGORIES.includes(category)) {
-      return json(400, { error: `category must be one of: ${RESOURCE_CATEGORIES.join(', ')}` })
-    }
+    if (!campId || quantity == null) return json(400, { error: 'campId and quantity are required' })
     if (typeof quantity !== 'number' || quantity <= 0) {
       return json(400, { error: 'quantity must be a positive number' })
     }
@@ -174,11 +212,15 @@ Deno.serve(async (req: Request) => {
       return json(400, { error: `urgency must be one of: ${URGENCY_LEVELS.join(', ')}` })
     }
 
+    const item = await resolveCatalogItem(supabase, body)
+    if ('error' in item) return json(400, { error: item.error })
+
     const { data, error } = await supabase.from('camp_resource_requests').insert({
       camp_id: campId,
-      item_name: itemName.trim(),
-      resource_category: category,
-      unit: unit || 'units',
+      item_id: item.id,
+      item_name: item.name,
+      resource_category: item.category,
+      unit: body.unit || item.default_unit,
       quantity_requested: quantity,
       urgency: urgency || 'normal',
       notes: notes || null,
@@ -238,14 +280,14 @@ Deno.serve(async (req: Request) => {
   }
 
   if (body.action === 'record') {
-    const { itemName, category, unit, transactionType, quantity, recordedByName, notes } = body
+    const { transactionType, quantity, recordedByName, notes } = body
 
     // A camp_admin can only ever write to its own camp, whatever campId the
     // request asks for; everyone else uses the campId they supplied.
     const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
 
-    if (!campId || !itemName || !category || !transactionType || quantity == null) {
-      return json(400, { error: 'campId, itemName, category, transactionType, and quantity are required' })
+    if (!campId || !transactionType || quantity == null) {
+      return json(400, { error: 'campId, itemId, transactionType, and quantity are required' })
     }
     if (!['received', 'distributed', 'adjusted'].includes(transactionType)) {
       return json(400, { error: 'transactionType must be received, distributed, or adjusted' })
@@ -254,11 +296,15 @@ Deno.serve(async (req: Request) => {
       return json(400, { error: 'quantity must be a positive number' })
     }
 
+    const item = await resolveCatalogItem(supabase, body)
+    if ('error' in item) return json(400, { error: item.error })
+    const unit = body.unit || item.default_unit
+
     // Can't distribute more than is on hand - otherwise the live view sums to
     // negative stock. Corrections that legitimately reduce below zero go
     // through 'adjusted', not 'distributed'.
     if (transactionType === 'distributed') {
-      const onHand = await currentStock(supabase, campId, itemName, category, unit || 'units')
+      const onHand = await currentStock(supabase, campId, item.name, item.category, unit)
       if (quantity > onHand) {
         return json(400, { error: `Cannot distribute ${quantity} - only ${onHand} on hand` })
       }
@@ -269,9 +315,10 @@ Deno.serve(async (req: Request) => {
 
     const { data, error } = await supabase.from('inventory_transactions').insert({
       camp_id: campId,
-      item_name: itemName,
-      category,
-      unit: unit || 'units',
+      item_id: item.id,
+      item_name: item.name,
+      category: item.category,
+      unit,
       transaction_type: transactionType,
       quantity,
       recorded_by_name: recordedBy,
