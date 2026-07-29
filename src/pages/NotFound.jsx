@@ -33,7 +33,7 @@ function NotFound() {
                     <div className="flex flex-col justify-center gap-3 sm:flex-row">
                         <Link
                             to="/"
-                            className="rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 px-6 py-2 font-bold text-white shadow-lg shadow-danger-500/30 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-danger-500/40"
+                            className="rounded-lg border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white px-8 py-3 font-bold text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 transition-colors duration-150 hover:-translate-y-0.5"
                         >
                             Go Home
                         </Link>

@@ -384,7 +384,7 @@ function CampsList() {
                                                 )}
 
                                                 {/* View Button */}
-                                                <button className="w-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium py-1.5 rounded-lg">
+                                                <button className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 text-xs font-medium py-1.5 rounded-lg transition-colors">
                                                     View Details →
                                                 </button>
                                             </div>

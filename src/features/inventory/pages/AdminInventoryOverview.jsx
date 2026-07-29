@@ -358,7 +358,7 @@ function CampBlock({ camp }) {
                                 <tr key={`${item.item_name}-${item.category}-${item.unit}`} className={item.low ? 'bg-danger-500/10' : ''}>
                                     <td className="px-4 py-2 text-slate-200">{item.item_name}</td>
                                     <td className="px-4 py-2 capitalize text-slate-400">{item.category}</td>
-                                    <td className={`px-4 py-2 text-right font-bold ${item.low ? 'text-danger-400' : 'text-white'}`}>
+                                    <td className={`px-4 py-2 text-right font-bold ${item.low ? 'text-danger-400' : 'text-slate-900 dark:text-white'}`}>
                                         {item.quantity_on_hand} {item.unit}
                                     </td>
                                     <td className="px-4 py-2 text-slate-500 text-xs">

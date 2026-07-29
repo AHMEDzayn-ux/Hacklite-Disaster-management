@@ -284,7 +284,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                             <button
                                 key={r}
                                 onClick={() => setRange(r)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${range === r ? 'border-2 border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white dark:bg-transparent' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}
                             >
                                 {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
                             </button>
@@ -303,7 +303,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
                             <button
                                 key={s.key}
                                 onClick={() => setView(s.key)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 ${view === s.key ? 'border-2 border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white dark:bg-transparent' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}
                             >
                                 <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
                             </button>
@@ -362,7 +362,8 @@ function MapPanel({ A, layers, setLayers, navigate }) {
                         <button
                             key={k}
                             onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                            className={`flex flex-1 items-center justify-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-md border transition-colors ${layers[k] ? 'border-white/20 bg-white/10 text-slate-900 dark:text-white' : 'border-white/10 text-slate-400 opacity-50 hover:opacity-100'}`}
+                            className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full border-[1.5px] bg-white text-slate-600 transition-colors duration-150 dark:bg-white/5 dark:text-slate-300 ${layers[k] ? '' : 'border-slate-200 opacity-50 hover:opacity-100 dark:border-white/10'}`}
+                            style={layers[k] ? { borderColor: KIND_META[k].color } : undefined}
                         >
                             <span className="text-xs leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
                         </button>
@@ -479,17 +480,17 @@ function AnalyticsView({ A }) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card icon={IconGrid} title="Report Distribution">
-                <Donut data={A.distribution} centerLabel={A.kpi.totalReports} centerSub="reports" />
+                <Donut data={A.distribution} size={100} thickness={16} centerLabel={A.kpi.totalReports} centerSub="reports" />
             </Card>
 
             <Card icon={IconBolt} title="Priority Breakdown (active disasters)">
-                <VBars data={A.priority} height={140} />
+                <VBars data={A.priority} height={90} />
             </Card>
 
             <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-xs text-slate-500">incoming vs resolved</span>}>
                 <TrendLine
                     series={[
-                        { label: 'Incoming', color: CHART_COLORS[7], values: A.trend.incoming },
+                        { label: 'Incoming', color: CHART_COLORS[3], values: A.trend.incoming },
                         { label: 'Resolved', color: CHART_COLORS[2], values: A.trend.resolved },
                     ]}
                     labels={A.trend.labels}
@@ -497,7 +498,7 @@ function AnalyticsView({ A }) {
             </Card>
 
             <Card icon={IconClock} title="Response Time" right={<span className="text-xs text-slate-500">avg hrs to resolve</span>}>
-                <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[4], values: A.responseTrend.values }]} labels={A.responseTrend.labels} />
+                <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[5], values: A.responseTrend.values }]} labels={A.responseTrend.labels} height={110} />
             </Card>
 
             <Card icon={IconMapPin} title="District Analytics" right={<span className="text-xs text-slate-500">active reports</span>}>
@@ -522,39 +523,39 @@ function CategoriesView({ A }) {
             {/* Missing persons */}
             <Card icon={IconUserSearch} title="Missing Person Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.missing.total} label="Total" accent="text-white" />
+                    <MiniStat value={c.missing.total} label="Total" accent="text-slate-900 dark:text-white" />
                     <MiniStat value={c.missing.found} label="Found" accent="text-success-400" />
-                    <MiniStat value={c.missing.searching} label="Searching" accent="text-orange-400" />
+                    <MiniStat value={c.missing.searching} label="Searching" accent="text-slate-900 dark:text-white" />
                 </div>
-                <TrendLine series={[{ label: 'New cases', color: CHART_COLORS[3], values: c.missing.trend }]} labels={A.trend.labels} height={130} />
+                <TrendLine series={[{ label: 'New cases', color: CHART_COLORS[3], values: c.missing.trend }]} labels={A.trend.labels} height={100} />
             </Card>
 
             {/* Disasters */}
             <Card icon={IconSiren} title="Disaster Analytics">
                 <div className="grid grid-cols-4 gap-2 mb-3">
-                    <MiniStat value={c.disaster.byType.flood || 0} label="Flood" accent="text-primary-300" />
-                    <MiniStat value={c.disaster.byType.landslide || 0} label="Landslide" accent="text-amber-400" />
-                    <MiniStat value={c.disaster.byType.fire || 0} label="Fire" accent="text-danger-400" />
-                    <MiniStat value={c.disaster.byType.cyclone || 0} label="Storm" accent="text-cyan-400" />
+                    <MiniStat value={c.disaster.byType.flood || 0} label="Flood" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={c.disaster.byType.landslide || 0} label="Landslide" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={c.disaster.byType.fire || 0} label="Fire" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={c.disaster.byType.cyclone || 0} label="Storm" accent="text-slate-900 dark:text-white" />
                 </div>
-                <Donut data={c.disaster.donut} size={116} thickness={18} centerLabel={c.disaster.donut.reduce((s, d) => s + d.value, 0)} centerSub="types" />
+                <Donut data={c.disaster.donut} size={92} thickness={14} centerLabel={c.disaster.donut.reduce((s, d) => s + d.value, 0)} centerSub="types" />
             </Card>
 
             {/* Animals */}
             <Card icon={IconPawPrint} title="Animal Rescue Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.animal.pending} label="Pending" accent="text-orange-400" />
+                    <MiniStat value={c.animal.pending} label="Pending" accent="text-slate-900 dark:text-white" />
                     <MiniStat value={c.animal.completed} label="Completed" accent="text-success-400" />
-                    <MiniStat value={c.animal.total} label="Total" accent="text-white" />
+                    <MiniStat value={c.animal.total} label="Total" accent="text-slate-900 dark:text-white" />
                 </div>
-                <VBars data={c.animal.byType} height={120} />
+                <VBars data={c.animal.byType} height={80} />
             </Card>
 
             {/* Camps */}
             <Card icon={IconTent} title="Relief Camp Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.camp.active} label="Active Camps" accent="text-primary-300" />
-                    <MiniStat value={`${c.camp.occupancyPct}%`} label="Occupancy" accent={c.camp.occupancyPct >= 85 ? 'text-danger-400' : 'text-white'} />
+                    <MiniStat value={c.camp.active} label="Active Camps" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={`${c.camp.occupancyPct}%`} label="Occupancy" accent={c.camp.occupancyPct >= 85 ? 'text-danger-400' : 'text-slate-900 dark:text-white'} />
                     <MiniStat value={c.camp.nearFull} label="Near Full" accent="text-danger-400" />
                 </div>
                 <HBars data={c.camp.byDistrict} valueSuffix="%" max={100} />
@@ -690,10 +691,10 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
     // ---- Priority breakdown
     const sevCount = s => activeDisasters.filter(i => i.severity === s).length;
     const priority = [
-        { label: 'Critical', value: sevCount('critical'), color: CHART_COLORS[1] },
-        { label: 'High', value: sevCount('high'), color: CHART_COLORS[7] },
-        { label: 'Moderate', value: sevCount('moderate'), color: CHART_COLORS[3] },
-        { label: 'Low', value: sevCount('low'), color: CHART_COLORS[0] },
+        { label: 'Critical', value: sevCount('critical'), color: '#dc2626' },
+        { label: 'High', value: sevCount('high'), color: '#64748b' },
+        { label: 'Moderate', value: sevCount('moderate'), color: '#94a3b8' },
+        { label: 'Low', value: sevCount('low'), color: '#cbd5e1' },
     ];
 
     // ---- Trends (incoming vs resolved) + labels
@@ -785,13 +786,14 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
     const allAnimals = incidents.filter(i => i.kind === 'animal');
     const allDisasters = incidents.filter(i => i.kind === 'disaster');
 
+    const NEUTRAL_SLOTS = CHART_COLORS.slice(3);
     const disByType = {};
     allDisasters.forEach(i => { disByType[i.type] = (disByType[i.type] || 0) + 1; });
-    const disasterDonut = topN(disByType, 6).map(([label, value], i) => ({ label: cap(label.replace('-', ' ')), value, color: CHART_COLORS[i % CHART_COLORS.length] }));
+    const disasterDonut = topN(disByType, 6).map(([label, value], i) => ({ label: cap(label.replace('-', ' ')), value, color: NEUTRAL_SLOTS[i % NEUTRAL_SLOTS.length] }));
 
     const animalTypeGroups = { Dogs: ['dog'], Cats: ['cat'], Livestock: ['cattle', 'goat'], Birds: ['bird'], Wildlife: ['wildlife'], Other: ['other'] };
     const animalByType = Object.entries(animalTypeGroups).map(([label, types], i) => ({
-        label, color: CHART_COLORS[i % CHART_COLORS.length],
+        label, color: NEUTRAL_SLOTS[i % NEUTRAL_SLOTS.length],
         value: allAnimals.filter(a => types.includes(a.type)).length,
     })).filter(d => d.value > 0);
 
@@ -825,7 +827,7 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
             active: activeCamps.length,
             occupancyPct: totalCap > 0 ? Math.round((totalOcc / totalCap) * 100) : 0,
             nearFull: nearFull.length,
-            byDistrict: topN(campByDistrict, 6).map(([label, value]) => ({ label, value, color: value >= 85 ? CHART_COLORS[1] : CHART_COLORS[0] })),
+            byDistrict: topN(campByDistrict, 6).map(([label, value]) => ({ label, value, color: value >= 85 ? CHART_COLORS[1] : CHART_COLORS[3] })),
         },
     };
 

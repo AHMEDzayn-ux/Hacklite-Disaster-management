@@ -418,8 +418,8 @@ function AnimalRescueDetail({ role: propRole }) {
 
                 {showConfirmDialog && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-                        <div className="bg-slate-900 border border-white/10 rounded-lg shadow-2xl max-w-md w-full p-4">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Confirm Rescue</h3>
+                        <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-4">
+                            <h3 className="text-lg font-bold text-white mb-2">Confirm Rescue</h3>
                             <p className="text-sm text-slate-300 mb-3">Confirm that this animal has been successfully rescued.</p>
 
                             <div className="space-y-2.5 mb-4">
@@ -442,7 +442,7 @@ function AnimalRescueDetail({ role: propRole }) {
                                         </span>
                                     ) : 'Confirm'}
                                 </button>
-                                <button onClick={() => { setShowConfirmDialog(false); setFoundContact(''); setFoundNotes(''); }} disabled={isSubmitting} className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">Cancel</button>
+                                <button onClick={() => { setShowConfirmDialog(false); setFoundContact(''); setFoundNotes(''); }} disabled={isSubmitting} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">Cancel</button>
                             </div>
                         </div>
                     </div>
