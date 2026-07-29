@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
@@ -22,12 +22,10 @@ import {
     IconUserSearch,
     IconPawPrint,
     IconTent,
-    IconUsers,
     IconMap,
     IconMapPin,
     IconClock,
     IconCheck,
-    IconHeart,
 } from '@/components/icons/Icons';
 
 /**
@@ -240,7 +238,7 @@ function MiniStat({ value, label, accent = 'text-white' }) {
     return (
         <div className="rounded-xl bg-white/5 border border-white/10 px-2.5 py-2 text-center">
             <p className={`text-lg font-bold leading-none ${accent}`}>{value}</p>
-            <p className="text-[11px] text-slate-400 mt-1 leading-tight">{label}</p>
+            <p className="text-xs text-slate-400 mt-1 leading-tight">{label}</p>
         </div>
     );
 }
@@ -277,7 +275,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Global filter bar */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
                 <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
@@ -326,9 +324,9 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 
 function OverviewView({ A, layers, setLayers, navigate, range }) {
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
                 <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
                 <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
@@ -338,12 +336,12 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
             </div>
 
             {/* AI operational summary */}
-            <Card icon={IconInfo} title="AI Operational Summary" right={<span className="text-[10px] text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
+            <Card icon={IconInfo} title="AI Operational Summary" right={<span className="text-xs text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
                 <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
                 {A.summary.chips.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2.5">
                         {A.summary.chips.map((c, i) => (
-                            <span key={i} className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
+                            <span key={i} className={`text-xs font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
                         ))}
                     </div>
                 )}
@@ -374,7 +372,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                     </div>
                 }
             >
-                <div className="rounded-2xl border border-white/15 overflow-hidden shadow-xl" style={{ height: 380 }}>
+                <div className="rounded-2xl border border-white/15 overflow-hidden shadow-xl" style={{ height: 300 }}>
                     <MapContainer center={defaultMapConfig.center} zoom={defaultMapConfig.zoom} style={{ height: '100%', width: '100%' }} preferCanvas>
                         <TileLayer
                             attribution='&copy; OpenStreetMap'
@@ -411,7 +409,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 </div>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Needs attention */}
                 <Card icon={IconBolt} title="Needs Immediate Attention">
                     {A.urgentFeed.length === 0 ? (
@@ -424,10 +422,10 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                                         <span className="text-base flex-shrink-0">{item.icon}</span>
                                         <div className="min-w-0">
                                             <p className="text-xs font-semibold text-white truncate">{item.title}</p>
-                                            <p className="text-[11px] text-slate-400 truncate">{item.subtitle}</p>
+                                            <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
+                                    <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
                                 </div>
                             ))}
                         </div>
@@ -445,7 +443,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                                 <div key={i} onClick={() => ev.link && navigate(ev.link)} className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group' : ''}`}>
                                     <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
                                     <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
-                                    <p className="text-[10px] text-slate-500">{ev.time}</p>
+                                    <p className="text-xs text-slate-500">{ev.time}</p>
                                 </div>
                             ))}
                         </div>
@@ -462,7 +460,7 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
 
 function AnalyticsView({ A, range }) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card icon={IconGrid} title="Report Distribution">
                 <Donut data={A.distribution} centerLabel={A.kpi.totalReports} centerSub="reports" />
             </Card>
@@ -471,11 +469,11 @@ function AnalyticsView({ A, range }) {
                 <VBars data={A.priority} height={140} />
             </Card>
 
-            <Card icon={IconBolt} title="Report Trend" right={<span className="text-[10px] text-slate-500">incoming / {RANGE_CONF[range].label}</span>}>
+            <Card icon={IconBolt} title="Report Trend" right={<span className="text-xs text-slate-500">incoming / {RANGE_CONF[range].label}</span>}>
                 <TrendLine series={[{ label: 'New reports', color: CHART_COLORS[0], values: A.trend.incoming }]} labels={A.trend.labels} />
             </Card>
 
-            <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-[10px] text-slate-500">incoming vs resolved</span>}>
+            <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-xs text-slate-500">incoming vs resolved</span>}>
                 <TrendLine
                     series={[
                         { label: 'Incoming', color: CHART_COLORS[7], values: A.trend.incoming },
@@ -485,15 +483,15 @@ function AnalyticsView({ A, range }) {
                 />
             </Card>
 
-            <Card icon={IconClock} title="Response Time" right={<span className="text-[10px] text-slate-500">avg hrs to resolve</span>}>
+            <Card icon={IconClock} title="Response Time" right={<span className="text-xs text-slate-500">avg hrs to resolve</span>}>
                 <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[4], values: A.responseTrend.values }]} labels={A.responseTrend.labels} />
             </Card>
 
-            <Card icon={IconMapPin} title="District Analytics" right={<span className="text-[10px] text-slate-500">active reports</span>}>
+            <Card icon={IconMapPin} title="District Analytics" right={<span className="text-xs text-slate-500">active reports</span>}>
                 <HBars data={A.districtRanking} />
             </Card>
 
-            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-[10px] text-slate-500">from report text</span>} className="lg:col-span-2">
+            <Card icon={IconGrid} title="Resource Demand" right={<span className="text-xs text-slate-500">from report text</span>} className="lg:col-span-2">
                 <HBars data={A.resourceDemand} labelWidth={110} />
             </Card>
         </div>
@@ -507,7 +505,7 @@ function AnalyticsView({ A, range }) {
 function CategoriesView({ A }) {
     const c = A.categories;
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Missing persons */}
             <Card icon={IconUserSearch} title="Missing Person Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
@@ -558,19 +556,19 @@ function CategoriesView({ A }) {
 
 function AiView({ A }) {
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {/* Hotspots */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {A.hotspots.map((h, i) => (
                     <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-3">
-                        <p className="text-[11px] font-medium text-slate-400">{h.icon} {h.label}</p>
+                        <p className="text-xs font-medium text-slate-400">{h.icon} {h.label}</p>
                         <p className="text-lg font-bold text-white mt-1 truncate">{h.value}</p>
-                        <p className="text-[11px] text-slate-500 truncate">{h.detail}</p>
+                        <p className="text-xs text-slate-500 truncate">{h.detail}</p>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Operational insights */}
                 <Card icon={IconInfo} title="AI Operational Insights">
                     {A.insights.length === 0 ? (
@@ -588,7 +586,7 @@ function AiView({ A }) {
                 </Card>
 
                 {/* Duplicate detection */}
-                <Card icon={IconSearch} title="Duplicate Report Detection" right={<span className="text-[10px] text-slate-500">{A.duplicates.length} cluster(s)</span>}>
+                <Card icon={IconSearch} title="Duplicate Report Detection" right={<span className="text-xs text-slate-500">{A.duplicates.length} cluster(s)</span>}>
                     {A.duplicates.length === 0 ? (
                         <p className="text-sm text-slate-500 py-4 text-center">No likely duplicate clusters detected.</p>
                     ) : (
@@ -597,9 +595,9 @@ function AiView({ A }) {
                                 <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2">
                                     <div className="flex items-center justify-between">
                                         <p className="text-xs font-semibold text-white">{d.icon} {d.title}</p>
-                                        <span className="text-[10px] font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
+                                        <span className="text-xs font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
                                     </div>
-                                    <p className="text-[11px] text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
+                                    <p className="text-xs text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
                                 </div>
                             ))}
                         </div>
@@ -617,10 +615,10 @@ function AiView({ A }) {
                             <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2.5 flex flex-col">
                                 <div className="flex items-start justify-between gap-2">
                                     <p className="text-xs font-semibold text-white">{r.icon} {r.action}</p>
-                                    <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
+                                    <span className={`text-xs font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
                                 </div>
-                                <p className="text-[11px] text-slate-400 mt-1 flex-1">{r.reason}</p>
-                                <p className="text-[10px] text-slate-500 mt-1.5">⏱ {r.impact}</p>
+                                <p className="text-xs text-slate-400 mt-1 flex-1">{r.reason}</p>
+                                <p className="text-xs text-slate-500 mt-1.5">⏱ {r.impact}</p>
                             </div>
                         ))}
                     </div>
@@ -981,8 +979,8 @@ function RespondDashboard() {
             ></div>
 
             <div className="relative z-10 mx-auto max-w-[1800px] px-4 pt-4 pb-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between flex-wrap gap-4 mb-3">
+                    <div className="flex items-center gap-4">
                         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
                             <IconLifeBuoy className="h-5 w-5" />
                         </div>
@@ -997,17 +995,6 @@ function RespondDashboard() {
                             <p className="text-slate-300 text-xs mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
                         </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Link to="/volunteers" className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-success-500/30 hover:bg-success-500 hover:shadow-xl hover:shadow-success-500/40">
-                            <IconUsers className="h-4 w-4" /> Volunteer
-                        </Link>
-                        <Link to="/donations" className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40">
-                            <IconHeart className="h-4 w-4" /> Donate
-                        </Link>
-                        <Link to="/request-camp" className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-500/30 hover:bg-primary-500 hover:shadow-xl hover:shadow-primary-500/40">
-                            <IconTent className="h-4 w-4" /> Request Camp
-                        </Link>
-                    </div>
                 </div>
 
                 {/* Top-level tabs */}
@@ -1021,7 +1008,7 @@ function RespondDashboard() {
                             <tab.icon className="h-4 w-4" />
                             {tab.label}
                             {tab.key !== 'command' && (
-                                <span className={`text-[10px] font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
+                                <span className={`text-xs font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
                             )}
                         </button>
                     ))}

@@ -53,25 +53,25 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
     if (recentDonations.length === 0) {
         return (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-6 text-center shadow-xl">
-                <p className="text-slate-400">No donations yet. Be the first to contribute!</p>
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-6 text-center">
+                <p className="text-slate-400 text-sm">No donations yet. Be the first to contribute!</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3">
             {/* New Donation Toast */}
             {newDonation && (
-                <div className="rounded-lg border border-success-400/30 bg-success-500 text-white p-4 shadow-xl shadow-success-500/30">
+                <div className="rounded-lg border border-success-500/30 bg-success-500/10 p-3">
                     <div className="flex items-center gap-3">
-                        <span className="text-3xl">🎉</span>
+                        <span className="text-xl">🎉</span>
                         <div className="flex-1">
-                            <p className="font-bold">
-                                {formatDonorName(newDonation)} {newDonation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(newDonation.amount).toFixed(2)}!
+                            <p className="text-sm font-semibold text-success-200">
+                                {formatDonorName(newDonation)} donated {newDonation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(newDonation.amount).toFixed(2)}
                             </p>
-                            <p className="text-sm text-success-50">
-                                Thank you for your generosity! 🙏
+                            <p className="text-xs text-success-300/80">
+                                Thank you for the generosity
                             </p>
                         </div>
                     </div>
@@ -79,51 +79,48 @@ function RecentDonations({ limit = 10, showTicker = true }) {
             )}
 
             {/* Recent Donations List */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden shadow-xl">
-                <div className="bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 backdrop-blur-md p-4 border-b border-white/10">
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                        <IconHeart className="h-5 w-5" /> Recent Donations
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] overflow-hidden">
+                <div className="bg-white/[0.03] p-3 border-b border-white/10">
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        <IconHeart className="h-4 w-4 text-slate-400" /> Recent Donations
                     </h3>
-                    <p className="text-slate-300 text-sm">Live updates from our generous donors</p>
+                    <p className="text-slate-500 text-xs">Live updates from our donors</p>
                 </div>
 
-                <div className="divide-y divide-white/10 max-h-96 overflow-y-auto">
+                <div className="divide-y divide-white/10 max-h-72 overflow-y-auto">
                     {recentDonations.map((donation) => (
-                        <div key={donation.id} className="p-4">
+                        <div key={donation.id} className="p-3">
                             <div className="flex items-start justify-between gap-4">
                                 {/* Left: Donor Info */}
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-lg">
-                                            {donation.is_anonymous ? '🙏' : '👤'}
-                                        </span>
-                                        <span className="font-semibold text-white">
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                        <span className="text-sm font-semibold text-white truncate">
                                             {formatDonorName(donation)}
                                         </span>
                                     </div>
 
-                                    <p className="text-sm text-slate-400 mb-1">
+                                    <p className="text-xs text-slate-400 mb-1">
                                         {donation.donation_purpose || 'General Relief'}
                                     </p>
 
                                     {donation.message && !donation.is_anonymous && (
-                                        <p className="text-sm text-slate-400 italic mt-2 border-l-2 border-white/10 pl-3">
+                                        <p className="text-xs text-slate-400 italic mt-1.5 border-l-2 border-white/10 pl-2.5">
                                             "{donation.message?.substring(0, 100) || ''}
                                             {donation.message.length > 100 ? '...' : ''}"
                                         </p>
                                     )}
 
-                                    <p className="text-xs text-slate-500 mt-2">
+                                    <p className="text-[11px] text-slate-500 mt-1.5">
                                         {formatTimeAgo(donation.created_at)}
                                     </p>
                                 </div>
 
                                 {/* Right: Amount */}
-                                <div className="text-right">
-                                    <div className="text-2xl font-bold text-success-400">
+                                <div className="text-right flex-shrink-0">
+                                    <div className="text-sm font-bold text-slate-200">
                                         {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toFixed(2)}
                                     </div>
-                                    <div className="text-xs text-slate-500 uppercase">
+                                    <div className="text-[10px] text-slate-500 uppercase">
                                         {donation.currency || 'USD'}
                                     </div>
                                 </div>
@@ -134,8 +131,8 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
                 {/* View All Link */}
                 {donations.filter(d => d.stripe_payment_status === 'succeeded').length > limit && (
-                    <div className="bg-white/5 border-t border-white/10 p-3 text-center">
-                        <button className="text-primary-300 hover:text-primary-200 text-sm font-semibold">
+                    <div className="bg-white/[0.02] border-t border-white/10 p-2.5 text-center">
+                        <button className="text-primary-300 hover:text-primary-200 text-xs font-semibold">
                             View All {donations.filter(d => d.stripe_payment_status === 'succeeded').length} Donations →
                         </button>
                     </div>

@@ -62,15 +62,15 @@ function RoleSelection() {
                 </button>
                 <button
                     onClick={() => navigate('/admin/login')}
-                    className="group flex items-center gap-1.5 rounded-full border border-white bg-white px-3 py-1.5 text-xs font-bold text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:bg-danger-600 hover:text-white hover:shadow-[0_6px_24px_rgba(220,38,38,0.5)]"
+                    className="group flex items-center gap-1.5 rounded-full border border-white bg-white px-3 py-1.5 text-xs font-bold text-slate-900 hover:bg-danger-600 hover:text-white"
                 >
                     <IconShieldLock className="h-4 w-4" />
                     <span>Admin Portal</span>
                 </button>
             </div>
 
-            <div className="relative z-10 flex h-full w-full flex-col overflow-y-auto px-6 py-4 sm:px-10 lg:pl-44 lg:pr-0 xl:pl-60">
-                <div className="m-auto max-w-6xl py-2">
+            <div className="relative z-10 flex h-full w-full flex-col justify-center overflow-y-auto px-6 py-4 sm:px-10 lg:px-16 xl:px-24">
+                <div className="max-w-6xl py-2">
                     <div
                         className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold tracking-wide text-primary-100 backdrop-blur-md"
                     >
@@ -115,7 +115,7 @@ function RoleSelection() {
 
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500 text-white shadow-lg shadow-danger-500/40">
+                                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-danger-500/15 text-danger-400">
                                         <IconMegaphone className="h-6 w-6" />
                                     </div>
                                     <div>
@@ -142,9 +142,8 @@ function RoleSelection() {
                                 ))}
                             </div>
 
-                            <button className="group/btn relative mt-4 w-full overflow-hidden rounded-lg bg-gradient-to-r from-danger-600 to-danger-500 py-2.5 text-base font-bold text-white shadow-lg shadow-danger-500/30 group-hover:shadow-danger-500/50">
-                                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent"></span>
-                                <span className="relative inline-flex items-center gap-2">
+                            <button className="mt-4 w-full rounded-lg bg-danger-600 py-2.5 text-base font-bold text-white group-hover:bg-danger-500">
+                                <span className="inline-flex items-center gap-2">
                                     Report Emergency
                                     <IconArrowRight className="h-5 w-5 group-hover/btn:translate-x-1" />
                                 </span>
@@ -160,7 +159,7 @@ function RoleSelection() {
 
                             <div className="flex items-start justify-between gap-2">
                                 <div className="flex items-start gap-3">
-                                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-success-500 text-white shadow-lg shadow-success-500/40">
+                                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-success-500/15 text-success-400">
                                         <IconLifeBuoy className="h-6 w-6" />
                                     </div>
                                     <div>
@@ -187,9 +186,8 @@ function RoleSelection() {
                                 ))}
                             </div>
 
-                            <button className="group/btn relative mt-4 w-full overflow-hidden rounded-lg bg-gradient-to-r from-success-600 to-success-500 py-2.5 text-base font-bold text-white shadow-lg shadow-success-500/30 group-hover:shadow-success-500/50">
-                                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent"></span>
-                                <span className="relative inline-flex items-center gap-2">
+                            <button className="mt-4 w-full rounded-lg bg-success-600 py-2.5 text-base font-bold text-white group-hover:bg-success-500">
+                                <span className="inline-flex items-center gap-2">
                                     I Want to Help
                                     <IconArrowRight className="h-5 w-5 group-hover/btn:translate-x-1" />
                                 </span>
@@ -199,11 +197,10 @@ function RoleSelection() {
 
                     {/* Hotline bar */}
                     <div
-                        className="mt-3 flex items-center gap-3 rounded-2xl border border-white/20 bg-slate-950/60 px-4 py-2 shadow-xl backdrop-blur-md"
+                        className="mt-3 flex items-center gap-3 rounded-2xl border border-white/15 bg-slate-950/60 px-4 py-2 backdrop-blur-md"
                     >
-                        <span className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/25">
-                            <span className="absolute inline-flex h-full w-full rounded-full bg-danger-400/40"></span>
-                            <IconPhone className="relative h-4 w-4 text-danger-300" />
+                        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-danger-500/15">
+                            <IconPhone className="h-4 w-4 text-danger-400" />
                         </span>
                         <div>
                             <p className="text-[10px] font-semibold uppercase tracking-wide text-primary-100">Emergency Hotline</p>

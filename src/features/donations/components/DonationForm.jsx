@@ -150,47 +150,47 @@ function DonationForm({ onSuccess }) {
 
     const renderStep1 = () => (
         <div>
-            <h3 className="text-xl font-bold text-white mb-4">Choose Your Impact</h3>
+            <h3 className="text-base font-bold text-white mb-3">Choose Your Impact</h3>
 
             {/* Preset Amounts */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-3 gap-2 mb-3">
                 {PRESET_AMOUNTS.map((amount) => (
                     <button
                         key={amount}
                         type="button"
                         onClick={() => handleAmountSelect(amount)}
-                        className={`p-4 rounded-lg border ${selectedAmount === amount && !customAmount
-                            ? 'bg-success-600 text-white border-success-500 shadow-md shadow-success-500/30 scale-105'
+                        className={`py-2.5 rounded-lg border text-sm font-semibold ${selectedAmount === amount && !customAmount
+                            ? 'bg-primary-600 text-white border-primary-500'
                             : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                             }`}
                     >
-                        <div className="text-2xl font-bold">{getCurrencySymbol()}{amount}</div>
+                        {getCurrencySymbol()}{amount}
                     </button>
                 ))}
             </div>
 
             {/* Custom Amount */}
-            <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div className="mb-3">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
                     Or enter custom amount
                 </label>
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">{getCurrencySymbol()}</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">{getCurrencySymbol()}</span>
                     <input
                         type="text"
                         value={customAmount}
                         onChange={handleCustomAmountChange}
                         placeholder="0.00"
-                        className="input-field pl-8 text-lg"
+                        className="input-field pl-8"
                     />
                 </div>
             </div>
 
             {/* Impact Preview */}
             {getFinalAmount() >= 25 && (
-                <div className="rounded-lg border border-success-400/20 bg-success-500/10 p-4 mb-6">
-                    <h4 className="font-semibold text-success-200 mb-2">Your Impact:</h4>
-                    <ul className="text-sm text-success-300 space-y-1">
+                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
+                    <h4 className="text-xs font-semibold text-slate-300 mb-1.5">Your Impact:</h4>
+                    <ul className="text-xs text-slate-400 space-y-1">
                         {getFinalAmount() >= 25 && <li>✓ Emergency supplies for 1 family</li>}
                         {getFinalAmount() >= 50 && <li>✓ Food for a family for 1 week</li>}
                         {getFinalAmount() >= 100 && <li>✓ Temporary shelter setup</li>}
@@ -204,7 +204,7 @@ function DonationForm({ onSuccess }) {
                 type="button"
                 onClick={() => setStep(2)}
                 disabled={!getFinalAmount() || getFinalAmount() < 1}
-                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg"
+                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm"
             >
                 Continue to Your Information
             </button>
@@ -213,10 +213,10 @@ function DonationForm({ onSuccess }) {
 
     const renderStep2 = () => (
         <div>
-            <h3 className="text-xl font-bold text-white mb-4">Your Information</h3>
+            <h3 className="text-base font-bold text-white mb-3">Your Information</h3>
 
             {/* Anonymous Checkbox */}
-            <div className="mb-4">
+            <div className="mb-3">
                 <label className="flex items-center gap-2 cursor-pointer">
                     <input
                         type="checkbox"
@@ -229,8 +229,8 @@ function DonationForm({ onSuccess }) {
 
             {/* Name */}
             {!isAnonymous && (
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                <div className="mb-3">
+                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">
                         Full Name *
                     </label>
                     <input
@@ -243,14 +243,14 @@ function DonationForm({ onSuccess }) {
                         placeholder="John Doe"
                     />
                     {errors.donor_name && (
-                        <p className="text-danger-400 text-sm mt-1">{errors.donor_name.message}</p>
+                        <p className="text-danger-400 text-xs mt-1">{errors.donor_name.message}</p>
                     )}
                 </div>
             )}
 
             {/* Email */}
-            <div className="mb-4">
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div className="mb-3">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
                     Email Address *
                 </label>
                 <input
@@ -266,13 +266,13 @@ function DonationForm({ onSuccess }) {
                     placeholder="john@example.com"
                 />
                 {errors.donor_email && (
-                    <p className="text-danger-400 text-sm mt-1">{errors.donor_email.message}</p>
+                    <p className="text-danger-400 text-xs mt-1">{errors.donor_email.message}</p>
                 )}
             </div>
 
             {/* Phone */}
-            <div className="mb-4">
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div className="mb-3">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
                     Phone Number (Optional)
                 </label>
                 <input
@@ -284,13 +284,13 @@ function DonationForm({ onSuccess }) {
             </div>
 
             {/* Message */}
-            <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div className="mb-4">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
                     Message (Optional)
                 </label>
                 <textarea
                     {...register('message')}
-                    rows={3}
+                    rows={2}
                     className="input-field resize-none"
                     placeholder="Leave a message of hope..."
                 />
@@ -300,14 +300,14 @@ function DonationForm({ onSuccess }) {
                 <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 font-semibold py-3 rounded-lg"
+                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 font-semibold py-2.5 rounded-lg text-sm"
                 >
                     Back
                 </button>
                 <button
                     type="button"
                     onClick={() => setStep(3)}
-                    className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-3 rounded-lg"
+                    className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-2.5 rounded-lg text-sm"
                 >
                     Continue to Payment
                 </button>
@@ -317,32 +317,32 @@ function DonationForm({ onSuccess }) {
 
     const renderStep3 = () => (
         <div>
-            <h3 className="text-xl font-bold text-white mb-4">Payment Details</h3>
+            <h3 className="text-base font-bold text-white mb-3">Payment Details</h3>
 
             {/* Amount Summary */}
-            <div className="rounded-lg border border-primary-400/20 bg-primary-500/10 p-4 mb-6">
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
                 <div className="flex justify-between items-center">
-                    <span className="text-slate-300 font-medium">Donation Amount:</span>
-                    <span className="text-2xl font-bold text-primary-300">
+                    <span className="text-sm text-slate-300 font-medium">Donation Amount:</span>
+                    <span className="text-lg font-bold text-white">
                         {getCurrencySymbol()}{getFinalAmount().toLocaleString()}
                     </span>
                 </div>
-                <div className="text-xs text-slate-400 mt-1 text-right">
+                <div className="text-xs text-slate-500 mt-1 text-right">
                     Currency: {selectedCurrency}
                 </div>
             </div>
 
             {/* Stripe Card Element */}
-            <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div className="mb-3">
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
                     Card Information *
                 </label>
-                <div className="p-4 rounded-lg border border-white/15 bg-white/5 focus-within:border-primary-400/50">
+                <div className="p-3 rounded-lg border border-white/15 bg-white/5 focus-within:border-primary-400/50">
                     <CardElement
                         options={{
                             style: {
                                 base: {
-                                    fontSize: '16px',
+                                    fontSize: '15px',
                                     color: '#e2e8f0',
                                     '::placeholder': {
                                         color: '#64748b',
@@ -359,22 +359,17 @@ function DonationForm({ onSuccess }) {
 
             {/* Error Display */}
             {paymentError && (
-                <div className="mb-4 p-3 rounded-lg border border-danger-400/20 bg-danger-500/10">
+                <div className="mb-3 p-2.5 rounded-lg border border-danger-400/20 bg-danger-500/10">
                     <p className="text-danger-300 text-sm">{paymentError}</p>
                 </div>
             )}
 
             {/* Security Info */}
-            <div className="mb-6 p-3 rounded-lg border border-success-400/20 bg-success-500/10">
-                <div className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-success-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                    <div>
-                        <p className="text-sm font-semibold text-success-200">Secure Payment</p>
-                        <p className="text-xs text-success-300">Your payment is encrypted and processed securely by Stripe</p>
-                    </div>
-                </div>
+            <div className="mb-4 flex items-center gap-2 text-xs text-slate-500">
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                <span>Payments are encrypted and processed securely by Stripe</span>
             </div>
 
             <div className="flex gap-3">
@@ -382,27 +377,25 @@ function DonationForm({ onSuccess }) {
                     type="button"
                     onClick={() => setStep(2)}
                     disabled={isProcessing}
-                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed font-semibold py-3 rounded-lg"
+                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed font-semibold py-2.5 rounded-lg text-sm"
                 >
                     Back
                 </button>
                 <button
                     type="submit"
                     disabled={isProcessing || !stripe}
-                    className="flex-1 bg-gradient-to-r from-success-600 to-success-500 hover:shadow-lg hover:shadow-success-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                    className="flex-1 bg-success-600 hover:bg-success-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <>
-                            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                             </svg>
                             Processing...
                         </>
                     ) : (
-                        <>
-                            🎁 Donate {getCurrencySymbol()}{getFinalAmount().toLocaleString()}
-                        </>
+                        <>Donate {getCurrencySymbol()}{getFinalAmount().toLocaleString()}</>
                     )}
                 </button>
             </div>
@@ -410,17 +403,17 @@ function DonationForm({ onSuccess }) {
     );
 
     return (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-6 md:p-8">
+        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4 md:p-5">
             {/* Progress Steps */}
-            <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center justify-center mb-4">
                 {[1, 2, 3].map((s) => (
                     <React.Fragment key={s}>
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${step >= s ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/10 text-slate-400'
+                        <div className={`flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${step >= s ? 'bg-primary-600 text-white' : 'bg-white/10 text-slate-400'
                             }`}>
                             {s}
                         </div>
                         {s < 3 && (
-                            <div className={`w-16 h-1 ${step > s ? 'bg-primary-500' : 'bg-white/10'}`} />
+                            <div className={`w-12 h-0.5 ${step > s ? 'bg-primary-600' : 'bg-white/10'}`} />
                         )}
                     </React.Fragment>
                 ))}
