@@ -228,7 +228,7 @@ function DonationForm({ onSuccess }) {
             <button
                 type="submit"
                 disabled={!getFinalAmount() || getFinalAmount() < 1}
-                className="w-full bg-primary-600 hover:bg-primary-500 disabled:bg-white/10 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm"
+                className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:bg-white/10 disabled:text-slate-400 disabled:cursor-not-allowed text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-semibold py-3 rounded-lg transition-colors duration-200"
             >
                 Continue to Your Information
             </button>
@@ -338,8 +338,9 @@ function DonationForm({ onSuccess }) {
                     Back
                 </button>
                 <button
-                    type="submit"
-                    className="flex-1 bg-primary-600 hover:bg-primary-500 text-white font-semibold py-2.5 rounded-lg text-sm"
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-semibold py-3 rounded-lg transition-colors duration-200"
                 >
                     Continue to Payment
                 </button>
@@ -416,7 +417,7 @@ function DonationForm({ onSuccess }) {
                 <button
                     type="submit"
                     disabled={isProcessing || !stripe}
-                    className="flex-1 bg-success-600 hover:bg-success-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg text-sm transition-colors duration-150 flex items-center justify-center gap-2"
+                    className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-semibold py-3 rounded-lg transition-colors duration-150 flex items-center justify-center gap-2"
                 >
                     {isProcessing ? (
                         <>

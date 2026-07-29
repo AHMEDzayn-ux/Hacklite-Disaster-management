@@ -375,10 +375,10 @@ function AdminReviewRequests() {
                 {/* Rejection Modal */}
                 {rejectModal.isOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full shadow-2xl">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Reject Camp Request</h3>
+                        <div className="bg-slate-900 border border-white/10 rounded-xl p-6 max-w-md w-full">
+                            <h3 className="text-lg font-bold text-white mb-2">Reject Camp Request</h3>
                             <p className="text-sm text-slate-300 mb-4">
-                                Please provide a reason for rejecting "<strong className="text-slate-900 dark:text-white">{rejectModal.request?.camp_name}</strong>"
+                                Please provide a reason for rejecting "<strong className="text-white">{rejectModal.request?.camp_name}</strong>"
                             </p>
                             <textarea
                                 value={rejectionReason}
@@ -393,7 +393,7 @@ function AdminReviewRequests() {
                                         setRejectModal({ isOpen: false, request: null });
                                         setRejectionReason('');
                                     }}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>

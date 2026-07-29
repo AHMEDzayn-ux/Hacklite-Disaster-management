@@ -204,7 +204,7 @@ function AdminCommandDashboard() {
                     <button
                         onClick={runFullPipeline}
                         disabled={running}
-                        className="group px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 disabled:from-slate-600 disabled:to-slate-600 disabled:cursor-not-allowed disabled:shadow-none disabled: rounded-lg text-sm font-semibold text-white flex items-center gap-2 shadow-md shadow-primary-500/25"
+                        className="group px-4 py-2 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white hover:-translate-y-0.5 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:hover:translate-y-0 rounded-lg text-sm font-semibold text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 flex items-center gap-2 transition-all duration-150"
                     >
                         {running ? (
                             <>
@@ -345,7 +345,7 @@ function AdminCommandDashboard() {
                                         <p className="text-slate-500 italic mt-1">{plan.solver_metadata.recommendation_text}</p>
                                     )}
                                     <div className="flex gap-2 mt-2">
-                                        <button onClick={() => setReviewPlan(plan)} className="flex-1 bg-primary-600 hover:bg-primary-500 hover:shadow-md hover:shadow-primary-500/30 text-white rounded-lg py-1.5 font-semibold">Review & Decide</button>
+                                        <button onClick={() => setReviewPlan(plan)} className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary-500/30 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 rounded-lg py-1.5 font-semibold transition-all duration-200">Review & Decide</button>
                                     </div>
                                 </div>
                             ))}
@@ -374,7 +374,7 @@ function AdminCommandDashboard() {
                                         {plan.status === 'delivered' && plan.received_by_name && (
                                             <p className="text-success-400 mt-1">✓ Received by {plan.received_by_name}</p>
                                         )}
-                                        <button onClick={() => setShipmentPlan(plan)} className="w-full mt-2 bg-primary-600 hover:bg-primary-500 hover:shadow-md hover:shadow-primary-500/30 text-white rounded-lg py-1.5 font-semibold">
+                                        <button onClick={() => setShipmentPlan(plan)} className="w-full mt-2 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary-500/30 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 rounded-lg py-1.5 font-semibold transition-all duration-200">
                                             {plan.status === 'approved' ? 'Mark as Dispatched' : 'Confirm Delivery'}
                                         </button>
                                     </div>
