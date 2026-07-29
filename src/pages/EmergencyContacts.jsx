@@ -52,10 +52,10 @@ function EmergencyContacts() {
         <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-8 font-sans sm:px-8 lg:px-12">
             <div className="mx-auto max-w-[1600px]">
                 <div className="mb-8 flex items-center gap-4">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-success-500 text-white">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconPhone className="h-7 w-7" />
                     </div>
-                    <h1 className="text-xl font-bold tracking-tight text-success-400 md:text-2xl">Emergency Contacts</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-primary-400 md:text-2xl">Emergency Contacts</h1>
                 </div>
 
                 {/* National Hotlines */}

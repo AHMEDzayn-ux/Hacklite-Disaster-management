@@ -133,7 +133,7 @@ function MissingPersonForm() {
                     {/* Photo Upload - Most Important */}
                     <div>
                         <h3 className="flex items-center gap-2 text-lg font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">
-                            <IconCamera className="h-5 w-5 text-fuchsia-400" />
+                            <IconCamera className="h-5 w-5 text-primary-400" />
                             Photo (Primary Identification)
                         </h3>
 

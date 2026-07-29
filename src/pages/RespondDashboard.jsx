@@ -1015,7 +1015,7 @@ function RespondDashboard() {
                         <Link to="/volunteers" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-success-500">
                             <IconUsers className="h-3.5 w-3.5" /> Volunteer
                         </Link>
-                        <Link to="/donations" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-fuchsia-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-fuchsia-500">
+                        <Link to="/donations" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-success-500">
                             <IconHeart className="h-3.5 w-3.5" /> Donate
                         </Link>
                         <Link to="/request-camp" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold transition-colors duration-150 hover:bg-primary-500">

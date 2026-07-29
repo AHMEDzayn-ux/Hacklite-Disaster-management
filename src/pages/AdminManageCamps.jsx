@@ -162,7 +162,7 @@ function AdminManageCamps() {
                         ← Dashboard
                     </Link>
                     {adminStatus.role === 'super_admin' && (
-                        <span className="px-3 py-1 rounded-full bg-fuchsia-500/15 text-fuchsia-300 text-xs font-semibold">
+                        <span className="px-3 py-1 rounded-full bg-slate-500/15 text-slate-300 text-xs font-semibold">
                             Super Admin
                         </span>
                     )}
@@ -170,11 +170,11 @@ function AdminManageCamps() {
 
                 {/* Header */}
                 <div className="mb-8 flex items-center gap-5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconTent className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-amber-400 md:text-2xl">Manage Camps</h1>
+                        <h1 className="text-xl font-bold text-primary-400 md:text-2xl">Manage Camps</h1>
                         <p className="mt-1 text-slate-300">View and manage all relief camps</p>
                     </div>
                 </div>

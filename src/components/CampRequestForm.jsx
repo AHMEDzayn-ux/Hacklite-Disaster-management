@@ -193,11 +193,11 @@ function CampRequestForm() {
                         ← Back
                     </button>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                             <IconTent className="h-6 w-6" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-amber-400">Request a New Relief Camp</h1>
+                            <h1 className="text-2xl font-bold text-primary-400">Request a New Relief Camp</h1>
                             <p className="text-slate-400 mt-1">
                                 Submit a request for a new relief camp. Your request will be reviewed by authorities.
                             </p>

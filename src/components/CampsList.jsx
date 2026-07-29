@@ -174,11 +174,11 @@ function CampsList({ role = 'responder' }) {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         {/* Title & Stats */}
                         <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                                 <IconTent className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-amber-400">Relief Camps</h1>
+                                <h1 className="text-xl font-bold text-primary-400">Relief Camps</h1>
                                 <div className="hidden sm:flex items-center gap-3 text-sm mt-1">
                                     <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
                                         {activeCount} Active
@@ -299,7 +299,7 @@ function CampsList({ role = 'responder' }) {
 
                 {camps.length === 0 ? (
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-10 text-center">
-                        <div className="mb-3 flex justify-center text-amber-300">
+                        <div className="mb-3 flex justify-center text-slate-500">
                             <IconTent className="h-12 w-12" />
                         </div>
                         <h2 className="text-xl font-bold text-white mb-1">No Relief Camps Available</h2>

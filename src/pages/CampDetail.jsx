@@ -145,7 +145,7 @@ function CampDetail() {
                                 {camp.status || 'Unknown'}
                             </span>
                             {camp.source && (
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${camp.source === 'public_request' ? 'bg-primary-500/15 text-primary-300' : 'bg-purple-500/15 text-purple-300'
+                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${camp.source === 'public_request' ? 'bg-primary-500/15 text-primary-300' : 'bg-slate-500/15 text-slate-300'
                                     }`}>
                                     {camp.source === 'public_request' ? '📋 From Request' : '👤 Admin Registered'}
                                 </span>

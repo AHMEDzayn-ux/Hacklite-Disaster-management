@@ -15,11 +15,11 @@ function MissingPersons() {
 
             <div className="relative z-10 mx-auto max-w-3xl px-6 py-8 sm:px-8 sm:py-10">
                 <div className="mb-6 flex flex-col items-center gap-3 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-fuchsia-500 text-white">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconUserSearch className="h-7 w-7" />
                     </div>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-fuchsia-400">Missing Persons</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-primary-400">Missing Persons</h1>
                         <p className="mt-2 text-lg text-slate-300">
                             Report missing persons to help locate them during disasters
                         </p>

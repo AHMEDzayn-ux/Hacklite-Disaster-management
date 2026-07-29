@@ -44,7 +44,7 @@ function Navbar({ userType = 'reporter' }) {
 
     return (
         <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/95 shadow-md shadow-black/20">
-            <div className={`h-1 bg-gradient-to-r ${isReporter ? 'from-danger-500 via-orange-400 to-danger-600' : 'from-success-500 via-primary-400 to-success-600'}`}></div>
+            <div className={`h-1 bg-gradient-to-r ${isReporter ? 'from-danger-600 to-danger-400' : 'from-success-600 to-success-400'}`}></div>
 
             <div className="w-full px-4 sm:px-6 lg:px-10">
                 <div className="flex h-16 items-center">

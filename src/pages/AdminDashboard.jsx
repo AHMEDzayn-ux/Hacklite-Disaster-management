@@ -5,40 +5,16 @@ import { IconShieldLock, IconSiren, IconTent } from '../components/icons/Icons';
 
 const COLOR_STYLES = {
     danger: {
-        bar: 'from-danger-500 to-orange-400',
+        bar: 'from-danger-600 to-danger-400',
         badge: 'bg-danger-500/15 text-danger-300',
         text: 'group-hover:text-danger-400',
         cta: 'text-danger-400',
     },
     primary: {
-        bar: 'from-primary-500 to-blue-400',
+        bar: 'from-primary-600 to-primary-400',
         badge: 'bg-primary-500/15 text-primary-300',
         text: 'group-hover:text-primary-300',
         cta: 'text-primary-300',
-    },
-    amber: {
-        bar: 'from-amber-500 to-orange-400',
-        badge: 'bg-amber-500/15 text-amber-300',
-        text: 'group-hover:text-amber-400',
-        cta: 'text-amber-400',
-    },
-    success: {
-        bar: 'from-success-500 to-primary-400',
-        badge: 'bg-success-500/15 text-success-300',
-        text: 'group-hover:text-success-400',
-        cta: 'text-success-400',
-    },
-    purple: {
-        bar: 'from-purple-500 to-fuchsia-400',
-        badge: 'bg-purple-500/15 text-purple-300',
-        text: 'group-hover:text-purple-300',
-        cta: 'text-purple-300',
-    },
-    rose: {
-        bar: 'from-rose-500 to-danger-400',
-        badge: 'bg-rose-500/15 text-rose-300',
-        text: 'group-hover:text-rose-300',
-        cta: 'text-rose-300',
     },
 };
 
@@ -64,7 +40,7 @@ const ACTION_CARDS = [
         to: '/admin/review-requests',
         icon: null,
         emoji: '📋',
-        color: 'amber',
+        color: 'primary',
         title: 'Review Requests',
         desc: 'Approve or reject public camp requests',
         cta: 'View Pending',
@@ -72,7 +48,7 @@ const ACTION_CARDS = [
     {
         to: '/admin/register-camp',
         icon: IconTent,
-        color: 'success',
+        color: 'primary',
         title: 'Register Camp',
         desc: 'Directly register a new relief camp',
         cta: 'Add New',
@@ -81,7 +57,7 @@ const ACTION_CARDS = [
         to: '/admin/manage-camps',
         icon: null,
         emoji: '🔧',
-        color: 'purple',
+        color: 'primary',
         title: 'Manage Camps',
         desc: 'View and edit existing relief camps',
         cta: 'Open Manager',
@@ -90,7 +66,7 @@ const ACTION_CARDS = [
         to: '/admin/records',
         icon: null,
         emoji: '📊',
-        color: 'rose',
+        color: 'primary',
         title: 'All Records',
         desc: 'View and delete any system records',
         cta: 'Manage Records',

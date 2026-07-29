@@ -23,7 +23,7 @@ const REPORT_OPTIONS = [
     {
         to: '/missing-persons',
         icon: IconUserSearch,
-        color: 'fuchsia',
+        color: 'primary',
         title: 'Report Missing Person',
         desc: 'Report someone missing during disaster',
         cta: 'Report Now',
@@ -39,7 +39,7 @@ const REPORT_OPTIONS = [
     {
         to: '/emergency',
         icon: IconPhone,
-        color: 'success',
+        color: 'primary',
         title: 'Emergency Contacts',
         desc: 'Quick access to helplines',
         cta: 'View Contacts',
@@ -47,7 +47,7 @@ const REPORT_OPTIONS = [
     {
         to: '/request-camp',
         icon: IconTent,
-        color: 'amber',
+        color: 'primary',
         title: 'Request Relief Camp',
         desc: 'Request a new relief camp in your area',
         cta: 'Request Now',
@@ -56,34 +56,16 @@ const REPORT_OPTIONS = [
 
 const COLOR_STYLES = {
     danger: {
-        bar: 'from-danger-500 to-orange-400',
+        bar: 'from-danger-600 to-danger-400',
         badge: 'bg-danger-500',
         text: 'group-hover:text-danger-400',
         cta: 'text-danger-400',
     },
-    fuchsia: {
-        bar: 'from-fuchsia-500 to-purple-400',
-        badge: 'bg-fuchsia-500',
-        text: 'group-hover:text-fuchsia-400',
-        cta: 'text-fuchsia-400',
-    },
     primary: {
-        bar: 'from-primary-500 to-blue-400',
+        bar: 'from-primary-600 to-primary-400',
         badge: 'bg-primary-500',
         text: 'group-hover:text-primary-300',
         cta: 'text-primary-300',
-    },
-    success: {
-        bar: 'from-success-500 to-primary-400',
-        badge: 'bg-success-500',
-        text: 'group-hover:text-success-400',
-        cta: 'text-success-400',
-    },
-    amber: {
-        bar: 'from-amber-500 to-orange-400',
-        badge: 'bg-amber-500',
-        text: 'group-hover:text-amber-400',
-        cta: 'text-amber-400',
     },
 };
 

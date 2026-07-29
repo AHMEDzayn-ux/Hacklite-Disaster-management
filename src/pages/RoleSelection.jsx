@@ -70,7 +70,7 @@ function RoleSelection() {
                 </button>
                 <button
                     onClick={() => navigate('/admin/login')}
-                    className="flex items-center gap-2 rounded-full border border-white bg-white px-3 py-2 text-xs font-bold text-slate-900 shadow-sm transition-colors duration-150 hover:bg-danger-600 hover:text-white hover:border-danger-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-5 sm:py-2.5 sm:text-sm"
+                    className="flex items-center gap-2 rounded-full border border-white bg-white px-3 py-2 text-xs font-bold text-slate-900 shadow-sm transition-colors duration-150 hover:bg-primary-600 hover:text-white hover:border-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-5 sm:py-2.5 sm:text-sm"
                 >
                     <IconShieldLock className="h-4 w-4" />
                     <span className="hidden sm:inline">Admin Portal</span>
@@ -96,7 +96,7 @@ function RoleSelection() {
                             <IconSiren className="h-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] w-[clamp(1.75rem,1.3rem+1.1vw,2.5rem)] flex-shrink-0 text-danger-400" />
                             Disaster
                         </span>
-                        <span className="block bg-gradient-to-r from-danger-500 via-fuchsia-500 to-purple-500 bg-clip-text pb-1.5 text-transparent">
+                        <span className="block bg-gradient-to-r from-white to-slate-400 bg-clip-text pb-1.5 text-transparent">
                             Management System
                         </span>
                     </h1>
@@ -118,7 +118,7 @@ function RoleSelection() {
                         {/* Reporter/Victim Card */}
                         <div
                             onClick={() => navigate('/report')}
-                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-danger-400/40 hover:shadow-[0_12px_32px_-16px_rgba(239,68,68,0.45)] animate-fade-in-up"
+                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-danger-400/40 hover:shadow-[0_12px_32px_-16px_rgba(239,68,68,0.25)] animate-fade-in-up"
                             style={{ animationDelay: '0.2s' }}
                         >
                             <div className="flex items-start justify-between gap-3">
@@ -156,7 +156,7 @@ function RoleSelection() {
                         {/* Responder/Helper Card */}
                         <div
                             onClick={() => navigate('/respond')}
-                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-success-400/40 hover:shadow-[0_12px_32px_-16px_rgba(34,197,94,0.45)] animate-fade-in-up"
+                            className="group relative cursor-pointer rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-success-400/40 hover:shadow-[0_12px_32px_-16px_rgba(34,197,94,0.25)] animate-fade-in-up"
                             style={{ animationDelay: '0.25s' }}
                         >
                             <div className="flex items-start justify-between gap-3">

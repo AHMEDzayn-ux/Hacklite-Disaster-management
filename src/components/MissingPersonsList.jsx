@@ -177,11 +177,11 @@ function MissingPersonsList({ role = 'responder' }) {
             <div className="relative z-10 mx-auto max-w-[1600px] px-6 py-6 sm:px-10">
                 {/* Header */}
                 <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-fuchsia-500 text-white">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconUserSearch className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-fuchsia-400">Missing Persons</h1>
+                        <h1 className="text-xl font-bold text-primary-400">Missing Persons</h1>
                         <p className="mt-0.5 text-sm text-slate-400">Reported missing persons in Sri Lanka</p>
                     </div>
                 </div>

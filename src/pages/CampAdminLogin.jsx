@@ -77,10 +77,10 @@ function CampAdminLogin() {
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
                     {/* Header */}
                     <div className="text-center mb-6">
-                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300 ring-1 ring-inset ring-amber-400/20">
+                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/15 text-primary-300 ring-1 ring-inset ring-primary-400/20">
                             <IconTent className="h-6 w-6" />
                         </div>
-                        <h1 className="text-xl font-bold text-amber-300">Camp Admin Portal</h1>
+                        <h1 className="text-xl font-bold text-primary-300">Camp Admin Portal</h1>
                         <p className="text-slate-400 text-sm mt-1">Manage your camp's inventory</p>
                     </div>
 
@@ -118,7 +118,7 @@ function CampAdminLogin() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150 disabled:opacity-50"
+                            className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-150 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>

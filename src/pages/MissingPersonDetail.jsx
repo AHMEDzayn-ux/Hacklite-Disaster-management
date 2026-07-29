@@ -147,7 +147,7 @@ function MissingPersonDetail({ role: propRole }) {
                 {/* Header - Single Row */}
                 <div className="mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0 items-center justify-center rounded-xl bg-fuchsia-500/15 text-fuchsia-300">
+                        <div className="flex h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500/15 text-primary-300">
                             <IconUserSearch className="h-6 w-6 sm:h-7 sm:w-7" />
                         </div>
                         <div>

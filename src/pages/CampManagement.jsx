@@ -14,10 +14,10 @@ function CampManagement() {
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
                 <div className="mb-6 flex items-center gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconTent className="h-6 w-6" />
                     </div>
-                    <h1 className="text-xl md:text-2xl font-bold text-amber-400">Camp Management</h1>
+                    <h1 className="text-xl md:text-2xl font-bold text-primary-400">Camp Management</h1>
                 </div>
                 <div className="card">
                     <p className="text-slate-400">Relief camp management system - Coming soon</p>

@@ -15,7 +15,7 @@ function NotFound() {
 
             <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
                 <div className="max-w-2xl text-center">
-                    <h1 className="mb-4 text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-danger-500 via-fuchsia-500 to-purple-500 sm:text-9xl">
+                    <h1 className="mb-4 text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 sm:text-9xl">
                         404
                     </h1>
 
@@ -54,7 +54,7 @@ function NotFound() {
                                 to="/missing-persons"
                                 className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
                             >
-                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-fuchsia-500/20 text-fuchsia-300">
+                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
                                     <IconUserSearch className="h-5 w-5" />
                                 </span>
                                 <div>
@@ -78,7 +78,7 @@ function NotFound() {
                                 to="/camps"
                                 className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
                             >
-                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300">
+                                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500/20 text-primary-300">
                                     <IconTent className="h-5 w-5" />
                                 </span>
                                 <div>

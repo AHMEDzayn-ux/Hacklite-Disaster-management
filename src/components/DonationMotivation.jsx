@@ -93,7 +93,7 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
 
     return (
         <div
-            className="relative rounded-xl border border-amber-400/20 bg-gradient-to-r from-amber-500/10 to-danger-500/10 p-6"
+            className="relative rounded-xl border border-success-400/20 bg-success-500/[0.06] p-6"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
@@ -153,7 +153,7 @@ function DonationMotivation({ autoRotate = true, rotateInterval = 5000 }) {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                    ? 'w-8 bg-amber-400'
+                                    ? 'w-8 bg-success-400'
                                     : 'w-2 bg-white/20 hover:bg-white/30'
                                 }`}
                             aria-label={`Go to message ${index + 1}`}

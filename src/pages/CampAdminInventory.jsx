@@ -156,7 +156,7 @@ function CampAdminInventory() {
 
             <header className="relative z-10 sticky top-0 flex items-center justify-between border-b border-white/10 bg-slate-950/95 px-4 py-4 shadow-lg shadow-black/30">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white">
                         <IconTent className="h-5 w-5" />
                     </div>
                     <div>

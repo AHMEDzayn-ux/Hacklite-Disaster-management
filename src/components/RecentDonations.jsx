@@ -89,7 +89,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
             {/* Recent Donations List */}
             <div className="rounded-xl border border-white/10 bg-white/[0.05] overflow-hidden">
-                <div className="bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 p-4 border-b border-white/10">
+                <div className="bg-gradient-to-r from-success-700/80 to-success-900/80 p-4 border-b border-white/10">
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
                         <IconHeart className="h-5 w-5" /> Recent Donations
                     </h3>
@@ -159,7 +159,7 @@ function RecentDonations({ limit = 10, showTicker = true }) {
 
             {/* Ticker Mode (Optional) */}
             {showTicker && recentDonations.length > 3 && (
-                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 overflow-hidden">
+                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-success-700/80 to-success-900/80 overflow-hidden">
                     <div className="ticker-container py-3">
                         <div className="ticker-content flex gap-8 items-center">
                             {[...recentDonations, ...recentDonations].map((donation, index) => (
