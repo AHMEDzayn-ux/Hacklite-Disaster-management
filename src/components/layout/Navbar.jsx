@@ -13,8 +13,6 @@ import {
     IconTent,
     IconUsers,
     IconHeart,
-    IconMenu,
-    IconX,
     IconSun,
     IconMoon,
     IconBell,
@@ -41,7 +39,6 @@ const responderLinks = [
 ];
 
 function Navbar({ userType = 'reporter' }) {
-    const [isOpen, setIsOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const location = useLocation();
@@ -73,8 +70,8 @@ function Navbar({ userType = 'reporter' }) {
                         <span className="text-lg font-extrabold text-slate-900 dark:text-white sm:hidden">DM SL</span>
                     </Link>
 
-                    {/* Desktop nav links */}
-                    <div className="ml-auto hidden items-center gap-0.5 xl:flex">
+                    {/* Nav links */}
+                    <div className="ml-auto flex items-center gap-0.5 overflow-x-auto">
                         {navLinks.map((link) => {
                             const LinkIcon = link.icon;
                             const active = isActive(link.path);
@@ -187,75 +184,7 @@ function Navbar({ userType = 'reporter' }) {
                             </div>
                         </div>
                     </div>
-
-                    {/* Mobile menu button */}
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="ml-auto rounded-lg p-2 text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400 dark:text-white dark:hover:bg-white/10 xl:hidden"
-                        aria-label="Toggle menu"
-                    >
-                        {isOpen ? <IconX className="h-6 w-6" /> : <IconMenu className="h-6 w-6" />}
-                    </button>
                 </div>
-
-                {/* Mobile menu */}
-                {isOpen && (
-                    <div className="max-h-[70vh] space-y-1.5 overflow-y-auto border-t border-slate-200 py-4 dark:border-white/10 xl:hidden">
-                        {navLinks.map((link) => {
-                            const LinkIcon = link.icon;
-                            return (
-                                <Link
-                                    key={link.path}
-                                    to={link.path}
-                                    onClick={() => setIsOpen(false)}
-                                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold transition-colors ${isActive(link.path)
-                                        ? isReporter
-                                            ? 'bg-danger-50 text-danger-700 dark:bg-danger-500/15 dark:text-danger-300'
-                                            : 'bg-success-50 text-success-700 dark:bg-success-500/15 dark:text-success-300'
-                                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10'
-                                        }`}
-                                >
-                                    <LinkIcon className="h-5 w-5 flex-shrink-0" />
-                                    {link.label}
-                                </Link>
-                            );
-                        })}
-
-                        {/* Mobile Mode Switcher */}
-                        <Link
-                            to={isReporter ? '/respond' : '/report'}
-                            onClick={() => setIsOpen(false)}
-                            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold text-white ${isReporter ? 'bg-success-600 hover:bg-success-700' : 'bg-danger-600 hover:bg-danger-700'}`}
-                        >
-                            {isReporter ? <IconLifeBuoy className="h-5 w-5" /> : <IconMegaphone className="h-5 w-5" />}
-                            {isReporter ? 'Respond Mode' : 'Report Mode'}
-                        </Link>
-
-                        <div className="flex items-center justify-between border-t border-slate-200 px-4 pt-3 dark:border-white/10">
-                            <button
-                                type="button"
-                                onClick={toggleTheme}
-                                className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
-                            >
-                                {theme === 'dark' ? <IconSun className="h-4 w-4" /> : <IconMoon className="h-4 w-4" />}
-                                {theme === 'dark' ? 'Light theme' : 'Dark theme'}
-                            </button>
-                            {user ? (
-                                <button
-                                    type="button"
-                                    onClick={() => { setIsOpen(false); signOut(); }}
-                                    className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300"
-                                >
-                                    <IconLogOut className="h-4 w-4" /> Sign out
-                                </button>
-                            ) : (
-                                <Link to="/admin/login" onClick={() => setIsOpen(false)} className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                                    Admin sign in
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                )}
             </div>
         </nav>
     );

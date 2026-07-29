@@ -4,8 +4,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '@/lib/leafletIconFix';
-import HeatmapLayer from '@/components/map/HeatmapLayer';
-import MapFrame from '@/components/map/MapFrame';
 import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
 import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
 import { defaultMapConfig, sriLankaFitBounds, districtBounds, allDistricts } from '@/lib/mapConfig';
@@ -185,7 +183,7 @@ function Card({ title, icon: Icon, right, children, className = '' }) {
     return (
         <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 hover:border-white/20 ${className}`}>
             {(title || right) && (
-                <div className="flex items-center justify-between mb-3 gap-2">
+                <div className="flex items-center justify-between mb-3 gap-2 flex-shrink-0">
                     {title && (
                         <h3 className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white text-sm truncate min-w-0">
                             {Icon && <Icon className="h-4 w-4 text-primary-300 flex-shrink-0" />}
@@ -213,18 +211,17 @@ function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor =
             type="button"
             onClick={onClick}
             title={sub || undefined}
-            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full transition-colors duration-150 ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
+            className={`group flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-2.5 py-2 text-left w-full transition-colors duration-150 ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
         >
-            <div className="flex items-start justify-between gap-2">
-                <p className={`text-3xl font-extrabold leading-none ${accent}`}>{value}</p>
-                {Icon && (
-                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${ICON_BADGE[iconColor]}`}>
-                        <Icon className="h-5 w-5" />
-                    </span>
-                )}
+            {Icon && (
+                <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${ICON_BADGE[iconColor]}`}>
+                    <Icon className="h-3.5 w-3.5" />
+                </span>
+            )}
+            <div className="min-w-0 leading-tight">
+                <p className={`text-lg font-extrabold leading-none truncate ${accent}`}>{value}</p>
+                <p className="text-[11px] font-medium text-slate-400 mt-0.5 truncate">{label}</p>
             </div>
-            <p className="text-sm font-medium text-slate-400 mt-2 leading-tight">{label}</p>
-            {sub && <p className="text-xs text-slate-500 mt-0.5 leading-tight truncate">{sub}</p>}
         </button>
     );
 }
@@ -254,7 +251,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     const [range, setRange] = useState('7d');
     const [district, setDistrict] = useState('all');
     const [view, setView] = useState('overview');
-    const [layers, setLayers] = useState({ disaster: true, missing: true, animal: true, camp: true, heat: false });
+    const [layers, setLayers] = useState({ disaster: true, missing: true, animal: true, camp: true });
 
     const A = useMemo(
         () => computeAnalytics({ disasters, missingPersons, animalRescues, camps, range, district }),
@@ -263,52 +260,64 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[320px]">
+            <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-500 border-t-transparent" />
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
-            {/* Global filter bar */}
-            <div className="rounded-2xl border border-white/10 bg-white/95 dark:bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
-                <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
-                    {Object.keys(RANGE_CONF).map(r => (
-                        <button
-                            key={r}
-                            onClick={() => setRange(r)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
-                        </button>
-                    ))}
-                </div>
-                <select
-                    value={district}
-                    onChange={e => setDistrict(e.target.value)}
-                    className="text-xs bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
-                >
-                    <option value="all" className="bg-slate-900 text-white">All districts</option>
-                    {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
-                </select>
-                <div className="ml-auto flex rounded-xl bg-white/5 border border-white/10 p-0.5">
-                    {SUBVIEWS.map(s => (
-                        <button
-                            key={s.key}
-                            onClick={() => setView(s.key)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
-                        </button>
-                    ))}
-                </div>
+        <div className="flex flex-col lg:flex-row gap-4 h-full min-h-0 flex-1">
+            {/* Left: live incident map — Sri Lanka is tall/narrow, so this column is
+                sized from the map's own aspect ratio rather than a fixed half-width,
+                giving the space that would've been empty sea back to the right column. */}
+            <div className="h-[50vh] lg:h-full lg:aspect-[3/5] min-h-0 flex flex-col flex-shrink-0">
+                <MapPanel A={A} layers={layers} setLayers={setLayers} navigate={navigate} />
             </div>
 
-            {view === 'overview' && <OverviewView A={A} layers={layers} setLayers={setLayers} navigate={navigate} range={range} />}
-            {view === 'analytics' && <AnalyticsView A={A} />}
-            {view === 'categories' && <CategoriesView A={A} />}
-            {view === 'ai' && <AiView A={A} />}
+            {/* Right: filter bar + KPIs / analytics / categories / AI insights */}
+            <div className="flex-1 min-w-0 h-full min-h-0 flex flex-col gap-4">
+                {/* Global filter bar */}
+                <div className="rounded-2xl border border-white/10 bg-white/95 dark:bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 flex-shrink-0 z-20">
+                    <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
+                        {Object.keys(RANGE_CONF).map(r => (
+                            <button
+                                key={r}
+                                onClick={() => setRange(r)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                            >
+                                {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
+                            </button>
+                        ))}
+                    </div>
+                    <select
+                        value={district}
+                        onChange={e => setDistrict(e.target.value)}
+                        className="text-xs bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
+                    >
+                        <option value="all" className="bg-slate-900 text-white">All districts</option>
+                        {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
+                    </select>
+                    <div className="ml-auto flex rounded-xl bg-white/5 border border-white/10 p-0.5">
+                        {SUBVIEWS.map(s => (
+                            <button
+                                key={s.key}
+                                onClick={() => setView(s.key)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
+                            >
+                                <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex-1 min-h-0 overflow-y-auto">
+                    {view === 'overview' && <OverviewStats A={A} range={range} navigate={navigate} />}
+                    {view === 'analytics' && <AnalyticsView A={A} />}
+                    {view === 'categories' && <CategoriesView A={A} />}
+                    {view === 'ai' && <AiView A={A} />}
+                </div>
+            </div>
         </div>
     );
 }
@@ -319,20 +328,101 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 
 // Fits the map to Sri Lanka's coastline on mount using Leaflet's own
 // fitBounds() rather than a guessed center/zoom, so the island fills the
-// viewport regardless of the container's actual rendered size.
+// viewport regardless of the container's actual rendered size. minZoom is
+// locked to whatever zoom that fit produces, so users can't zoom out past
+// the island (maxBounds stays generous so it never fights the fit at load).
 function FitSriLanka() {
     const map = useMap();
     useEffect(() => {
-        map.fitBounds(sriLankaFitBounds, { padding: [4,4] });
+        const fit = () => {
+            map.invalidateSize();
+            map.fitBounds(sriLankaFitBounds, { padding: [4, 4] });
+            map.setMinZoom(map.getZoom());
+        };
+        fit();
+        // Window 'resize' only fires on actual browser resizes — our column width
+        // is driven by flex/aspect-ratio layout (header wraps, tab switches, etc.)
+        // which changes the container's real size without that event ever firing,
+        // leaving fitBounds() centered on a stale size. Watch the container itself.
+        const ro = new ResizeObserver(fit);
+        ro.observe(map.getContainer());
+        return () => ro.disconnect();
     }, [map]);
     return null;
 }
 
-function OverviewView({ A, layers, setLayers, navigate, range }) {
+function MapPanel({ A, layers, setLayers, navigate }) {
     return (
-        <div className="space-y-4">
+        <Card
+            icon={IconMap}
+            className="h-full flex flex-col"
+            right={
+                <div className="flex flex-1 gap-1">
+                    {['disaster', 'missing', 'animal', 'camp'].map(k => (
+                        <button
+                            key={k}
+                            onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
+                            className={`flex flex-1 items-center justify-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-md border transition-colors ${layers[k] ? 'border-white/20 bg-white/10 text-slate-900 dark:text-white' : 'border-white/10 text-slate-400 opacity-50 hover:opacity-100'}`}
+                        >
+                            <span className="text-xs leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
+                        </button>
+                    ))}
+                </div>
+            }
+        >
+            <div className="flex-1 min-h-0 h-full rounded-2xl border border-white/15 overflow-hidden shadow-xl">
+                <MapContainer
+                    center={defaultMapConfig.center}
+                    zoom={defaultMapConfig.zoom}
+                    minZoom={defaultMapConfig.minZoom}
+                    maxZoom={defaultMapConfig.maxZoom}
+                    maxBounds={defaultMapConfig.maxBounds}
+                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                    style={{ height: '100%', width: '100%' }}
+                    preferCanvas
+                >
+                    <FitSriLanka />
+                    <TileLayer
+                        attribution='&copy; OpenStreetMap'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {['disaster', 'missing', 'animal'].map(k => layers[k] && A.map.markers[k].map(m => (
+                        <Marker key={`${k}-${m.id}`} position={[m.lat, m.lng]} icon={KIND_META[k].marker}>
+                            <Popup>
+                                <div className="text-xs">
+                                    <p className="font-bold">{KIND_META[k].icon} {m.title}</p>
+                                    {m.severity && <p>Severity: <strong className="capitalize">{m.severity}</strong></p>}
+                                    {m.condition && <p>Condition: <strong className="capitalize">{m.condition}</strong></p>}
+                                    <p className="text-gray-500">{m.address || m.district || 'Location on map'}</p>
+                                    <p className="text-gray-500">Waiting: {timeAgo(m.created_at)} · {m.active ? 'Active' : 'Resolved'}</p>
+                                    {m.description && <p className="text-gray-600 mt-1 line-clamp-2">{m.description}</p>}
+                                    <button onClick={() => navigate(m.link)} className="mt-1 text-primary-600 font-semibold">Open report →</button>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    )))}
+                    {layers.camp && A.map.markers.camp.map(c => (
+                        <Marker key={`camp-${c.id}`} position={[c.lat, c.lng]} icon={c.full ? greyIcon : blueIcon}>
+                            <Popup>
+                                <div className="text-xs">
+                                    <p className="font-bold">⛺ {c.title}</p>
+                                    <p className="text-gray-500">{c.district}</p>
+                                    <p>Occupancy: <strong>{c.occ}/{c.cap}</strong> ({c.pct}%)</p>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    ))}
+                </MapContainer>
+            </div>
+        </Card>
+    );
+}
+
+function OverviewStats({ A, range, navigate }) {
+    return (
+        <div className="flex flex-col gap-4 h-full min-h-0">
             {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-shrink-0">
                 <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
                 <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
                 <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
@@ -341,143 +431,42 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-white" icon={IconClock} iconColor="slate" />
             </div>
 
-            {/* Live incident map */}
-            <Card
-                icon={IconMap}
-                title="Live Incident Map"
-                right={
-                    <div className="flex flex-wrap gap-1">
-                        {['disaster', 'missing', 'animal', 'camp'].map(k => (
-                            <button
-                                key={k}
-                                onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
-                                style={layers[k] ? { background: KIND_META[k].color, boxShadow: `0 6px 18px -4px ${KIND_META[k].color}99` } : undefined}
-                            >
-                                <span className="text-base leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
-                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
-                        >
-                            <span className="text-base leading-none">🔥</span> Heat
-                        </button>
-                    </div>
-                }
-            >
-                <div className="flex justify-center">
-                    <MapFrame height={420} className="rounded-2xl border border-white/15 overflow-hidden shadow-xl">
-                    <MapContainer
-                        center={defaultMapConfig.center}
-                        zoom={defaultMapConfig.zoom}
-                        minZoom={defaultMapConfig.minZoom}
-                        maxZoom={defaultMapConfig.maxZoom}
-                        maxBounds={defaultMapConfig.maxBounds}
-                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                        style={{ height: '100%', width: '100%' }}
-                        preferCanvas
-                    >
-                        <FitSriLanka />
-                        <TileLayer
-                            attribution='&copy; OpenStreetMap'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        {layers.heat && <HeatmapLayer points={A.map.heat} />}
-                        {['disaster', 'missing', 'animal'].map(k => layers[k] && A.map.markers[k].map(m => (
-                            <Marker key={`${k}-${m.id}`} position={[m.lat, m.lng]} icon={KIND_META[k].marker}>
-                                <Popup>
-                                    <div className="text-xs">
-                                        <p className="font-bold">{KIND_META[k].icon} {m.title}</p>
-                                        {m.severity && <p>Severity: <strong className="capitalize">{m.severity}</strong></p>}
-                                        {m.condition && <p>Condition: <strong className="capitalize">{m.condition}</strong></p>}
-                                        <p className="text-gray-500">{m.address || m.district || 'Location on map'}</p>
-                                        <p className="text-gray-500">Waiting: {timeAgo(m.created_at)} · {m.active ? 'Active' : 'Resolved'}</p>
-                                        {m.description && <p className="text-gray-600 mt-1 line-clamp-2">{m.description}</p>}
-                                        <button onClick={() => navigate(m.link)} className="mt-1 text-primary-600 font-semibold">Open report →</button>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        )))}
-                        {layers.camp && A.map.markers.camp.map(c => (
-                            <Marker key={`camp-${c.id}`} position={[c.lat, c.lng]} icon={c.full ? greyIcon : blueIcon}>
-                                <Popup>
-                                    <div className="text-xs">
-                                        <p className="font-bold">⛺ {c.title}</p>
-                                        <p className="text-gray-500">{c.district}</p>
-                                        <p>Occupancy: <strong>{c.occ}/{c.cap}</strong> ({c.pct}%)</p>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        ))}
-                    </MapContainer>
-                    </MapFrame>
-                </div>
-            </Card>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Needs attention */}
-                <Card icon={IconBolt} title="Needs Immediate Attention">
-                    {A.urgentFeed.length === 0 ? (
-                        <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
-                    ) : (
-                        <div className="divide-y divide-white/10 -mx-1">
-                            {A.urgentFeed.map(item => {
-                                const isCritical = item.icon === '🚨';
-                                const isHigh = item.icon === '⚠️';
-                                const badge = item.kind === 'disaster'
-                                    ? { text: isCritical ? 'Critical' : 'High', tone: isCritical ? 'bg-danger-500/15 text-danger-300' : 'bg-amber-500/15 text-amber-300' }
-                                    : { text: 'Missing', tone: 'bg-primary-500/15 text-primary-300' };
-                                return (
-                                    <div
-                                        key={`${item.kind}-${item.id}`}
-                                        onClick={() => navigate(item.link)}
-                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.link); } }}
-                                        role="button"
-                                        tabIndex={0}
-                                        className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
-                                    >
-                                        <div className="flex items-center gap-2 min-w-0">
-                                            <span className="text-base flex-shrink-0">{item.icon}</span>
-                                            <div className="min-w-0">
-                                                <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{item.title}</p>
-                                                <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
-                                            </div>
-                                        </div>
-                                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${badge.tone}`}>{badge.text}</span>
-                                        <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </Card>
-
-                {/* Live activity timeline */}
-                <Card icon={IconClock} title="Live Activity Timeline">
-                    {A.timeline.length === 0 ? (
-                        <p className="text-sm text-slate-500 py-6 text-center">No recent activity.</p>
-                    ) : (
-                        <div className="relative pl-4 max-h-[340px] overflow-y-auto">
-                            <span className="absolute left-1 top-1 bottom-1 w-px bg-white/10" />
-                            {A.timeline.map((ev, i) => (
+            {/* Needs attention */}
+            <Card icon={IconBolt} title="Needs Immediate Attention" className="flex-1 min-h-0 flex flex-col">
+                {A.urgentFeed.length === 0 ? (
+                    <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
+                ) : (
+                    <div className="divide-y divide-white/10 -mx-1 flex-1 min-h-0 overflow-y-auto">
+                        {A.urgentFeed.map(item => {
+                            const isCritical = item.icon === '🚨';
+                            const isHigh = item.icon === '⚠️';
+                            const badge = item.kind === 'disaster'
+                                ? { text: isCritical ? 'Critical' : 'High', tone: isCritical ? 'bg-danger-500/15 text-danger-300' : 'bg-amber-500/15 text-amber-300' }
+                                : { text: 'Missing', tone: 'bg-primary-500/15 text-primary-300' };
+                            return (
                                 <div
-                                    key={i}
-                                    onClick={() => ev.link && navigate(ev.link)}
-                                    onKeyDown={(e) => { if (ev.link && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); navigate(ev.link); } }}
-                                    role={ev.link ? 'button' : undefined}
-                                    tabIndex={ev.link ? 0 : undefined}
-                                    className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400' : ''}`}
+                                    key={`${item.kind}-${item.id}`}
+                                    onClick={() => navigate(item.link)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.link); } }}
+                                    role="button"
+                                    tabIndex={0}
+                                    className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
                                 >
-                                    <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
-                                    <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
-                                    <p className="text-xs text-slate-500">{ev.time}</p>
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <span className="text-base flex-shrink-0">{item.icon}</span>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{item.title}</p>
+                                            <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
+                                        </div>
+                                    </div>
+                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${badge.tone}`}>{badge.text}</span>
+                                    <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
-            </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </Card>
         </div>
     );
 }
@@ -767,7 +756,6 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
                 return { id: c.id, lat: c.latitude, lng: c.longitude, title: c.name, district: c.district, cap: cap_, occ, pct, full: pct >= 90 };
             }),
         },
-        heat: activeDisasters.filter(geo).map(i => ({ lat: i.lat, lng: i.lng, weight: (i.damage ?? 30) / 100 })),
     };
 
     // ---- Needs attention feed
@@ -953,7 +941,7 @@ function RespondDashboard() {
     const loading = !mpInit || !dInit || !arInit || !cInit;
 
     return (
-        <div className="page-shell">
+        <div className="relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
@@ -969,7 +957,7 @@ function RespondDashboard() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1800px] px-4 pt-4 pb-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 mx-auto w-full max-w-[1800px] px-3 pt-3 pb-3 sm:px-4 lg:px-6 flex-1 min-h-0 flex flex-col">
                 <CommandCenter
                     disasters={disasters}
                     missingPersons={missingPersons}
