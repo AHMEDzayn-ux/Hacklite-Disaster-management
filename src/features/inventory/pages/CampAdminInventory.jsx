@@ -379,7 +379,7 @@ function CampAdminInventory() {
                         <button
                             type="submit"
                             disabled={reqSubmitting}
-                            className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold rounded-lg transition-colors duration-150 py-3"
+                            className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold py-3 rounded-lg transition-colors duration-150"
                         >
                             {reqSubmitting ? 'Sending...' : 'Raise Request'}
                         </button>
@@ -433,7 +433,7 @@ function CampAdminInventory() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold rounded-lg transition-colors duration-150 py-3"
+                            className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold py-3 rounded-lg transition-colors duration-150"
                         >
                             {submitting ? 'Saving...' : 'Add Item'}
                         </button>
@@ -446,7 +446,7 @@ function CampAdminInventory() {
                 <div className="fixed inset-0 z-20 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                            <h3 className="text-xl font-bold text-white">
+                            <h3 className="text-xl font-bold text-white mb-1">
                                 {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                             </h3>
                             <button
@@ -477,7 +477,7 @@ function CampAdminInventory() {
                             {error && <p className="text-danger-400 text-sm">{error}</p>}
                             <div className="flex gap-3">
                                 <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-bold transition-colors">Cancel</button>
-                                <button type="submit" disabled={submitting} className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold rounded-lg transition-colors duration-150 py-3 font-bold">
+                                <button type="submit" disabled={submitting} className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-50 text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 py-3 rounded-xl font-bold transition-colors duration-150">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>
                             </div>
