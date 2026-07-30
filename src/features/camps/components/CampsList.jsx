@@ -161,7 +161,9 @@ function CampsList() {
     }
 
     return (
-        <div className="page-shell">
+        <div className={viewMode === 'map'
+            ? 'relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col'
+            : 'page-shell'}>
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -170,50 +172,21 @@ function CampsList() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
-                {/* Header with Stats and Controls */}
-                <div className="card mb-3 p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className={`relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 w-full ${viewMode === 'map' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
+                {/* Header + Filters — one compact row so map view keeps most of the viewport */}
+                <div className="card mb-3 p-3 flex-shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
                         {/* Stats */}
-                        <div className="flex items-center gap-3 text-sm">
-                            <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
-                                {activeCount} Active
-                            </span>
-                            <span className="flex items-center gap-1 text-slate-400">
-                                <IconUsers className="h-3.5 w-3.5" />
-                                {totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()} sheltered
-                            </span>
-                        </div>
+                        <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium text-sm">
+                            {activeCount} Active
+                        </span>
+                        <span className="flex items-center gap-1 text-slate-400 text-sm">
+                            <IconUsers className="h-3.5 w-3.5" />
+                            {totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()} sheltered
+                        </span>
 
-                        {/* View Toggle */}
-                        {camps.length > 0 && (
-                            <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
-                                <button
-                                    onClick={() => setViewMode('map')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'map'
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                        : 'text-slate-300 hover:bg-white/10'
-                                        }`}
-                                >
-                                    <IconMap className="h-3.5 w-3.5" />
-                                    Map
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('cards')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'cards'
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                        : 'text-slate-300 hover:bg-white/10'
-                                        }`}
-                                >
-                                    <IconGrid className="h-3.5 w-3.5" />
-                                    Cards
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                        <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block" />
 
-                    {/* Inline Filters */}
-                    <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-white/10">
                         <select
                             value={districtFilter}
                             onChange={(e) => setDistrictFilter(e.target.value)}
@@ -288,6 +261,32 @@ function CampsList() {
                         <span className="ml-auto text-xs text-slate-500">
                             {filteredCamps.length} of {camps.length} camps
                         </span>
+
+                        {/* View Toggle */}
+                        {camps.length > 0 && (
+                            <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
+                                <button
+                                    onClick={() => setViewMode('map')}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'map'
+                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        : 'text-slate-300 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <IconMap className="h-3.5 w-3.5" />
+                                    Map
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('cards')}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'cards'
+                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                        : 'text-slate-300 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <IconGrid className="h-3.5 w-3.5" />
+                                    Cards
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -394,13 +393,7 @@ function CampsList() {
                             </div>
                         ) : (
                             // Map View
-                            <div className="card p-0 overflow-hidden">
-                                {/* Compact Warning */}
-                                <div className="bg-amber-500/10 border-b border-amber-400/20 px-3 py-2 flex items-center gap-2 text-xs text-amber-200">
-                                    <span>⚠️</span>
-                                    <span>Only camps with coordinates shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
-                                </div>
-
+                            <div className="card p-0 overflow-hidden flex-1 min-h-0 flex flex-col">
                                 {filteredCamps.length === 0 ? (
                                     <div className="text-center py-8">
                                         <div className="mb-2 flex justify-center text-slate-500">
@@ -411,9 +404,15 @@ function CampsList() {
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="flex flex-col lg:flex-row gap-4 items-start p-3">
-                                        <div className="rounded-xl overflow-hidden border border-white/10 w-full lg:w-auto">
-                                            <MapFrame height="calc(100vh - 320px)" style={{ minHeight: 400 }}>
+                                        <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 items-start p-3">
+                                        <div className="w-full h-[50vh] lg:h-full flex-1 min-w-0">
+                                            <MapFrame
+                                                height="100%"
+                                                className="rounded-xl border border-white/10"
+                                                resizable
+                                                fillWidth
+                                                minHeight={320}
+                                            >
                                             <MapContainer
                                                 center={[7.8731, 80.7718]}
                                                 zoom={7}
@@ -492,10 +491,18 @@ function CampsList() {
                                             </MapFrame>
                                         </div>
 
-                                        {/* Compact Legend */}
-                                        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 w-full lg:w-56 lg:flex-shrink-0 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
-                                            <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Active ({activeCount})</span>
-                                            <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-500 rounded-full inline-block"></span> Closed ({closedCount})</span>
+                                        {/* Sidebar: warning note + legend */}
+                                        <div className="w-full lg:w-56 lg:flex-shrink-0 flex flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:pr-1 scroll-panel">
+                                            <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                                                <span>⚠️</span>
+                                                <span>Only camps with coordinates shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
+                                            </div>
+
+                                            {/* Marker color key — counts already shown in the filter bar above */}
+                                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
+                                                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Active</span>
+                                                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-500 rounded-full inline-block"></span> Closed</span>
+                                            </div>
                                         </div>
                                         </div>
                                     </>

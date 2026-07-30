@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { supabase } from '@/lib/supabase';
+import { useTheme } from '@/features/auth/ThemeContext';
+import { useDonationStore } from '@/store/supabaseStore';
+import { resolveImpact } from '@/features/donations/impact';
+import { IconShieldCheck, IconHeart, IconCheck } from '@/components/icons/Icons';
 
 const PRESET_AMOUNTS = [500, 1000, 2500, 5000, 10000, 25000]; // LKR amounts
 
@@ -23,9 +27,22 @@ const DONATION_PURPOSES = [
     { value: 'shelter', label: 'Temporary Shelter Setup', category: 'general' },
 ];
 
+const STEPS = [
+    { n: 1, label: 'Amount' },
+    { n: 2, label: 'Your details' },
+    { n: 3, label: 'Payment' },
+];
+
+const FIELD_LABEL = 'mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400';
+const FIELD = 'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500';
+const BTN_PRIMARY = 'inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border-2 border-slate-900 bg-white px-4 text-sm font-bold text-slate-900 transition-colors hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 dark:border-white dark:bg-transparent dark:text-white dark:hover:bg-white dark:hover:text-slate-900 dark:disabled:border-white/10 dark:disabled:bg-white/5 dark:disabled:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1';
+const BTN_BACK = 'inline-flex h-11 items-center justify-center rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-40 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10';
+
 function DonationForm({ onSuccess }) {
     const stripe = useStripe();
     const elements = useElements();
+    const { theme } = useTheme();
+    const { donations } = useDonationStore();
 
     const [selectedAmount, setSelectedAmount] = useState(5000); // Default LKR 5000
     const [customAmount, setCustomAmount] = useState('');
@@ -34,7 +51,8 @@ function DonationForm({ onSuccess }) {
     const [paymentError, setPaymentError] = useState(null);
     const [step, setStep] = useState(1); // 1: Amount, 2: Info, 3: Payment
 
-    const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
+    const { register, handleSubmit, formState: { errors }, watch, setValue, trigger } = useForm({
+        mode: 'onTouched',
         defaultValues: {
             donor_name: '',
             donor_email: '',
@@ -46,6 +64,23 @@ function DonationForm({ onSuccess }) {
     });
 
     const isAnonymous = watch('is_anonymous');
+
+    // Anchor the choice on what donors actually give, not an invented figure.
+    // Falls back to the default preset until there is enough data to mean
+    // anything, in which case it is labelled as a suggestion instead.
+    const popularAmount = useMemo(() => {
+        const counts = new Map();
+        donations
+            .filter(d => d.stripe_payment_status === 'succeeded' && d.currency === 'LKR')
+            .forEach(d => {
+                const amt = Math.round(parseFloat(d.amount) || 0);
+                if (PRESET_AMOUNTS.includes(amt)) counts.set(amt, (counts.get(amt) || 0) + 1);
+            });
+        const total = [...counts.values()].reduce((a, b) => a + b, 0);
+        if (total < 5) return { amount: 5000, evidenced: false };
+        const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+        return { amount: top[0], evidenced: true };
+    }, [donations]);
 
     const autofillTestData = () => {
         setSelectedAmount(2500);
@@ -62,9 +97,10 @@ function DonationForm({ onSuccess }) {
         return currency ? currency.symbol : 'Rs.';
     };
 
-    const getFinalAmount = () => {
-        return customAmount ? parseFloat(customAmount) : selectedAmount;
-    };
+    const getFinalAmount = () => (customAmount ? parseFloat(customAmount) : selectedAmount) || 0;
+
+    const impact = resolveImpact(getFinalAmount(), selectedCurrency);
+    const formattedAmount = `${getCurrencySymbol()}${getFinalAmount().toLocaleString()}`;
 
     const handleAmountSelect = (amount) => {
         setSelectedAmount(amount);
@@ -158,16 +194,27 @@ function DonationForm({ onSuccess }) {
         }
     };
 
+    /**
+     * Gate step 2 on the fields the payment actually requires. Without this a
+     * donor can reach the card form with no name or email, then hit Donate and
+     * watch nothing happen: react-hook-form blocks the submit and renders its
+     * errors back on step 2, which is no longer on screen.
+     */
+    const goToPayment = async () => {
+        const fields = isAnonymous ? ['donor_email'] : ['donor_name', 'donor_email'];
+        if (await trigger(fields)) setStep(3);
+    };
+
     const handleFormSubmit = (e) => {
         if (step === 1) {
             e.preventDefault();
-            if (!getFinalAmount() || getFinalAmount() < 1) return;
+            if (getFinalAmount() < 1) return;
             setStep(2);
             return;
         }
         if (step === 2) {
             e.preventDefault();
-            setStep(3);
+            goToPayment();
             return;
         }
         handleSubmit(onSubmit)(e);
@@ -175,260 +222,227 @@ function DonationForm({ onSuccess }) {
 
     const renderStep1 = () => (
         <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">Choose Your Impact</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">Choose your contribution</h3>
+            <p className="mb-3 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                Every amount is put to work in the current relief operation.
+            </p>
 
-            {/* Preset Amounts */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
-                {PRESET_AMOUNTS.map((amount) => (
-                    <button
-                        key={amount}
-                        type="button"
-                        onClick={() => handleAmountSelect(amount)}
-                        className={`py-2.5 rounded-lg border text-sm font-semibold ${selectedAmount === amount && !customAmount
-                            ? 'bg-primary-600 text-white border-primary-500'
-                            : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
-                            }`}
-                    >
-                        {getCurrencySymbol()}{amount}
-                    </button>
-                ))}
+            <div className="mb-3 grid grid-cols-3 gap-2">
+                {PRESET_AMOUNTS.map((amount) => {
+                    const active = selectedAmount === amount && !customAmount;
+                    const flagged = amount === popularAmount.amount;
+                    return (
+                        <button
+                            key={amount}
+                            type="button"
+                            onClick={() => handleAmountSelect(amount)}
+                            aria-pressed={active}
+                            className={`relative h-12 rounded-md border-2 text-sm font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 ${active
+                                ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+                                : 'border-slate-200 bg-white text-slate-800 hover:border-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:border-white/30'
+                                }`}
+                        >
+                            {getCurrencySymbol()}{amount.toLocaleString()}
+                            {flagged && (
+                                <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded border border-success-200 bg-success-50 px-1.5 text-[10px] font-bold uppercase tracking-wide text-success-700 dark:border-success-500/40 dark:bg-success-900 dark:text-success-200">
+                                    {popularAmount.evidenced ? 'Most chosen' : 'Suggested'}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
-            {/* Custom Amount */}
             <div className="mb-3">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
-                    Or enter custom amount
-                </label>
+                <label htmlFor="custom-amount" className={FIELD_LABEL}>Or enter another amount</label>
                 <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">{getCurrencySymbol()}</span>
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">{getCurrencySymbol()}</span>
                     <input
+                        id="custom-amount"
                         type="text"
+                        inputMode="decimal"
                         value={customAmount}
                         onChange={handleCustomAmountChange}
                         placeholder="0.00"
-                        className="input-field pl-8"
+                        className={`${FIELD} pl-10`}
                     />
                 </div>
             </div>
 
-            {/* Impact Preview */}
-            {getFinalAmount() >= 25 && (
-                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
-                    <h4 className="text-xs font-semibold text-slate-300 mb-1.5">Your Impact:</h4>
-                    <ul className="text-xs text-slate-400 space-y-1">
-                        {getFinalAmount() >= 25 && <li>✓ Emergency supplies for 1 family</li>}
-                        {getFinalAmount() >= 50 && <li>✓ Food for a family for 1 week</li>}
-                        {getFinalAmount() >= 100 && <li>✓ Temporary shelter setup</li>}
-                        {getFinalAmount() >= 250 && <li>✓ Medical supplies for 10+ people</li>}
-                        {getFinalAmount() >= 500 && <li>✓ Major relief camp support</li>}
-                    </ul>
+            {/* One concrete outcome beats a list of ticks — it is what the donor
+                carries to the confirm button. */}
+            {impact && (
+                <div className="mb-4 flex items-start gap-2.5 rounded-md border border-success-200 bg-success-50 p-3 dark:border-success-500/30 dark:bg-success-500/10">
+                    <IconHeart className="mt-0.5 h-4 w-4 flex-shrink-0 text-success-700 dark:text-success-300" />
+                    <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-success-800 dark:text-success-300">
+                            {formattedAmount} provides
+                        </p>
+                        <p className="mt-0.5 text-sm font-semibold leading-snug text-success-900 dark:text-success-100">
+                            {impact.headline}
+                        </p>
+                    </div>
                 </div>
             )}
 
-            <button
-                type="submit"
-                disabled={!getFinalAmount() || getFinalAmount() < 1}
-                className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:bg-white/10 disabled:text-slate-400 disabled:cursor-not-allowed text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-semibold py-3 rounded-lg transition-colors duration-200"
-            >
-                Continue to Your Information
+            <button type="submit" disabled={getFinalAmount() < 1} className={BTN_PRIMARY}>
+                Continue
             </button>
         </div>
     );
 
     const renderStep2 = () => (
         <div>
-            <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">Your Information</h3>
-                <button
-                    type="button"
-                    onClick={autofillTestData}
-                    className="text-xs px-2.5 py-1 rounded-md bg-primary-500/20 text-primary-300 hover:bg-primary-500/30"
-                >
-                    Test Fill
-                </button>
+            <div className="mb-3 flex items-start justify-between gap-3">
+                <div>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">Your details</h3>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                        We use these to send your receipt and record the gift in the public ledger.
+                    </p>
+                </div>
+                {import.meta.env.DEV && (
+                    <button
+                        type="button"
+                        onClick={autofillTestData}
+                        className="flex-shrink-0 rounded border border-slate-300 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-50 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/10"
+                    >
+                        Test fill
+                    </button>
+                )}
             </div>
 
-            {/* Anonymous Checkbox */}
-            <div className="mb-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        {...register('is_anonymous')}
-                        className="w-4 h-4 accent-primary-500"
-                    />
-                    <span className="text-sm text-slate-300">Make my donation anonymous</span>
-                </label>
-            </div>
+            <label className="mb-3 flex cursor-pointer items-center gap-2">
+                <input type="checkbox" {...register('is_anonymous')} className="h-4 w-4 accent-primary-600" />
+                <span className="text-sm text-slate-700 dark:text-slate-300">Publish this donation anonymously</span>
+            </label>
 
-            {/* Name */}
             {!isAnonymous && (
                 <div className="mb-3">
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">
-                        Full Name *
-                    </label>
+                    <label htmlFor="donor_name" className={FIELD_LABEL}>Full name *</label>
                     <input
+                        id="donor_name"
                         type="text"
                         {...register('donor_name', {
                             required: !isAnonymous && 'Name is required',
                             minLength: { value: 2, message: 'Name must be at least 2 characters' }
                         })}
-                        className="input-field"
-                        placeholder="John Doe"
+                        className={FIELD}
+                        placeholder="Nimal Perera"
+                        aria-invalid={errors.donor_name ? 'true' : 'false'}
                     />
-                    {errors.donor_name && (
-                        <p className="text-danger-400 text-xs mt-1">{errors.donor_name.message}</p>
-                    )}
+                    {errors.donor_name && <p className="mt-1 text-xs text-danger-600 dark:text-danger-400">{errors.donor_name.message}</p>}
                 </div>
             )}
 
-            {/* Email */}
             <div className="mb-3">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
-                    Email Address *
-                </label>
+                <label htmlFor="donor_email" className={FIELD_LABEL}>Email address *</label>
                 <input
+                    id="donor_email"
                     type="email"
                     {...register('donor_email', {
                         required: 'Email is required',
                         pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: 'Invalid email address'
+                            message: 'Enter a valid email address'
                         }
                     })}
-                    className="input-field"
-                    placeholder="john@example.com"
+                    className={FIELD}
+                    placeholder="you@example.com"
+                    aria-invalid={errors.donor_email ? 'true' : 'false'}
                 />
-                {errors.donor_email && (
-                    <p className="text-danger-400 text-xs mt-1">{errors.donor_email.message}</p>
-                )}
+                {errors.donor_email && <p className="mt-1 text-xs text-danger-600 dark:text-danger-400">{errors.donor_email.message}</p>}
             </div>
 
-            {/* Phone */}
             <div className="mb-3">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
-                    Phone Number (Optional)
-                </label>
-                <input
-                    type="tel"
-                    {...register('donor_phone')}
-                    className="input-field"
-                    placeholder="+1 (555) 123-4567"
-                />
+                <label htmlFor="donation_purpose" className={FIELD_LABEL}>Direct my donation to</label>
+                <select id="donation_purpose" {...register('donation_purpose')} className={FIELD}>
+                    {DONATION_PURPOSES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                </select>
             </div>
 
-            {/* Message */}
+            <div className="mb-3">
+                <label htmlFor="donor_phone" className={FIELD_LABEL}>Phone number (optional)</label>
+                <input id="donor_phone" type="tel" {...register('donor_phone')} className={FIELD} placeholder="077 123 4567" />
+            </div>
+
             <div className="mb-4">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
-                    Message (Optional)
-                </label>
-                <textarea
-                    {...register('message')}
-                    rows={2}
-                    className="input-field resize-none"
-                    placeholder="Leave a message of hope..."
-                />
+                <label htmlFor="message" className={FIELD_LABEL}>Message of support (optional)</label>
+                <textarea id="message" {...register('message')} rows={2} className={`${FIELD} resize-none`} placeholder="Shown beside your name in the public ledger." />
             </div>
 
-            <div className="flex gap-3">
-                <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 font-semibold py-2.5 rounded-lg text-sm"
-                >
-                    Back
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setStep(3)}
-                    className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-semibold py-3 rounded-lg transition-colors duration-200"
-                >
-                    Continue to Payment
-                </button>
+            <div className="flex gap-2">
+                <button type="button" onClick={() => setStep(1)} className={BTN_BACK}>Back</button>
+                <button type="button" onClick={goToPayment} className={BTN_PRIMARY}>Continue to payment</button>
             </div>
         </div>
     );
 
     const renderStep3 = () => (
         <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">Payment Details</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">Payment</h3>
+            <p className="mb-3 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                Your card is processed directly by Stripe. We never see or store the number.
+            </p>
 
-            {/* Amount Summary */}
-            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
-                <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300 font-medium">Donation Amount:</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">
-                        {getCurrencySymbol()}{getFinalAmount().toLocaleString()}
-                    </span>
+            <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+                <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm text-slate-600 dark:text-slate-300">You are donating</span>
+                    <span className="text-xl font-bold tabular-nums text-slate-900 dark:text-white">{formattedAmount}</span>
                 </div>
-                <div className="text-xs text-slate-500 mt-1 text-right">
-                    Currency: {selectedCurrency}
-                </div>
+                {impact && (
+                    <p className="mt-1.5 border-t border-slate-200 pt-1.5 text-xs leading-snug text-slate-600 dark:border-white/10 dark:text-slate-400">
+                        {impact.headline}
+                    </p>
+                )}
             </div>
 
-            {/* Stripe Card Element */}
             <div className="mb-3">
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
-                    Card Information *
-                </label>
-                <div className="p-3 rounded-lg border border-white/15 bg-white/5 focus-within:border-primary-400/50">
+                <label className={FIELD_LABEL}>Card information *</label>
+                <div className="rounded-md border border-slate-300 bg-white p-3 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 dark:border-white/15 dark:bg-white/5">
                     <CardElement
                         options={{
                             style: {
+                                // Stripe renders in an iframe and cannot inherit our
+                                // theme, so the ink has to be handed to it explicitly.
+                                // It was hardcoded near-white, which made typed card
+                                // numbers invisible against the light-mode field.
                                 base: {
                                     fontSize: '15px',
-                                    color: '#e2e8f0',
-                                    '::placeholder': {
-                                        color: '#64748b',
-                                    },
+                                    color: theme === 'dark' ? '#e5e5e5' : '#171717',
+                                    iconColor: theme === 'dark' ? '#a3a3a3' : '#525252',
+                                    '::placeholder': { color: theme === 'dark' ? '#737373' : '#a3a3a3' },
                                 },
-                                invalid: {
-                                    color: '#f87171',
-                                },
+                                invalid: { color: '#dc2626', iconColor: '#dc2626' },
                             },
                         }}
                     />
                 </div>
             </div>
 
-            {/* Error Display */}
             {paymentError && (
-                <div className="mb-3 p-2.5 rounded-lg border border-danger-400/20 bg-danger-500/10">
-                    <p className="text-danger-300 text-sm">{paymentError}</p>
+                <div role="alert" className="mb-3 rounded-md border border-danger-200 bg-danger-50 p-2.5 dark:border-danger-500/30 dark:bg-danger-500/10">
+                    <p className="text-sm text-danger-800 dark:text-danger-200">{paymentError}</p>
                 </div>
             )}
 
-            {/* Security Info */}
-            <div className="mb-4 flex items-center gap-2 text-xs text-slate-500">
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-                <span>Payments are encrypted and processed securely by Stripe</span>
-            </div>
+            <p className="mb-4 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                <IconShieldCheck className="h-4 w-4 flex-shrink-0" />
+                Encrypted and processed securely by Stripe
+            </p>
 
-            <div className="flex gap-3">
-                <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    disabled={isProcessing}
-                    className="flex-1 border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed font-semibold py-2.5 rounded-lg text-sm"
-                >
-                    Back
-                </button>
-                <button
-                    type="submit"
-                    disabled={isProcessing || !stripe}
-                    className="flex-1 border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-semibold py-3 rounded-lg transition-colors duration-150 flex items-center justify-center gap-2"
-                >
+            <div className="flex gap-2">
+                <button type="button" onClick={() => setStep(2)} disabled={isProcessing} className={BTN_BACK}>Back</button>
+                <button type="submit" disabled={isProcessing || !stripe} className={BTN_PRIMARY}>
                     {isProcessing ? (
                         <>
-                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                            </svg>
-                            Processing...
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            Processing…
                         </>
                     ) : (
-                        <>Donate {getCurrencySymbol()}{getFinalAmount().toLocaleString()}</>
+                        <>
+                            <IconHeart className="h-4 w-4" />
+                            Donate {formattedAmount}
+                        </>
                     )}
                 </button>
             </div>
@@ -436,30 +450,37 @@ function DonationForm({ onSuccess }) {
     );
 
     return (
-        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4 md:p-5">
-            {/* Progress Steps */}
-            <div className="flex items-center justify-center mb-4">
-                {[1, 2, 3].map((s) => (
-                    <React.Fragment key={s}>
-                        <div className={`flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${step >= s ? 'bg-primary-600 text-white' : 'bg-white/10 text-slate-400'
-                            }`}>
-                            {s}
-                        </div>
-                        {s < 3 && (
-                            <div className={`w-12 h-0.5 ${step > s ? 'bg-primary-600' : 'bg-white/10'}`} />
+        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5 dark:border-white/10 dark:bg-white/[0.04]">
+            {/* Labelled progress — a donor should always know how much is left. */}
+            <ol className="mb-4 flex list-none items-center gap-1 p-0">
+                {STEPS.map(({ n, label }, i) => (
+                    <React.Fragment key={n}>
+                        <li className="flex items-center gap-1.5" aria-current={step === n ? 'step' : undefined}>
+                            <span className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${step > n
+                                ? 'bg-success-600 text-white'
+                                : step === n
+                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-slate-400'
+                                }`}>
+                                {step > n ? <IconCheck className="h-3.5 w-3.5" /> : n}
+                            </span>
+                            <span className={`hidden text-xs font-medium sm:inline ${step >= n ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
+                                {label}
+                            </span>
+                        </li>
+                        {i < STEPS.length - 1 && (
+                            <li aria-hidden="true" className={`h-px flex-1 ${step > n ? 'bg-success-600' : 'bg-slate-200 dark:bg-white/10'}`} />
                         )}
                     </React.Fragment>
                 ))}
-            </div>
+            </ol>
 
-            {/* Form */}
-            <form onSubmit={handleFormSubmit}>
+            <form onSubmit={handleFormSubmit} noValidate>
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
             </form>
-
-        </div>
+        </section>
     );
 }
 

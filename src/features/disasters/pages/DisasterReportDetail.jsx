@@ -1,23 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useDisasterStore } from '@/store';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import '@/lib/leafletIconFix';
-import { defaultMapConfig } from '@/lib/mapConfig';
-import MapResizeFix from '@/components/map/MapResizeFix';
+import {
+    DetailShell, DetailHeader, DetailLoading, DetailNotFound, MetaDot,
+    InfoCard, KeyValueRow, MetricCard, StatusChip, Chip,
+    Timeline, TimelineItem, Button, ConfirmDialog, Field,
+    PhotoCard, WeatherCard, LocationCard,
+} from '@/components/detail/DetailKit';
+import { INPUT, useWeather, formatDateTime, formatTime, timeSince } from '@/lib/detailKit';
+import {
+    IconSiren, IconCheck, IconUsers, IconFileText, IconClipboardList,
+    IconPhone, IconCalendar, IconCamera, IconMapPin, IconClock,
+} from '@/components/icons/Icons';
+
+// Severity drives the loudest colour on the page, so it is the only place
+// red is allowed: critical/high are red, moderate amber, low stays neutral.
+const SEVERITY_TONE = { critical: 'critical', high: 'critical', moderate: 'warning', low: 'neutral' };
+const SEVERITY_LABEL = { critical: 'Critical', high: 'High', moderate: 'Moderate', low: 'Low' };
+
+const CASUALTIES = {
+    none: 'None known',
+    minor: 'Minor injuries',
+    serious: 'Serious injuries',
+    fatalities: 'Fatalities reported',
+};
+
+const NEEDS = [
+    { key: 'rescue', icon: '🚒', label: 'Rescue', tone: 'critical' },
+    { key: 'medical', icon: '🚑', label: 'Medical', tone: 'critical' },
+    { key: 'evacuation', icon: '🚸', label: 'Evacuation', tone: 'critical' },
+    { key: 'shelter', icon: '🏠', label: 'Shelter', tone: 'warning' },
+    { key: 'food', icon: '🍞', label: 'Food', tone: 'warning' },
+    { key: 'water', icon: '💧', label: 'Water', tone: 'info' },
+];
 
 function DisasterReportDetail({ role: propRole }) {
     const { id } = useParams();
-    const navigate = useNavigate();
     const location = useLocation();
     const { disasters, markResolvedByResponder, subscribeToDisasters, isInitialized } = useDisasterStore();
 
-    // Ensure data is loaded
     useEffect(() => {
-        if (!isInitialized) {
-            subscribeToDisasters();
-        }
+        if (!isInitialized) subscribeToDisasters();
     }, [isInitialized, subscribeToDisasters]);
 
     const role = propRole ||
@@ -27,15 +50,13 @@ function DisasterReportDetail({ role: propRole }) {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [resolvedBy, setResolvedBy] = useState('');
     const [responderNotes, setResponderNotes] = useState('');
-    const [weather, setWeather] = useState(null);
-    const [weatherLoading, setWeatherLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const disaster = disasters.find(d => d.id === id || d.id === parseInt(id));
 
     // Handle both snake_case (from Supabase) and camelCase (legacy)
     const disasterType = disaster?.disaster_type || disaster?.disasterType;
     const peopleAffected = disaster?.people_affected || disaster?.peopleAffected;
-    const casualties = disaster?.casualties;
     const areaSize = disaster?.area_size || disaster?.areaSize;
     const reporterName = disaster?.reporter_name || disaster?.reporterName;
     const contactNumber = disaster?.contact_number || disaster?.contactNumber;
@@ -45,373 +66,172 @@ function DisasterReportDetail({ role: propRole }) {
     const resolvedByPerson = disaster?.resolved_by || disaster?.resolvedBy;
     const responderNotesData = disaster?.responder_notes || disaster?.responderNotes;
 
-    // Fetch weather data
-    useEffect(() => {
-        if (disaster?.location?.lat && disaster?.location?.lng) {
-            setWeatherLoading(true);
-            // Using Open-Meteo API (free, no API key required)
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${disaster.location.lat}&longitude=${disaster.location.lng}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`)
-                .then(res => res.json())
-                .then(data => {
-                    setWeather(data.current);
-                    setWeatherLoading(false);
-                })
-                .catch(err => {
-                    console.error('Weather fetch error:', err);
-                    setWeatherLoading(false);
-                });
-        }
-    }, [disaster?.location?.lat, disaster?.location?.lng]);
+    const { weather, loading: weatherLoading } = useWeather(disaster?.location?.lat, disaster?.location?.lng);
 
-    // Show loading while data is being fetched
-    if (!isInitialized) {
-        return (
-            <div className="page-shell">
-                <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-12 text-center sm:px-6">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
-                    <p className="text-slate-300">Loading...</p>
-                </div>
-            </div>
-        );
-    }
+    if (!isInitialized) return <DetailLoading label="Loading incident record…" />;
 
     if (!disaster) {
-        return (
-            <div className="page-shell">
-                <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-12 text-center sm:px-6">
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Report Not Found</h1>
-                    <p className="text-slate-300 mb-6">The disaster report could not be found.</p>
-                    <button onClick={() => navigate(-1)} className="btn-primary">← Go Back</button>
-                </div>
-            </div>
-        );
+        return <DetailNotFound title="Report not found" message="This disaster report could not be located. It may have been removed." />;
     }
 
-    const getDisasterIcon = (type) => {
-        const icons = {
-            'flood': '🌊', 'landslide': '⛰️', 'fire': '🔥', 'earthquake': '🌍',
-            'cyclone': '🌀', 'drought': '🌵', 'tsunami': '🌊', 'building-collapse': '🏚️', 'other': '⚠️'
-        };
-        return icons[type] || '⚠️';
-    };
-
-    const getSeverityBadge = (severity) => {
-        const badges = {
-            'critical': { className: 'bg-danger-600 text-white', text: '🚨 Critical' },
-            'high': { className: 'bg-danger-500 text-white', text: '⚠️ High' },
-            'moderate': { className: 'bg-warning-500 text-white', text: '⚡ Moderate' },
-            'low': { className: 'bg-info-500 text-white', text: 'ℹ️ Low' }
-        };
-        return <span className={`px-3 py-1.5 rounded text-sm font-semibold ${badges[severity].className}`}>{badges[severity].text}</span>;
-    };
-
-    const getStatusBadge = (status) => {
-        return status === 'Active'
-            ? <span className="px-3 py-1.5 rounded text-sm font-semibold bg-danger-500/15 text-danger-300">🔴 Active</span>
-            : <span className="px-3 py-1.5 rounded text-sm font-semibold bg-success-500/15 text-success-300">✅ Resolved</span>;
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' +
-            date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const getWeatherDescription = (code) => {
-        const weatherCodes = {
-            0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
-            45: 'Foggy', 48: 'Foggy', 51: 'Light Drizzle', 53: 'Drizzle', 55: 'Heavy Drizzle',
-            61: 'Light Rain', 63: 'Rain', 65: 'Heavy Rain', 71: 'Light Snow', 73: 'Snow', 75: 'Heavy Snow',
-            80: 'Rain Showers', 81: 'Rain Showers', 82: 'Heavy Rain Showers', 95: 'Thunderstorm', 96: 'Thunderstorm', 99: 'Thunderstorm'
-        };
-        return weatherCodes[code] || 'Unknown';
-    };
-
-    const getCasualtiesDisplay = (value) => {
-        const casualtyMap = {
-            'none': 'None known',
-            'minor': 'Minor injuries',
-            'serious': 'Serious injuries',
-            'fatalities': 'Fatalities reported'
-        };
-        return casualtyMap[value] || value || 'N/A';
-    };
-
-    const handleMarkResolved = () => setShowConfirmDialog(true);
-
     const confirmMarkResolved = async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await markResolvedByResponder(disaster.id, resolvedBy || 'Disaster Response Team', responderNotes || null);
             setShowConfirmDialog(false);
         } catch (error) {
             console.error('Error marking disaster as resolved:', error);
             alert('Failed to mark disaster as resolved. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const canMarkResolved = role === 'responder' && disaster.status === 'Active';
+    const isActive = disaster.status === 'Active';
+    const canMarkResolved = role === 'responder' && isActive;
+    const severity = disaster.severity || 'low';
+    const activeNeeds = NEEDS.filter(n => disaster.needs?.[n.key]);
+    const typeLabel = (disasterType || 'Unknown').replace('-', ' ');
 
     return (
-        <div className="page-shell">
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
-            {/* Header - Single Row */}
-            <div className="mb-3">
-                <div className="flex items-center gap-3">
-                    <span className="text-3xl sm:text-4xl">{getDisasterIcon(disasterType)}</span>
-                    <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
-                            {disasterType?.replace('-', ' ') || 'Unknown'} <span className="text-xs sm:text-sm text-slate-500 font-normal ml-2 sm:ml-3">ID: #{disaster.id} • {reportedAt ? formatDate(reportedAt) : 'N/A'}</span>
-                        </h1>
-                    </div>
-                </div>
-            </div>
+        <DetailShell>
+            <DetailHeader
+                icon={IconSiren}
+                iconTone={SEVERITY_TONE[severity] || 'neutral'}
+                title={<span className="capitalize">{typeLabel}</span>}
+                chips={
+                    <>
+                        <StatusChip tone={SEVERITY_TONE[severity] || 'neutral'}>{SEVERITY_LABEL[severity] || severity}</StatusChip>
+                        <StatusChip tone={isActive ? 'warning' : 'success'}>{isActive ? 'Active' : 'Resolved'}</StatusChip>
+                    </>
+                }
+                subtitle={`Report #${String(disaster.id).slice(0, 8)}`}
+                meta={
+                    <>
+                        <MetaDot />
+                        <span>Submitted {formatDateTime(reportedAt)}</span>
+                        <MetaDot />
+                        <span>{timeSince(reportedAt)}</span>
+                        {disaster.location?.address && (
+                            <>
+                                <MetaDot />
+                                <span className="inline-flex items-center gap-1 truncate">
+                                    <IconMapPin className="h-3 w-3 flex-shrink-0" />
+                                    <span className="truncate">{disaster.location.address}</span>
+                                </span>
+                            </>
+                        )}
+                    </>
+                }
+                actions={canMarkResolved && (
+                    <Button variant="primary" icon={IconCheck} onClick={() => setShowConfirmDialog(true)}>
+                        Mark Resolved
+                    </Button>
+                )}
+            />
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-
-                {/* Left Column - Impact & Contact */}
-                <div className="lg:col-span-5 space-y-3">
-
-                    {/* Severity & Key Metrics */}
-                    <div className="card p-5">
-                        <div className="mb-3">{getSeverityBadge(disaster.severity)}</div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
-                            <div className="border-r border-white/10">
-                                <p className="text-xs text-slate-500 mb-1">People</p>
-                                <p className="text-base font-bold text-slate-900 dark:text-white">{peopleAffected || 'N/A'}</p>
-                            </div>
-                            <div className="border-r border-white/10">
-                                <p className="text-xs text-slate-500 mb-1">Casualties</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">{getCasualtiesDisplay(casualties)}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-slate-500 mb-1">Area</p>
-                                <p className="text-base font-bold text-slate-900 dark:text-white">{areaSize || 'N/A'}</p>
-                            </div>
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+                {/* Left ~65% — assessment: what happened, what is needed, who reported it */}
+                <div className="flex flex-col gap-3 lg:col-span-8">
+                    <InfoCard title="Incident Summary" icon={IconClipboardList}>
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                            <MetricCard label="People Affected" value={peopleAffected || '—'} icon={IconUsers} />
+                            <MetricCard
+                                label="Casualties"
+                                value={CASUALTIES[disaster.casualties] || disaster.casualties || '—'}
+                                tone={disaster.casualties === 'fatalities' || disaster.casualties === 'serious' ? 'critical' : undefined}
+                            />
+                            <MetricCard label="Area Affected" value={areaSize || '—'} />
+                            <MetricCard label="Occurred" value={occurredDate ? formatDateTime(occurredDate) : '—'} icon={IconClock} />
                         </div>
-                    </div>
 
-                    {/* Immediate Needs */}
-                    {disaster.needs && (
-                        <div className="card p-5">
-                            <p className="text-sm font-semibold text-slate-200 mb-2">⚡ Immediate Needs</p>
-                            <div className="flex flex-wrap gap-2">
-                                {disaster.needs.rescue && <span className="px-2.5 py-1 bg-danger-500/15 text-danger-300 rounded text-sm font-medium">🆘 Rescue</span>}
-                                {disaster.needs.medical && <span className="px-2.5 py-1 bg-danger-500/15 text-danger-300 rounded text-sm font-medium">🏥 Medical</span>}
-                                {disaster.needs.shelter && <span className="px-2.5 py-1 bg-amber-500/15 text-amber-300 rounded text-sm font-medium">🏠 Shelter</span>}
-                                {disaster.needs.food && <span className="px-2.5 py-1 bg-amber-500/15 text-amber-300 rounded text-sm font-medium">🍚 Food</span>}
-                                {disaster.needs.water && <span className="px-2.5 py-1 bg-primary-500/15 text-primary-300 rounded text-sm font-medium">💧 Water</span>}
-                                {disaster.needs.evacuation && <span className="px-2.5 py-1 bg-danger-500/15 text-danger-300 rounded text-sm font-medium">🚶 Evacuation</span>}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Reporter Contact */}
-                    <div className="card p-5">
-                        <p className="text-sm font-semibold text-slate-200 mb-2">📞 Reporter Contact</p>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <p className="text-xs text-slate-500 mb-0.5">Name</p>
-                                <p className="text-sm font-medium text-slate-900 dark:text-white">{reporterName || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-slate-500 mb-0.5">Phone</p>
-                                <p className="text-sm font-medium text-slate-900 dark:text-white">{contactNumber || 'N/A'}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="card p-5 min-h-36">
-                        <p className="text-sm font-semibold text-slate-200 mb-3">📝 Description</p>
-                        <p className="text-sm text-slate-300 leading-relaxed">{disaster.description}</p>
-                    </div>
-
-                    {/* Timeline */}
-                    <div className="card p-5">
-                        <p className="text-sm font-semibold text-slate-200 mb-2">⏱️ Timeline</p>
-                        <div className="space-y-2">
-                            <div className="flex gap-2.5 items-start">
-                                <div className="w-7 h-7 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Submitted</p>
-                                    <p className="text-xs text-slate-400">{reportedAt ? formatDate(reportedAt) : 'N/A'} • {reporterName || 'Anonymous'}</p>
+                        {activeNeeds.length > 0 && (
+                            <div className="mt-3 border-t border-slate-200 pt-2.5 dark:border-white/10">
+                                <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Immediate needs</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {activeNeeds.map(n => (
+                                        <Chip key={n.key} tone={n.tone} icon={n.icon}>{n.label}</Chip>
+                                    ))}
                                 </div>
                             </div>
-                            {resolvedAtDate && (
-                                <div className="flex gap-2.5 items-start">
-                                    <div className="w-7 h-7 rounded-full bg-success-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">✓</div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Resolved</p>
-                                        <p className="text-xs text-slate-400">{formatDate(resolvedAtDate)} • {resolvedByPerson || 'N/A'}</p>
-                                        {responderNotesData && <p className="text-xs text-slate-400 italic mt-1">{responderNotesData}</p>}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                        )}
+                    </InfoCard>
 
-                    {/* Status & Action Button */}
-                    <div className="card p-5">
-                        <div className="flex items-center gap-3">
-                            {getStatusBadge(disaster.status)}
-                            {canMarkResolved && (
-                                <button onClick={handleMarkResolved} className="btn-primary py-2 px-5">Mark as Resolved</button>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                    <InfoCard title="Description" icon={IconFileText}>
+                        <p className="max-w-[75ch] text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                            {disaster.description || 'No description provided.'}
+                        </p>
+                    </InfoCard>
 
-                {/* Right Column - Photo & Map */}
-                <div className="lg:col-span-7 space-y-4">
+                    <WeatherCard weather={weather} loading={weatherLoading} />
 
-                    {/* Photo & Map Side by Side on larger screens */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                        {/* Photo */}
-                        {disaster.photo && (
-                            <div className="card p-4">
-                                <p className="text-sm font-semibold text-slate-200 mb-2">📸 Photo Evidence</p>
-                                <div className="w-full h-64 rounded border border-white/10 bg-white/5 flex items-center justify-center">
-                                    <img
-                                        src={disaster.photo}
-                                        alt={disasterType}
-                                        className="max-w-full max-h-full object-contain"
-                                        loading="lazy"
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <InfoCard title="Timeline" icon={IconCalendar}>
+                            <Timeline>
+                                <TimelineItem
+                                    tone="info"
+                                    label="Report submitted"
+                                    time={formatTime(reportedAt)}
+                                    detail={`${formatDateTime(reportedAt)} · ${reporterName || 'Anonymous'}`}
+                                    last={!resolvedAtDate}
+                                />
+                                {resolvedAtDate && (
+                                    <TimelineItem
+                                        tone="success"
+                                        label="Resolved"
+                                        time={formatTime(resolvedAtDate)}
+                                        detail={`${formatDateTime(resolvedAtDate)} · ${resolvedByPerson || 'Response team'}${responderNotesData ? ` — ${responderNotesData}` : ''}`}
+                                        last
                                     />
-                                </div>
-                            </div>
-                        )}
+                                )}
+                            </Timeline>
+                        </InfoCard>
 
-                        {/* Location & Weather */}
-                        <div className="card p-4">
-                            <p className="text-sm font-semibold text-slate-200 mb-2">📍 Location & Weather</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {/* Location Column */}
-                                <div className="space-y-2.5">
-                                    <div>
-                                        <p className="text-xs text-slate-500 mb-1">Address</p>
-                                        <p className="text-sm text-slate-900 dark:text-white">{disaster.location?.address || 'N/A'}</p>
-                                    </div>
-                                    {occurredDate && (
-                                        <div>
-                                            <p className="text-xs text-slate-500 mb-1">Occurred</p>
-                                            <p className="text-sm text-slate-900 dark:text-white">{formatDate(occurredDate)}</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Weather Column */}
-                                <div className="space-y-2.5">
-                                    <p className="text-xs font-semibold text-slate-200 mb-1 flex items-center gap-1">
-                                        <span>🌤️</span> Current Weather
-                                    </p>
-                                    {weatherLoading ? (
-                                        <div className="flex items-center justify-center py-3">
-                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-500 border-t-transparent"></div>
-                                            <p className="text-xs text-slate-500 ml-2">Loading...</p>
-                                        </div>
-                                    ) : weather ? (
-                                        <div className="bg-primary-500/10 rounded-lg p-2 border border-primary-400/20">
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                    <p className="text-xs text-slate-400">🌡️ Temp</p>
-                                                    <p className="text-base font-bold text-slate-900 dark:text-white">{weather.temperature_2m}°C</p>
-                                                </div>
-                                                <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                    <p className="text-xs text-slate-400">💧 Humidity</p>
-                                                    <p className="text-base font-bold text-slate-900 dark:text-white">{weather.relative_humidity_2m}%</p>
-                                                </div>
-                                                <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                    <p className="text-xs text-slate-400">💨 Wind</p>
-                                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{weather.wind_speed_10m} km/h</p>
-                                                </div>
-                                                <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                    <p className="text-xs text-slate-400">☁️ Sky</p>
-                                                    <p className="text-xs font-bold text-slate-900 dark:text-white">{getWeatherDescription(weather.weather_code)}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-white/5 rounded p-2 text-center">
-                                            <p className="text-xs text-slate-500">Unavailable</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        <InfoCard title="Reporter Information" icon={IconPhone}>
+                            <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                <KeyValueRow label="Reporter" value={reporterName} />
+                                <KeyValueRow label="Phone" value={contactNumber} href={contactNumber ? `tel:${contactNumber}` : undefined} />
+                                <KeyValueRow label="Submitted" value={timeSince(reportedAt)} />
+                                <KeyValueRow label="Status" value={isActive ? 'Awaiting response' : 'Closed'} />
+                            </dl>
+                        </InfoCard>
                     </div>
+                </div>
 
-                    {/* Map */}
-                    <div className="card p-4">
-                        <p className="text-sm font-semibold text-slate-200 mb-2">🗺️ Map View</p>
-                        {disaster.location?.lat && disaster.location?.lng ? (
-                            <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                <MapContainer
-                                    center={[disaster.location.lat, disaster.location.lng]}
-                                    zoom={15}
-                                    minZoom={defaultMapConfig.minZoom}
-                                    maxZoom={defaultMapConfig.maxZoom}
-                                    maxBounds={defaultMapConfig.maxBounds}
-                                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                                    style={{ height: '100%', width: '100%' }}
-                                >
-                                    <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                    <MapResizeFix />
-                                    <Marker position={[disaster.location.lat, disaster.location.lng]}>
-                                        <Popup><div className="p-1"><p className="text-xs font-bold">{disasterType}</p><p className="text-xs text-gray-600">{disaster.location.address}</p></div></Popup>
-                                    </Marker>
-                                </MapContainer>
-                            </div>
-                        ) : (
-                            <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                <MapContainer
-                                    center={defaultMapConfig.center}
-                                    zoom={defaultMapConfig.zoom}
-                                    minZoom={defaultMapConfig.minZoom}
-                                    maxZoom={defaultMapConfig.maxZoom}
-                                    maxBounds={defaultMapConfig.maxBounds}
-                                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                                    style={{ height: '100%', width: '100%' }}
-                                >
-                                    <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                    <MapResizeFix />
-                                </MapContainer>
-                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-10 pointer-events-none">
-                                    <p className="text-xs text-slate-200 bg-slate-900/90 px-2 py-1 rounded shadow">No specific location</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                {/* Right ~35% — evidence, then the map. Weather sits in the left
+                    column so this stack stays short enough to clear the fold. */}
+                <div className="flex flex-col gap-3 lg:col-span-4">
+                    <PhotoCard src={disaster.photo} alt={`${typeLabel} report photo`} icon={IconCamera} />
+                    <LocationCard
+                        lat={disaster.location?.lat}
+                        lng={disaster.location?.lng}
+                        label={typeLabel}
+                        address={disaster.location?.address}
+                    >
+                        <KeyValueRow label="Address" value={disaster.location?.address} />
+                    </LocationCard>
                 </div>
             </div>
 
             {showConfirmDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-                    <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-4">
-                        <h3 className="text-lg font-bold text-white mb-2">Confirm Resolution</h3>
-                        <p className="text-sm text-slate-300 mb-3">Confirm that this disaster has been resolved.</p>
-
-                        <div className="space-y-2.5 mb-4">
-                            <div>
-                                <label className="block text-xs font-medium text-slate-300 mb-1">Resolved By</label>
-                                <input type="text" value={resolvedBy} onChange={(e) => setResolvedBy(e.target.value)} placeholder="Team/Organization name" className="input-field text-sm" />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-slate-300 mb-1">Notes (Optional)</label>
-                                <textarea value={responderNotes} onChange={(e) => setResponderNotes(e.target.value)} placeholder="Resolution details..." rows="2" className="input-field text-sm" />
-                            </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                            <button onClick={confirmMarkResolved} className="btn-primary flex-1 text-sm py-2">Confirm</button>
-                            <button onClick={() => setShowConfirmDialog(false)} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm">Cancel</button>
-                        </div>
-                    </div>
-                </div>
+                <ConfirmDialog
+                    title="Confirm resolution"
+                    description="This marks the incident as resolved and stops it appearing in active response queues."
+                    confirmLabel="Mark Resolved"
+                    submitting={isSubmitting}
+                    onCancel={() => setShowConfirmDialog(false)}
+                    onConfirm={confirmMarkResolved}
+                >
+                    <Field label="Resolved by">
+                        <input type="text" value={resolvedBy} onChange={e => setResolvedBy(e.target.value)} placeholder="Team or organisation name" className={INPUT} />
+                    </Field>
+                    <Field label="Notes (optional)">
+                        <textarea value={responderNotes} onChange={e => setResponderNotes(e.target.value)} placeholder="Resolution details…" rows="3" className={INPUT} />
+                    </Field>
+                </ConfirmDialog>
             )}
-            </div>
-        </div>
+        </DetailShell>
     );
 }
 

@@ -946,7 +946,7 @@ function RespondDashboard() {
         <div className="relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-slate-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>

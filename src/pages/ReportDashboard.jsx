@@ -56,32 +56,32 @@ const REPORT_OPTIONS = [
 
 const COLOR_STYLES = {
     danger: {
-        bar: 'from-danger-500 to-orange-400',
-        badge: 'bg-danger-500 shadow-danger-500/40',
+        bar: 'bg-danger-500',
+        badge: 'bg-danger-500 text-white',
         text: 'group-hover:text-danger-400',
         cta: 'text-danger-400',
     },
     fuchsia: {
-        bar: 'from-fuchsia-500 to-purple-400',
-        badge: 'bg-fuchsia-500 shadow-fuchsia-500/40',
+        bar: 'bg-fuchsia-500',
+        badge: 'bg-fuchsia-500 text-white',
         text: 'group-hover:text-fuchsia-400',
         cta: 'text-fuchsia-400',
     },
     primary: {
-        bar: 'from-primary-500 to-blue-400',
-        badge: 'bg-primary-500 shadow-primary-500/40',
+        bar: 'bg-primary-500',
+        badge: 'bg-primary-500 text-white',
         text: 'group-hover:text-primary-300',
         cta: 'text-primary-300',
     },
     success: {
-        bar: 'from-success-500 to-primary-400',
-        badge: 'bg-success-500 shadow-success-500/40',
+        bar: 'bg-success-500',
+        badge: 'bg-success-500 text-white',
         text: 'group-hover:text-success-400',
         cta: 'text-success-400',
     },
     amber: {
-        bar: 'from-amber-500 to-orange-400',
-        badge: 'bg-amber-500 shadow-amber-500/40',
+        bar: 'bg-amber-500',
+        badge: 'bg-amber-500 text-white',
         text: 'group-hover:text-amber-400',
         cta: 'text-amber-400',
     },
@@ -107,7 +107,7 @@ function ReportDashboard() {
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-4 pt-6 pb-6 sm:px-8 lg:px-12">
                 <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-lg shadow-danger-500/30">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-danger-500 text-white shadow-sm">
                         <IconSiren className="h-5 w-5" />
                     </div>
                     <div>
@@ -126,10 +126,10 @@ function ReportDashboard() {
                         return (
                             <Link key={to} to={to} className="group">
                                 <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.08]">
-                                    <div className={`absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b ${styles.bar}`}></div>
+                                    <div className={`absolute inset-y-0 left-0 w-1 ${styles.bar}`}></div>
                                     <div className="flex items-start gap-3">
-                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-white shadow-lg transition-transform duration-200 group-hover:scale-105 ${styles.badge}`}>
-                                            <Icon className="h-6 w-6" />
+                                        <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl shadow-sm transition-transform duration-200 group-hover:scale-105 ${styles.badge}`}>
+                                            <Icon className="h-5 w-5" />
                                         </div>
                                         <div className="flex-1">
                                             <h3 className={`mb-1 text-base font-bold text-slate-900 dark:text-white ${styles.text}`}>
@@ -152,7 +152,7 @@ function ReportDashboard() {
 
                 {/* Important Notice */}
                 <div className="mt-4 flex items-start gap-3 rounded-2xl border border-primary-400/20 bg-primary-500/10 p-4 backdrop-blur-md">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-primary-500/20 bg-primary-500/10 text-primary-300">
                         <IconCloud className="h-5 w-5" />
                     </div>
                     <div>
@@ -165,7 +165,7 @@ function ReportDashboard() {
 
                 {/* SMS Alternative */}
                 <div className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-300">
                         <IconMessageSquare className="h-5 w-5" />
                     </div>
                     <div>
@@ -174,7 +174,7 @@ function ReportDashboard() {
                             Text your report to: <span className="font-bold text-slate-900 dark:text-white">1234</span>
                         </p>
                         <p className="text-xs text-slate-400">
-                            Format: MISSING [Name] [Age] [Location] OR DISASTER [Type] [Location]
+                            No fixed format needed — just describe what's happening in your own words, in any language. e.g. "missing boy 10yo near river bridge" or "flood in my village need boats"
                         </p>
                     </div>
                 </div>

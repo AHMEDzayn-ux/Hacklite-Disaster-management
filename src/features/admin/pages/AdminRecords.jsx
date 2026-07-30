@@ -494,6 +494,55 @@ function AdminRecords() {
                                             </div>
                                         </div>
 
+                                        {/*
+                                          Missing person cases only. The reporter's identity is withheld
+                                          from every responder and public view — a stranger who can name
+                                          the family and phone them directly is how "I found her, pay me
+                                          first" starts. This console is the one place it is shown.
+                                        */}
+                                        {selectedTable === 'missing_persons' && (
+                                            <div className="bg-white/5 border border-amber-500/30 rounded-xl p-4">
+                                                <h4 className="text-lg font-semibold text-white mb-1">Reporter (withheld from public views)</h4>
+                                                <p className="text-xs text-slate-400 mb-4">
+                                                    Administrator-only. Responders never see these; the reporter is notified automatically by SMS when a case is closed.
+                                                </p>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {renderDetailField('Reporter Name', detailModal.record.reporter_name)}
+                                                    {renderDetailField('Reporter Phone', detailModal.record.contact_number)}
+                                                    {renderDetailField('Reported Via', detailModal.record.reported_via_sms ? 'SMS' : 'Web form')}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Case closure record (missing persons) */}
+                                        {selectedTable === 'missing_persons' && detailModal.record.found_at && (
+                                            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                                <h4 className="text-lg font-semibold text-white mb-1">Case Closure</h4>
+                                                <p className="text-xs text-slate-400 mb-4">
+                                                    Submitted by a member of the public and screened for payment demands, but not independently verified.
+                                                </p>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {renderDetailField('Closed By', detailModal.record.resolved_by_name)}
+                                                    {renderDetailField('Closer\'s Phone', detailModal.record.found_by_contact)}
+                                                    {renderDetailField('Person Now At', detailModal.record.found_person_location)}
+                                                    {renderDetailField('Condition', (detailModal.record.found_person_condition || '').replace(/_/g, ' '))}
+                                                    {renderDetailField('Verify With', detailModal.record.authority_contact)}
+                                                    {renderDetailField('Closed At', formatDate(detailModal.record.found_at))}
+                                                    {renderDetailField('Reporter Notified',
+                                                        detailModal.record.reporter_notification_status === 'sent'
+                                                            ? `Yes — SMS ${formatDate(detailModal.record.reporter_notified_at)}`
+                                                            : detailModal.record.reporter_notification_status
+                                                                ? `No — ${detailModal.record.reporter_notification_status.replace(/_/g, ' ')}`
+                                                                : null)}
+                                                </div>
+                                                {detailModal.record.found_notes && (
+                                                    <p className="mt-4 pt-4 border-t border-white/10 text-slate-300 whitespace-pre-wrap">
+                                                        {detailModal.record.found_notes}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+
                                         {/* Description Card */}
                                         {(detailModal.record.description || detailModal.record.notes || detailModal.record.additional_info || detailModal.record.reason) && (
                                             <div className="bg-white/5 border border-white/10 rounded-xl p-4">

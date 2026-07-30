@@ -1,190 +1,115 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDonationStore } from '@/store/supabaseStore';
-import { IconHeart } from '@/components/icons/Icons';
+import { IconHeart, IconCheck, IconUser } from '@/components/icons/Icons';
 
-function RecentDonations({ limit = 10, showTicker = true }) {
+/** A gift counts as "just in" for two minutes after it clears. */
+const JUST_IN_MS = 120_000;
+
+const CURRENCY_PREFIX = { LKR: 'Rs.', USD: '$', EUR: '€', GBP: '£' };
+
+const formatAmount = donation =>
+    `${CURRENCY_PREFIX[donation.currency] || 'Rs.'}${parseFloat(donation.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const formatTimeAgo = dateString => {
+    const date = new Date(dateString);
+    if (isNaN(date)) return '';
+    const secs = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (secs < 60) return 'Just now';
+    if (secs < 3600) return `${Math.floor(secs / 60)} min ago`;
+    if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+    if (secs < 2592000) return `${Math.floor(secs / 86400)}d ago`;
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+};
+
+const donorName = donation => (donation.is_anonymous ? 'Anonymous donor' : donation.donor_name || 'Anonymous');
+
+/**
+ * Public donor ledger.
+ *
+ * This is the page's social proof: seeing that other people just gave, and
+ * reading why, is what moves an undecided visitor. So real names, amounts,
+ * designations and messages are all shown rather than summarised away.
+ */
+function RecentDonations({ limit = 8 }) {
     const { donations } = useDonationStore();
-    const [recentDonations, setRecentDonations] = useState([]);
-    const [newDonation, setNewDonation] = useState(null);
 
-    useEffect(() => {
-        // Filter successful donations and sort by date
-        const successful = donations
+    const successful = useMemo(
+        () => donations
             .filter(d => d.stripe_payment_status === 'succeeded')
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-            .slice(0, limit);
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+        [donations]
+    );
 
-        setRecentDonations(successful);
-    }, [donations, limit]);
+    const recent = useMemo(() => successful.slice(0, limit), [successful, limit]);
 
+    // "New" is derived from the timestamp rather than flagged on arrival: a
+    // donation earns the badge because it genuinely just happened, not because
+    // this component happened to mount — otherwise a days-old gift gets
+    // announced as new on first paint. The clock is held in state and ticked
+    // from an interval so render stays pure and the badge expires on its own.
+    const [now, setNow] = useState(() => Date.now());
     useEffect(() => {
-        // Check if there's a new donation (notify)
-        if (recentDonations.length > 0) {
-            const latestId = recentDonations[0].id;
-            const currentNew = newDonation?.id;
+        const id = setInterval(() => setNow(Date.now()), 30_000);
+        return () => clearInterval(id);
+    }, []);
 
-            if (latestId && latestId !== currentNew) {
-                setNewDonation(recentDonations[0]);
-                const timer = setTimeout(() => setNewDonation(null), 5000);
-                return () => clearTimeout(timer);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [recentDonations]);
-
-    const formatTimeAgo = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-
-        if (diffInSeconds < 60) return 'Just now';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}min ago`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-        return date.toLocaleDateString();
-    };
-
-    const formatDonorName = (donation) => {
-        if (donation.is_anonymous) {
-            return 'Anonymous Donor';
-        }
-        return donation.donor_name || 'Anonymous';
-    };
-
-    if (recentDonations.length === 0) {
-        return (
-            <div className="rounded-xl border border-white/10 bg-white/[0.04] p-6 text-center">
-                <p className="text-slate-400 text-sm">No donations yet. Be the first to contribute!</p>
-            </div>
-        );
-    }
+    const isJustIn = donation => now - new Date(donation.created_at).getTime() < JUST_IN_MS;
 
     return (
-        <div className="space-y-3">
-            {/* New Donation Toast */}
-            {newDonation && (
-                <div className="rounded-lg border border-success-500/30 bg-success-500/10 p-3">
-                    <div className="flex items-center gap-3">
-                        <span className="text-xl">🎉</span>
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-success-200">
-                                {formatDonorName(newDonation)} donated {newDonation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(newDonation.amount).toFixed(2)}
-                            </p>
-                            <p className="text-xs text-success-300/80">
-                                Thank you for the generosity
-                            </p>
-                        </div>
-                    </div>
+        <section className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+            <header className="flex h-10 flex-shrink-0 items-center justify-between gap-2 border-b border-slate-200 px-3 dark:border-white/10">
+                <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <IconHeart className="h-4 w-4 flex-shrink-0 text-slate-400" />
+                    Recent Donations
+                </h2>
+                {successful.length > 0 && (
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {successful.length} total
+                    </span>
+                )}
+            </header>
+
+            {recent.length === 0 ? (
+                <div className="px-3 py-8 text-center">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">No donations recorded yet.</p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Be the first to contribute to this appeal.</p>
                 </div>
-            )}
-
-            {/* Recent Donations List */}
-            <div className="rounded-xl border border-white/10 bg-white/[0.04] overflow-hidden">
-                <div className="bg-white/[0.03] p-3 border-b border-white/10">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <IconHeart className="h-4 w-4 text-slate-400" /> Recent Donations
-                    </h3>
-                    <p className="text-slate-500 text-xs">Live updates from our donors</p>
-                </div>
-
-                <div className="divide-y divide-white/10 max-h-72 overflow-y-auto">
-                    {recentDonations.map((donation) => (
-                        <div key={donation.id} className="p-3">
-                            <div className="flex items-start justify-between gap-4">
-                                {/* Left: Donor Info */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-0.5">
-                                        <span className="text-sm">
-                                            {donation.is_anonymous ? '🙏' : '👤'}
-                                        </span>
-                                        <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                                            {formatDonorName(donation)}
-                                        </span>
-                                    </div>
-
-                                    <p className="text-xs text-slate-400 mb-1">
-                                        {donation.donation_purpose || 'General Relief'}
+            ) : (
+                <ul className="m-0 max-h-[22rem] list-none divide-y divide-slate-200 overflow-y-auto p-0 scroll-panel dark:divide-white/10">
+                    {recent.map(donation => (
+                        <li
+                            key={donation.id}
+                            className={`px-3 py-2.5 ${isJustIn(donation) ? 'bg-success-50 dark:bg-success-500/10' : ''}`}
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                    <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-900 dark:text-white">
+                                        <IconUser className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
+                                        <span className="truncate">{donorName(donation)}</span>
+                                        {isJustIn(donation) && (
+                                            <span className="inline-flex flex-shrink-0 items-center gap-1 rounded border border-success-200 bg-success-50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success-700 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-300">
+                                                <IconCheck className="h-3 w-3" /> New
+                                            </span>
+                                        )}
                                     </p>
-
+                                    <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                                        {donation.donation_purpose || 'General Relief Fund'} · {formatTimeAgo(donation.created_at)}
+                                    </p>
                                     {donation.message && !donation.is_anonymous && (
-                                        <p className="text-xs text-slate-400 italic mt-1.5 border-l-2 border-white/10 pl-2.5">
-                                            "{donation.message?.substring(0, 100) || ''}
-                                            {donation.message.length > 100 ? '...' : ''}"
+                                        <p className="mt-1.5 border-l-2 border-slate-200 pl-2 text-xs italic leading-snug text-slate-600 dark:border-white/15 dark:text-slate-300">
+                                            “{donation.message.length > 120 ? `${donation.message.slice(0, 120)}…` : donation.message}”
                                         </p>
                                     )}
-
-                                    <p className="text-[11px] text-slate-500 mt-1.5">
-                                        {formatTimeAgo(donation.created_at)}
-                                    </p>
                                 </div>
-
-                                {/* Right: Amount */}
-                                <div className="text-right flex-shrink-0">
-                                    <div className="text-sm font-bold text-slate-200">
-                                        {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toFixed(2)}
-                                    </div>
-                                    <div className="text-[10px] text-slate-500 uppercase">
-                                        {donation.currency || 'USD'}
-                                    </div>
-                                </div>
+                                <p className="flex-shrink-0 text-[15px] font-semibold tabular-nums text-slate-900 dark:text-white">
+                                    {formatAmount(donation)}
+                                </p>
                             </div>
-                        </div>
+                        </li>
                     ))}
-                </div>
-
-                {/* View All Link */}
-                {donations.filter(d => d.stripe_payment_status === 'succeeded').length > limit && (
-                    <div className="bg-white/[0.02] border-t border-white/10 p-2.5 text-center">
-                        <button className="text-primary-300 hover:text-primary-200 text-xs font-semibold">
-                            View All {donations.filter(d => d.stripe_payment_status === 'succeeded').length} Donations →
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            {/* Ticker Mode (Optional) */}
-            {showTicker && recentDonations.length > 3 && (
-                <div className="rounded-lg border border-white/10 bg-gradient-to-r from-primary-600/70 to-fuchsia-600/70 backdrop-blur-md overflow-hidden">
-                    <div className="ticker-container py-3">
-                        <div className="ticker-content flex gap-8 items-center">
-                            {[...recentDonations, ...recentDonations].map((donation, index) => (
-                                <div
-                                    key={`${donation.id}-${index}`}
-                                    className="flex items-center gap-3 text-slate-900 dark:text-white whitespace-nowrap"
-                                >
-                                    <span>🎁</span>
-                                    <span className="font-semibold">
-                                        {formatDonorName(donation)}
-                                    </span>
-                                    <span>donated</span>
-                                    <span className="font-bold text-amber-300">
-                                        {donation.currency === 'LKR' ? 'Rs.' : '$'}{parseFloat(donation.amount).toFixed(2)}
-                                    </span>
-                                    <span className="text-slate-300">•</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                </ul>
             )}
-
-            <style jsx>{`
-                .ticker-container {
-                    overflow: hidden;
-                }
-                .ticker-content {
-                    display: flex;
-                    animation: ticker 30s linear infinite;
-                }
-                @keyframes ticker {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .ticker-content:hover {
-                    animation-play-state: paused;
-                }
-            `}</style>
-        </div>
+        </section>
     );
 }
 

@@ -8,6 +8,8 @@ import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
 import MapResizeFix from '@/components/map/MapResizeFix';
 import MapFrame from '@/components/map/MapFrame';
+import MapInsightsPanel from '@/components/map/MapInsightsPanel';
+import { INSIGHT_TONE } from '@/lib/mapInsightTones';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconSearch, IconGrid, IconMap, IconMapPin, IconUsers, IconX, IconInfo } from '@/components/icons/Icons';
@@ -163,6 +165,54 @@ function DisasterReportsList({ role = 'responder' }) {
         return 'Just now';
     };
 
+    // Records actually plotted on the map (same geo filter as the markers
+    // below) - insights are derived from exactly what the user can see.
+    const mappedDisasters = filteredDisasters.filter(d => d.location && d.location.lat && d.location.lng);
+
+    const buildMapInsights = (disastersOnMap) => {
+        if (disastersOnMap.length === 0) return { stats: [], insights: [] };
+
+        const byDistrict = {};
+        const byType = {};
+        disastersOnMap.forEach(d => {
+            const district = getDistrictFromAddress(d.location?.address || '');
+            if (district) byDistrict[district] = (byDistrict[district] || 0) + 1;
+            const type = d.disaster_type || d.disasterType || 'other';
+            byType[type] = (byType[type] || 0) + 1;
+        });
+        const topDistrict = Object.entries(byDistrict).sort((a, b) => b[1] - a[1])[0];
+        const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0];
+
+        const active = disastersOnMap.filter(d => d.status === 'Active');
+        const critical = active.filter(d => d.severity === 'critical' || d.severity === 'high');
+        const resolved = disastersOnMap.filter(d => d.status === 'Resolved');
+
+        const stats = [
+            { icon: '📍', label: 'Most Affected Area', value: topDistrict ? topDistrict[0] : '—', detail: topDistrict ? `${topDistrict[1]} report(s) mapped` : 'no district data' },
+            { icon: '🚨', label: 'Critical/High', value: critical.length, detail: `of ${active.length} active` },
+            { icon: '✅', label: 'Resolved', value: resolved.length, detail: `of ${disastersOnMap.length} mapped` },
+            { icon: topType ? getDisasterIcon(topType[0]) : '⚠️', label: 'Top Disaster Type', value: topType ? topType[0].replace('-', ' ') : '—', detail: topType ? `${topType[1]} report(s)` : 'no data' },
+        ];
+
+        const insights = [];
+        if (topDistrict && topDistrict[1] >= 2) {
+            insights.push({ icon: '📈', tone: INSIGHT_TONE.warn, text: `${topDistrict[1]} reports are clustered in ${topDistrict[0]} — the most affected area in this view.` });
+        }
+        if (critical.length > 0) {
+            insights.push({ icon: '🚨', tone: INSIGHT_TONE.danger, text: `${critical.length} critical/high severity disaster(s) need immediate attention${topDistrict ? `, mostly around ${topDistrict[0]}` : ''}.` });
+        }
+        if (topType && topType[1] >= 2) {
+            insights.push({ icon: getDisasterIcon(topType[0]), tone: INSIGHT_TONE.info, text: `${getDisasterIcon(topType[0])} ${topType[0].replace('-', ' ')} is the most-reported disaster type here (${topType[1]} reports).` });
+        }
+        if (active.length === 0) {
+            insights.push({ icon: '✅', tone: INSIGHT_TONE.ok, text: 'No active disasters in this view.' });
+        }
+
+        return { stats, insights };
+    };
+
+    const mapInsights = buildMapInsights(mappedDisasters);
+
     const handleDisasterClick = (disaster) => {
         const route = role === 'responder' ? `/disasters-list/${disaster.id}` : `/disasters/${disaster.id}`;
         navigate(route);
@@ -183,7 +233,9 @@ function DisasterReportsList({ role = 'responder' }) {
     }
 
     return (
-        <div className="page-shell">
+        <div className={viewMode === 'map'
+            ? 'relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col'
+            : 'page-shell'}>
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -192,85 +244,51 @@ function DisasterReportsList({ role = 'responder' }) {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
-                <div className="mb-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <p className="text-sm text-slate-300">
-                            {activeCount} ongoing disasters &middot; {criticalCount} critical severity &middot; {resolvedCount} resolved cases
-                        </p>
+            <div className={`relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 w-full ${viewMode === 'map' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
+                {/* Header + Filters — one compact row so map view keeps most of the viewport */}
+                <div className="card mb-3 p-3 flex-shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2 py-1 bg-danger-500/15 text-danger-300 rounded-full font-medium text-sm">
+                            {activeCount} Active
+                        </span>
+                        <span className="text-slate-400 text-sm">
+                            {criticalCount} critical &middot; {resolvedCount} resolved
+                        </span>
 
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setViewMode('cards')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${viewMode === 'cards'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
-                                    }`}
-                            >
-                                <IconGrid className="h-4 w-4" />
-                                Card View
-                            </button>
-                            <button
-                                onClick={() => setViewMode('map')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${viewMode === 'map'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
-                                    }`}
-                            >
-                                <IconMap className="h-4 w-4" />
-                                Map View
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                        <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block" />
 
-                {/* Filters */}
-                <div className="card mb-3 p-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Search</label>
-                            <div className="relative">
-                                <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                                <input
-                                    type="text"
-                                    placeholder="Location, description..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="input-field pl-10"
-                                />
-                            </div>
+                        <div className="relative">
+                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                            <input
+                                type="text"
+                                placeholder="Location, description..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
+                            />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
-                            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-field">
-                                <option value="all" className="text-slate-900">All Status</option>
-                                <option value="active" className="text-slate-900">Active</option>
-                                <option value="resolved" className="text-slate-900">Resolved</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Type</label>
-                            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="input-field">
-                                <option value="all" className="text-slate-900">All Types</option>
-                                <option value="flood" className="text-slate-900">Flood</option>
-                                <option value="landslide" className="text-slate-900">Landslide</option>
-                                <option value="fire" className="text-slate-900">Fire</option>
-                                <option value="cyclone" className="text-slate-900">Cyclone</option>
-                                <option value="earthquake" className="text-slate-900">Earthquake</option>
-                                <option value="drought" className="text-slate-900">Drought</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Severity</label>
-                            <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)} className="input-field">
-                                <option value="all" className="text-slate-900">All Severities</option>
-                                <option value="critical" className="text-slate-900">Critical</option>
-                                <option value="high" className="text-slate-900">High</option>
-                                <option value="moderate" className="text-slate-900">Moderate</option>
-                                <option value="low" className="text-slate-900">Low</option>
-                            </select>
-                        </div>
-                        <div className="flex items-end">
+                        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50">
+                            <option value="all" className="text-slate-900">All Status</option>
+                            <option value="active" className="text-slate-900">Active</option>
+                            <option value="resolved" className="text-slate-900">Resolved</option>
+                        </select>
+                        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50">
+                            <option value="all" className="text-slate-900">All Types</option>
+                            <option value="flood" className="text-slate-900">Flood</option>
+                            <option value="landslide" className="text-slate-900">Landslide</option>
+                            <option value="fire" className="text-slate-900">Fire</option>
+                            <option value="cyclone" className="text-slate-900">Cyclone</option>
+                            <option value="earthquake" className="text-slate-900">Earthquake</option>
+                            <option value="drought" className="text-slate-900">Drought</option>
+                        </select>
+                        <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)} className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50">
+                            <option value="all" className="text-slate-900">All Severities</option>
+                            <option value="critical" className="text-slate-900">Critical</option>
+                            <option value="high" className="text-slate-900">High</option>
+                            <option value="moderate" className="text-slate-900">Moderate</option>
+                            <option value="low" className="text-slate-900">Low</option>
+                        </select>
+                        {(searchTerm || statusFilter !== 'all' || typeFilter !== 'all' || severityFilter !== 'all' || districtFilter !== 'all') && (
                             <button
                                 onClick={() => {
                                     setSearchTerm('');
@@ -279,10 +297,36 @@ function DisasterReportsList({ role = 'responder' }) {
                                     setSeverityFilter('all');
                                     setDistrictFilter('all');
                                 }}
-                                className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium rounded-lg flex items-center justify-center gap-2"
+                                className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 px-2 py-1.5"
                             >
                                 <IconX className="h-3.5 w-3.5" />
-                                Clear Filters
+                                Clear
+                            </button>
+                        )}
+                        <span className="ml-auto text-xs text-slate-500">
+                            {filteredDisasters.length} of {disasters.length}
+                        </span>
+
+                        <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
+                            <button
+                                onClick={() => setViewMode('cards')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'cards'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    : 'text-slate-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                <IconGrid className="h-3.5 w-3.5" />
+                                Cards
+                            </button>
+                            <button
+                                onClick={() => setViewMode('map')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'map'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    : 'text-slate-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                <IconMap className="h-3.5 w-3.5" />
+                                Map
                             </button>
                         </div>
                     </div>
@@ -290,7 +334,7 @@ function DisasterReportsList({ role = 'responder' }) {
 
                 {/* Content */}
                 {viewMode === 'cards' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredDisasters.map((disaster) => {
                             const severityBadge = getSeverityBadge(disaster.severity);
                             const statusBadge = getStatusBadge(disaster.status);
@@ -304,74 +348,73 @@ function DisasterReportsList({ role = 'responder' }) {
                                     onClick={() => handleDisasterClick(disaster)}
                                     className="card hover:border-white/25 hover:bg-white/[0.08] cursor-pointer"
                                 >
-                                    {disaster.photo && (
-                                        <div className="relative mb-4">
-                                            <LazyImage src={disaster.photo} alt={disasterType} className="w-full h-48 rounded-lg bg-white/5" aspectRatio="16/9" />
-                                            <div className="absolute top-2 right-2">
-                                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusBadge.className}`}>
+                                    <div className="flex gap-4">
+                                        {/* Photo */}
+                                        {disaster.photo && (
+                                            <div className="flex-shrink-0">
+                                                <LazyImage
+                                                    src={disaster.photo}
+                                                    alt={disasterType}
+                                                    className="w-24 h-24 rounded-lg border border-white/10 bg-white/5"
+                                                    aspectRatio="1/1"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Details */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between gap-2 mb-2">
+                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2 truncate">
+                                                    <span>{getDisasterIcon(disasterType)}</span>
+                                                    {disasterType?.replace('-', ' ') || 'Unknown'}
+                                                </h3>
+                                                <span className={`px-2 py-1 rounded text-xs font-semibold flex-shrink-0 ${statusBadge.className}`}>
                                                     {statusBadge.text}
                                                 </span>
                                             </div>
-                                        </div>
-                                    )}
 
-                                    <div className="space-y-3">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2">
-                                                <span>{getDisasterIcon(disasterType)}</span>
-                                                {disasterType?.replace('-', ' ') || 'Unknown'}
-                                            </h3>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${severityBadge.className}`}>
-                                                {severityBadge.text}
-                                            </span>
-                                        </div>
-
-                                        <p className="text-sm text-slate-300 line-clamp-2">{disaster.description}</p>
-
-                                        <div className="pt-2 border-t border-white/10 space-y-2">
-                                            <div className="flex items-start gap-2">
-                                                <IconMapPin className="h-4 w-4 flex-shrink-0 text-slate-500 mt-0.5" />
-                                                <span className="text-sm text-slate-300 line-clamp-2">{disaster.location?.address || 'Unknown'}</span>
+                                            <div className="flex gap-2 mb-2">
+                                                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${severityBadge.className}`}>
+                                                    {severityBadge.text}
+                                                </span>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <IconUsers className="h-4 w-4 flex-shrink-0 text-slate-500" />
-                                                    <span className="text-sm text-slate-400">{peopleAffected || 'Unknown'} affected</span>
-                                                </div>
-                                                <span className="text-sm text-slate-500">{getTimeSince(reportedAt)}</span>
-                                            </div>
-                                        </div>
 
-                                        <button className="btn-primary w-full mt-4">
-                                            View Details
-                                        </button>
+                                            <p className="text-sm text-slate-300 line-clamp-2">{disaster.description}</p>
+                                        </div>
                                     </div>
+
+                                    <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                                        <div className="flex items-start gap-2">
+                                            <IconMapPin className="h-4 w-4 flex-shrink-0 text-slate-500 mt-0.5" />
+                                            <span className="text-sm text-slate-300 line-clamp-2">{disaster.location?.address || 'Unknown'}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <IconUsers className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                                                <span className="text-sm text-slate-400">{peopleAffected || 'Unknown'} affected</span>
+                                            </div>
+                                            <span className="text-sm text-slate-500">{getTimeSince(reportedAt)}</span>
+                                        </div>
+                                    </div>
+
+                                    <button className="btn-primary w-full mt-3">
+                                        View Details
+                                    </button>
                                 </div>
                             );
                         })}
                     </div>
                 ) : (
-                    <div>
-                        {/* Warning Note */}
-                        <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
-                            <div className="flex items-start gap-3">
-                                <IconInfo className="h-5 w-5 flex-shrink-0 text-amber-300 mt-0.5" />
-                                <div>
-                                    <h4 className="text-sm font-semibold text-amber-200 mb-1">Map View Limitation</h4>
-                                    <p className="text-sm text-amber-100/80">
-                                        Only disaster reports with valid location coordinates are displayed on the map.
-                                        <span className="font-medium text-amber-100"> Switch to Card View</span> to see all reports including those without map coordinates.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col lg:flex-row gap-4 items-start">
-                            <div className="card p-0 overflow-hidden w-full lg:w-auto">
-                                <MapFrame height={600}>
+                    <div className="flex-1 min-h-0 flex flex-col">
+                        <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 items-start">
+                            <div className="w-full h-[50vh] lg:h-full flex-1 min-w-0">
+                                <MapFrame
+                                    height="100%"
+                                    className="rounded-xl border border-white/10"
+                                    resizable
+                                    fillWidth
+                                    minHeight={260}
+                                >
                                 <MapContainer
                                     center={[7.8731, 80.7718]}
                                     zoom={7}
@@ -445,19 +488,20 @@ function DisasterReportsList({ role = 'responder' }) {
                                 </MapFrame>
                             </div>
 
-                            <div className="card p-4 w-full lg:w-64 lg:flex-shrink-0 space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-danger-500 rounded-full flex-shrink-0"></div>
-                                    <span className="text-sm font-medium text-slate-200">Active ({activeCount})</span>
+                            {/* Sidebar: warning note + legend */}
+                            <div className="w-full lg:w-72 lg:flex-shrink-0 flex flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:pr-1 scroll-panel">
+                                <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                                    <IconInfo className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                                    <span>Only reports with coordinates are shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-success-500 rounded-full flex-shrink-0"></div>
-                                    <span className="text-sm font-medium text-slate-200">Resolved ({resolvedCount})</span>
+
+                                {/* Marker color key — counts already shown in the filter bar above */}
+                                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-danger-500 rounded-full inline-block"></span> Active</span>
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Resolved</span>
                                 </div>
-                                <p className="flex items-start gap-1.5 text-xs text-slate-400 pt-2 border-t border-white/10">
-                                    <IconInfo className="h-4 w-4 flex-shrink-0" />
-                                    Records without valid coordinates are not displayed on the map. Switch to Card View to see all reports.
-                                </p>
+
+                                <MapInsightsPanel stats={mapInsights.stats} insights={mapInsights.insights} />
                             </div>
                         </div>
                     </div>

@@ -181,7 +181,7 @@ function AdminCommandDashboard() {
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
                 <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-slate-500/10 rounded-full blur-3xl"></div>
             </div>
 
             <div

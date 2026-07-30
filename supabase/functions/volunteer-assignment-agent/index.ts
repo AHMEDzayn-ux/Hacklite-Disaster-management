@@ -11,7 +11,12 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7'
 import { authenticateAgentCaller } from '../_shared/agentAuth.ts'
 import { solveAssignmentProblem, FORBIDDEN_PAIRING_COST } from '../_shared/hungarianAlgorithm.ts'
 import { haversineKm } from '../_shared/geo.ts'
-import { inferRequiredSkills, hasMatchingSkill } from '../_shared/taskSkills.ts'
+import {
+  inferDisasterRequiredSkills, isDisasterHazardous,
+  inferMissingPersonRequiredSkills, isMissingPersonHazardous,
+  inferAnimalRescueRequiredSkills, isAnimalRescueHazardous,
+  isSafeToAssign,
+} from '../_shared/taskSkills.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -79,7 +84,37 @@ Deno.serve(async (req: Request) => {
       taskDisasterIds = (recent ?? []).map((d: any) => d.id)
     }
 
-    if (!volunteers || volunteers.length === 0 || taskDisasterIds.length === 0) {
+    const [{ data: disasterRows }, { data: missingRows }, { data: animalRows }] = await Promise.all([
+      taskDisasterIds.length
+        ? supabase.from('disasters').select('id, location, needs, severity').in('id', taskDisasterIds)
+        : Promise.resolve({ data: [] }),
+      supabase.from('missing_persons').select('id, last_seen_location, description, additional_info')
+        .eq('status', 'Active').order('created_at', { ascending: false }).limit(MAX_TASKS_PER_RUN),
+      supabase.from('animal_rescues').select('id, location, description, condition, is_dangerous')
+        .eq('status', 'Active').order('created_at', { ascending: false }).limit(MAX_TASKS_PER_RUN),
+    ])
+
+    // Unify all three report types into one task shape so a single
+    // Hungarian-algorithm solve can consider them together - each task
+    // carries its own required-skill list and hazard flag so the safety
+    // gate below applies uniformly regardless of task type.
+    type Task = { type: 'disaster' | 'missing_person' | 'animal_rescue'; id: string; location: any; requiredSkills: string[]; hazardous: boolean }
+    const taskList: Task[] = [
+      ...(disasterRows ?? []).map((d: any): Task => ({
+        type: 'disaster', id: d.id, location: d.location,
+        requiredSkills: inferDisasterRequiredSkills(d.needs), hazardous: isDisasterHazardous(d),
+      })),
+      ...(missingRows ?? []).map((p: any): Task => ({
+        type: 'missing_person', id: p.id, location: p.last_seen_location,
+        requiredSkills: inferMissingPersonRequiredSkills(p), hazardous: isMissingPersonHazardous(p),
+      })),
+      ...(animalRows ?? []).map((a: any): Task => ({
+        type: 'animal_rescue', id: a.id, location: a.location,
+        requiredSkills: inferAnimalRescueRequiredSkills(), hazardous: isAnimalRescueHazardous(a),
+      })),
+    ]
+
+    if (!volunteers || volunteers.length === 0 || taskList.length === 0) {
       await supabase.from('agent_runs').update({
         status: 'success', finished_at: new Date().toISOString(), duration_ms: Date.now() - runStart,
         items_processed: 0, output_summary: { reason: 'no available volunteers or no open tasks' },
@@ -87,17 +122,10 @@ Deno.serve(async (req: Request) => {
       return json(200, { success: true, run_id: run.id, assignments_created: 0 })
     }
 
-    const { data: tasks } = await supabase
-      .from('disasters')
-      .select('id, location, needs')
-      .in('id', taskDisasterIds)
-
-    const taskList = tasks ?? []
     const costMatrix: number[][] = volunteers.map((v: any) => {
       const vLoc = v.location
-      return taskList.map((t: any) => {
-        const requiredSkills = inferRequiredSkills(t.needs)
-        if (!hasMatchingSkill(v.skills, requiredSkills)) return FORBIDDEN_PAIRING_COST
+      return taskList.map((t) => {
+        if (!isSafeToAssign(v.skills, t.requiredSkills, t.hazardous)) return FORBIDDEN_PAIRING_COST
 
         const tLoc = t.location
         if (vLoc?.lat && vLoc?.lng && tLoc?.lat && tLoc?.lng) {
@@ -116,15 +144,17 @@ Deno.serve(async (req: Request) => {
       const cost = costMatrix[i][j]
       if (cost >= FORBIDDEN_PAIRING_COST) continue
 
+      const task = taskList[j]
       const { error } = await supabase.from('volunteer_assignments').insert({
         run_id: run.id,
         volunteer_id: volunteers[i].id,
-        task_type: 'disaster',
-        task_ref_id: taskList[j].id,
+        task_type: task.type,
+        task_ref_id: task.id,
         assignment_cost: cost,
         distance_km: cost < NO_LOCATION_DISTANCE_KM ? cost : null,
         skill_match: true,
         status: 'proposed',
+        source: 'agent',
       })
       if (!error) assignmentsCreated++
     }

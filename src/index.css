@@ -12,13 +12,71 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* Opt-in slim scrollbar, re-enabled on top of the global hide above.
+   Hiding scrollbars is fine for the page body, where the content is obviously
+   continuous. It is not fine for a panel whose height is capped by its
+   container (the map-view sidebar): the overflow is then invisible AND
+   undiscoverable, so content just looks truncated. Any element that scrolls
+   independently of the page must carry this class. Declared unlayered and
+   with class specificity so it wins over the `*` rules above. */
+.scroll-panel {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(212 212 212) transparent;
+}
+
+.scroll-panel::-webkit-scrollbar {
+  display: block;
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-panel::-webkit-scrollbar-thumb {
+  background-color: rgb(212 212 212);
+  border-radius: 9999px;
+}
+
+.scroll-panel:hover::-webkit-scrollbar-thumb {
+  background-color: rgb(163 163 163);
+}
+
+.dark .scroll-panel {
+  scrollbar-color: rgb(64 64 64) transparent;
+}
+
+.dark .scroll-panel::-webkit-scrollbar-thumb {
+  background-color: rgb(64 64 64);
+}
+
+.dark .scroll-panel:hover::-webkit-scrollbar-thumb {
+  background-color: rgb(82 82 82);
+}
+
 html, body {
   overflow-x: hidden;
 }
 
+/* The home page's content is sized to fit the viewport exactly - kill the
+   rubber-band bounce there only. Scoped via :has() so it never touches
+   pages (forms, dashboards) that legitimately need to scroll. */
+body:has(.home-shell) {
+  overscroll-behavior-y: none;
+}
+
+/* Safety net: the home page's spacing/font-sizes scale down with viewport
+   height so it should always fit in one screen, but if some browser/OS
+   chrome makes the real available height smaller than expected, allow a
+   vertical scroll instead of silently clipping content off-screen. */
+.page-shell.home-shell {
+  overflow-y: auto;
+}
+
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
   }
 }
 
@@ -54,7 +112,7 @@ html, body {
   /* Shared full-page wrapper: flat neutral in light mode, the existing
      subtle monochrome gradient in dark mode. */
   .page-shell {
-    @apply relative min-h-screen overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950;
+    @apply relative min-h-dvh overflow-hidden bg-slate-100 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950;
   }
 }
 
@@ -69,56 +127,84 @@ html, body {
  * on a solid color fill (buttons, badges), so it can't break contrast there.
  * --------------------------------------------------------------------- */
 @layer utilities {
-  .text-slate-200 { color: #334155; }
-  .dark .text-slate-200 { color: #e2e8f0; }
+  .text-slate-200 { color: #404040; }
+  .dark .text-slate-200 { color: #e5e5e5; }
 
-  .text-slate-300 { color: #475569; }
-  .dark .text-slate-300 { color: #cbd5e1; }
+  .text-slate-300 { color: #525252; }
+  .dark .text-slate-300 { color: #d4d4d4; }
 
-  .text-slate-400 { color: #64748b; }
-  .dark .text-slate-400 { color: #94a3b8; }
+  .text-slate-400 { color: #737373; }
+  .dark .text-slate-400 { color: #a3a3a3; }
 
-  .placeholder\:text-slate-400::placeholder { color: #94a3b8; }
-  .dark .placeholder\:text-slate-400::placeholder { color: #94a3b8; }
+  .placeholder\:text-slate-400::placeholder { color: #a3a3a3; }
+  .dark .placeholder\:text-slate-400::placeholder { color: #a3a3a3; }
 
-  .border-white\/10 { border-color: rgb(226 232 240); }
+  .border-white\/10 { border-color: rgb(229 229 229); }
   .dark .border-white\/10 { border-color: rgb(255 255 255 / 0.1); }
 
-  .border-white\/15 { border-color: rgb(203 213 225); }
+  .border-white\/15 { border-color: rgb(212 212 212); }
   .dark .border-white\/15 { border-color: rgb(255 255 255 / 0.15); }
 
-  .border-white\/20 { border-color: rgb(203 213 225); }
+  .border-white\/20 { border-color: rgb(212 212 212); }
   .dark .border-white\/20 { border-color: rgb(255 255 255 / 0.2); }
 
-  .bg-white\/5 { background-color: rgb(248 250 252); }
+  .bg-white\/5 { background-color: rgb(250 250 250); }
   .dark .bg-white\/5 { background-color: rgb(255 255 255 / 0.05); }
 
-  .bg-white\/10 { background-color: rgb(241 245 249); }
+  .bg-white\/10 { background-color: rgb(245 245 245); }
   .dark .bg-white\/10 { background-color: rgb(255 255 255 / 0.1); }
 
-  .bg-white\/\[0\.02\] { background-color: rgb(248 250 252); }
+  .bg-white\/\[0\.02\] { background-color: rgb(250 250 250); }
   .dark .bg-white\/\[0\.02\] { background-color: rgb(255 255 255 / 0.02); }
 
-  .bg-white\/\[0\.03\] { background-color: rgb(248 250 252); }
+  .bg-white\/\[0\.03\] { background-color: rgb(250 250 250); }
   .dark .bg-white\/\[0\.03\] { background-color: rgb(255 255 255 / 0.03); }
 
-  .bg-white\/\[0\.05\] { background-color: rgb(248 250 252); }
+  .bg-white\/\[0\.05\] { background-color: rgb(250 250 250); }
   .dark .bg-white\/\[0\.05\] { background-color: rgb(255 255 255 / 0.05); }
 
-  .bg-white\/\[0\.06\] { background-color: rgb(241 245 249); }
+  .bg-white\/\[0\.06\] { background-color: rgb(245 245 245); }
   .dark .bg-white\/\[0\.06\] { background-color: rgb(255 255 255 / 0.06); }
 
-  .bg-white\/\[0\.08\] { background-color: rgb(241 245 249); }
+  .bg-white\/\[0\.08\] { background-color: rgb(245 245 245); }
   .dark .bg-white\/\[0\.08\] { background-color: rgb(255 255 255 / 0.08); }
 
-  .hover\:bg-white\/5:hover { background-color: rgb(248 250 252); }
+  .hover\:bg-white\/5:hover { background-color: rgb(250 250 250); }
   .dark .hover\:bg-white\/5:hover { background-color: rgb(255 255 255 / 0.05); }
 
-  .hover\:bg-white\/10:hover { background-color: rgb(241 245 249); }
+  .hover\:bg-white\/10:hover { background-color: rgb(245 245 245); }
   .dark .hover\:bg-white\/10:hover { background-color: rgb(255 255 255 / 0.1); }
 
-  .hover\:bg-white\/20:hover { background-color: rgb(226 232 240); }
+  .hover\:bg-white\/20:hover { background-color: rgb(229 229 229); }
   .dark .hover\:bg-white\/20:hover { background-color: rgb(255 255 255 / 0.2); }
+
+  /* Semantic accent text at -200/-300 (danger/amber/success/primary) is only
+     ever used on a translucent wash of its own hue (bg-*-500/15) or on a card
+     surface. In dark mode that wash is dark, so the pale ink works. In light
+     mode the same wash resolves to near-white and the pale ink drops far below
+     4.5:1 - status pills like "2 Need Rescue" render as light pink on pink.
+     Remap to a -700/-800 ink for light mode and restore the original under
+     .dark. Verified by grep that none of these classes sit on a solid
+     saturated or dark fill, where a dark ink would be wrong. */
+  .text-danger-200 { color: #991b1b; }
+  .dark .text-danger-200 { color: #fecaca; }
+  .text-danger-300 { color: #b91c1c; }
+  .dark .text-danger-300 { color: #fca5a5; }
+
+  .text-amber-200 { color: #92400e; }
+  .dark .text-amber-200 { color: #fde68a; }
+  .text-amber-300 { color: #b45309; }
+  .dark .text-amber-300 { color: #fcd34d; }
+
+  .text-success-200 { color: #166534; }
+  .dark .text-success-200 { color: #bbf7d0; }
+  .text-success-300 { color: #15803d; }
+  .dark .text-success-300 { color: #86efac; }
+
+  .text-primary-200 { color: #1e40af; }
+  .dark .text-primary-200 { color: #bfdbfe; }
+  .text-primary-300 { color: #1d4ed8; }
+  .dark .text-primary-300 { color: #93c5fd; }
 }
 
 /* Override Tailwind container centering so content fits viewport horizontally */

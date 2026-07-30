@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useAnimalRescueStore } from '@/store';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import '@/lib/leafletIconFix';
-import { defaultMapConfig } from '@/lib/mapConfig';
-import MapResizeFix from '@/components/map/MapResizeFix';
-import { IconCamera, IconMapPin, IconMap, IconPhone, IconFirstAid } from '@/components/icons/Icons';
+import {
+    DetailShell, DetailHeader, DetailLoading, DetailNotFound, MetaDot,
+    InfoCard, KeyValueRow, MetricCard, StatusChip,
+    Timeline, TimelineItem, Button, ConfirmDialog, Field,
+    PhotoCard, WeatherCard, LocationCard,
+} from '@/components/detail/DetailKit';
+import { INPUT, useWeather, formatDateTime, formatTime, timeSince } from '@/lib/detailKit';
+import {
+    IconPawPrint, IconCheck, IconFileText, IconClipboardList, IconFirstAid,
+    IconPhone, IconCalendar, IconCamera, IconMapPin, IconClock, IconSiren,
+} from '@/components/icons/Icons';
+
+const CONDITION_TONE = { critical: 'critical', injured: 'warning', trapped: 'warning', sick: 'warning', healthy: 'success' };
+const CONDITION_LABEL = { critical: 'Critical', injured: 'Injured', trapped: 'Trapped', sick: 'Sick', healthy: 'Healthy' };
 
 function AnimalRescueDetail({ role: propRole }) {
     const { id } = useParams();
-    const navigate = useNavigate();
     const location = useLocation();
     const { animalRescues, markFoundByResponder, subscribeToAnimalRescues, isInitialized } = useAnimalRescueStore();
 
-    // Ensure data is loaded
     useEffect(() => {
-        if (!isInitialized) {
-            subscribeToAnimalRescues();
-        }
+        if (!isInitialized) subscribeToAnimalRescues();
     }, [isInitialized, subscribeToAnimalRescues]);
 
     // Determine role from prop, URL path, or location state
@@ -30,8 +34,6 @@ function AnimalRescueDetail({ role: propRole }) {
     const [foundContact, setFoundContact] = useState('');
     const [foundNotes, setFoundNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [weather, setWeather] = useState(null);
-    const [weatherLoading, setWeatherLoading] = useState(false);
 
     const rescue = animalRescues.find(r => r.id === id || r.id === parseInt(id));
 
@@ -46,112 +48,15 @@ function AnimalRescueDetail({ role: propRole }) {
     const isDangerous = rescue?.is_dangerous || rescue?.isDangerous;
     const dangerDetails = rescue?.danger_details || rescue?.dangerDetails;
     const healthDetails = rescue?.health_details || rescue?.healthDetails;
-    const status = rescue?.status || (foundAt ? 'Resolved' : 'Active'); // Default to Active if not set
+    const status = rescue?.status || (foundAt ? 'Resolved' : 'Active');
 
-    // Fetch weather data
-    useEffect(() => {
-        if (rescue?.location?.lat && rescue?.location?.lng) {
-            setWeatherLoading(true);
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${rescue.location.lat}&longitude=${rescue.location.lng}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`)
-                .then(res => res.json())
-                .then(data => {
-                    setWeather(data.current);
-                    setWeatherLoading(false);
-                })
-                .catch(err => {
-                    console.error('Weather fetch error:', err);
-                    setWeatherLoading(false);
-                });
-        }
-    }, [rescue?.location?.lat, rescue?.location?.lng]);
+    const { weather, loading: weatherLoading } = useWeather(rescue?.location?.lat, rescue?.location?.lng);
 
-    // Show loading while data is being fetched
-    if (!isInitialized) {
-        return (
-            <div className="page-shell flex items-center justify-center">
-                <div className="relative z-10 text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
-                    <p className="text-slate-400">Loading...</p>
-                </div>
-            </div>
-        );
-    }
+    if (!isInitialized) return <DetailLoading label="Loading rescue record…" />;
 
     if (!rescue) {
-        return (
-            <div className="page-shell flex items-center justify-center">
-                <div className="relative z-10 text-center px-4">
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Rescue Report Not Found</h1>
-                    <p className="text-slate-400 mb-6">The animal rescue record could not be found.</p>
-                    <button onClick={() => navigate(-1)} className="btn-primary">
-                        ← Go Back
-                    </button>
-                </div>
-            </div>
-        );
+        return <DetailNotFound title="Rescue report not found" message="This animal rescue record could not be located. It may have been removed." />;
     }
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' +
-            date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    };
-
-    const getTimeSince = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffHours / 24);
-
-        if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-        if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-        return 'Just now';
-    };
-
-    const getStatusBadge = (statusValue) => {
-        const actualStatus = statusValue || 'Active'; // Default to Active if undefined
-        return actualStatus === 'Active'
-            ? <span className="px-3 py-1.5 rounded text-sm font-semibold bg-danger-500/15 text-danger-300">🔴 Active</span>
-            : <span className="px-3 py-1.5 rounded text-sm font-semibold bg-success-500/15 text-success-300">✅ Rescued</span>
-    };
-
-    const getConditionBadge = (condition) => {
-        const badges = {
-            'critical': { className: 'bg-danger-600 text-white', text: '🚨 Critical' },
-            'injured': { className: 'bg-amber-600 text-white', text: '🩹 Injured' },
-            'trapped': { className: 'bg-amber-500 text-white', text: '🔒 Trapped' },
-            'sick': { className: 'bg-amber-400 text-slate-900', text: '🤒 Sick' },
-            'healthy': { className: 'bg-blue-500 text-white', text: '✓ Healthy' },
-        };
-        const badge = badges[condition] || { className: 'bg-slate-500 text-white', text: condition };
-        return <span className={`px-3 py-1.5 rounded text-sm font-semibold ${badge.className}`}>{badge.text}</span>;
-    };
-
-    const getAnimalTypeIcon = (animalType) => {
-        const icons = {
-            'dog': '🐕',
-            'cat': '🐈',
-            'cattle': '🐄',
-            'goat': '🐐',
-            'bird': '🐦',
-            'wildlife': '🦎',
-            'other': '🐾'
-        };
-        return icons[animalType] || '🐾';
-    };
-
-    const getWeatherDescription = (code) => {
-        const weatherCodes = {
-            0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
-            45: 'Foggy', 48: 'Foggy', 51: 'Light Drizzle', 53: 'Drizzle', 55: 'Heavy Drizzle',
-            61: 'Light Rain', 63: 'Rain', 65: 'Heavy Rain', 71: 'Light Snow', 73: 'Snow', 75: 'Heavy Snow',
-            80: 'Rain Showers', 81: 'Rain Showers', 82: 'Heavy Rain Showers', 95: 'Thunderstorm', 96: 'Thunderstorm', 99: 'Thunderstorm'
-        };
-        return weatherCodes[code] || 'Unknown';
-    };
-
-    const handleMarkRescued = () => setShowConfirmDialog(true);
 
     const confirmMarkRescued = async () => {
         if (isSubmitting) return;
@@ -169,286 +74,168 @@ function AnimalRescueDetail({ role: propRole }) {
         }
     };
 
-    const canMarkRescued = role === 'responder' && status === 'Active';
+    const isActive = status === 'Active';
+    const canMarkRescued = role === 'responder' && isActive;
+    const condition = rescue.condition;
+    const conditionTone = CONDITION_TONE[condition] || 'neutral';
+    const typeLabel = (animalType || 'Unknown').replace('-', ' ');
 
     return (
-        <div className="page-shell">
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
-                {/* Header - Single Row */}
-                <div className="mb-3">
-                    <div className="flex items-center gap-3">
-                        <span className="text-3xl sm:text-4xl">{getAnimalTypeIcon(animalType)}</span>
-                        <div>
-                            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white capitalize leading-tight">
-                                {animalType?.replace('-', ' ') || 'Unknown'} {rescue.breed && <span className="text-base sm:text-lg text-slate-400">({rescue.breed})</span>} <span className="text-xs sm:text-sm text-slate-500 font-normal ml-2 sm:ml-3">ID: #{rescue.id} • {reportedAt ? formatDate(reportedAt) : 'N/A'}</span>
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-
-                    {/* Left Column - Animal Info & Contact */}
-                    <div className="lg:col-span-5 space-y-3">
-
-                        {/* Condition & Key Info */}
-                        <div className="card p-5">
-                            <div className="mb-3">{getConditionBadge(rescue.condition)}</div>
-                            <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 text-center">
-                                <div className="border-r border-white/10">
-                                    <p className="text-xs text-slate-500 mb-1">Type</p>
-                                    <p className="text-base font-bold text-slate-900 dark:text-white capitalize">{animalType || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-500 mb-1">Spotted</p>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{spottedDate ? getTimeSince(spottedDate) : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Safety Alert */}
-                        {isDangerous && (
-                            <div className="card p-5 bg-danger-500/10 border border-danger-400/30 border-l-4 border-l-danger-500">
-                                <p className="text-sm font-semibold text-danger-300 mb-2">⚠️ Dangerous Animal</p>
-                                <p className="text-sm text-danger-200 leading-relaxed">{dangerDetails || 'Exercise extreme caution when approaching'}</p>
-                            </div>
+        <DetailShell>
+            <DetailHeader
+                icon={IconPawPrint}
+                iconTone={isActive ? conditionTone : 'success'}
+                title={<span className="capitalize">{typeLabel}{rescue.breed ? ` · ${rescue.breed}` : ''}</span>}
+                chips={
+                    <>
+                        {condition && <StatusChip tone={conditionTone}>{CONDITION_LABEL[condition] || condition}</StatusChip>}
+                        <StatusChip tone={isActive ? 'warning' : 'success'}>{isActive ? 'Pending' : 'Rescued'}</StatusChip>
+                        {isDangerous && <StatusChip tone="critical">Dangerous</StatusChip>}
+                    </>
+                }
+                subtitle={`Report #${String(rescue.id).slice(0, 8)}`}
+                meta={
+                    <>
+                        <MetaDot />
+                        <span>Reported {formatDateTime(reportedAt)}</span>
+                        {rescue.location?.address && (
+                            <>
+                                <MetaDot />
+                                <span className="inline-flex items-center gap-1 truncate">
+                                    <IconMapPin className="h-3 w-3 flex-shrink-0" />
+                                    <span className="truncate">{rescue.location.address}</span>
+                                </span>
+                            </>
                         )}
-
-                        {/* Description */}
-                        <div className="card p-5 min-h-36">
-                            <p className="text-sm font-semibold text-slate-200 mb-3">📝 Description</p>
-                            <p className="text-sm text-slate-300 leading-relaxed">{rescue.description || 'No description provided'}</p>
-                        </div>
-
-                        {/* Health Details */}
-                        {healthDetails && (
-                            <div className="card p-5">
-                                <p className="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-1.5"><IconFirstAid className="h-4 w-4" /> Health Details</p>
-                                <p className="text-sm text-slate-300 leading-relaxed">{healthDetails}</p>
-                            </div>
-                        )}
-
-                        {/* Accessibility */}
-                        {rescue.accessibility && (
-                            <div className="card p-5">
-                                <p className="text-sm font-semibold text-slate-200 mb-2">🚶 Accessibility</p>
-                                <p className="text-sm text-slate-300 capitalize">{rescue.accessibility} access</p>
-                            </div>
-                        )}
-
-                        {/* Reporter Contact */}
-                        <div className="card p-5">
-                            <p className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-1.5"><IconPhone className="h-4 w-4" /> Reporter Contact</p>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <p className="text-xs text-slate-500 mb-0.5">Name</p>
-                                    <p className="text-sm font-medium text-slate-900 dark:text-white">{reporterName || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-500 mb-0.5">Phone</p>
-                                    <p className="text-sm font-medium text-slate-900 dark:text-white">{contactNumber || 'N/A'}</p>
-                                </div>
-                            </div>
-                            {foundByContact && (
-                                <div className="mt-3 pt-3 border-t border-white/10">
-                                    <p className="text-xs text-slate-500 mb-0.5">Rescue Contact</p>
-                                    <p className="text-sm font-medium text-success-300">{foundByContact}</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Timeline */}
-                        <div className="card p-5">
-                            <p className="text-sm font-semibold text-slate-200 mb-2">⏱️ Timeline</p>
-                            <div className="space-y-2">
-                                <div className="flex gap-2.5 items-start">
-                                    <div className="w-7 h-7 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Reported</p>
-                                        <p className="text-xs text-slate-400">{reportedAt ? formatDate(reportedAt) : 'N/A'} • {reporterName || 'Anonymous'}</p>
-                                    </div>
-                                </div>
-                                {foundAt && (
-                                    <div className="flex gap-2.5 items-start">
-                                        <div className="w-7 h-7 rounded-full bg-success-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">✓</div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-semibold text-slate-900 dark:text-white">Rescued</p>
-                                            <p className="text-xs text-slate-400">{formatDate(foundAt)}</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Status & Action Button */}
-                        <div className="card p-5">
-                            <div className="flex items-center gap-3">
-                                {getStatusBadge(status)}
-                                {canMarkRescued && (
-                                    <button onClick={handleMarkRescued} className="btn-primary py-2 px-5">Mark as Rescued</button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column - Photo & Map */}
-                    <div className="lg:col-span-7 space-y-4">
-
-                        {/* Photo & Location Side by Side */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                            {/* Photo */}
-                            {rescue.photo && (
-                                <div className="card p-4">
-                                    <p className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-1.5"><IconCamera className="h-4 w-4" /> Photo</p>
-                                    <div className="w-full h-64 rounded border border-white/10 bg-white/5 flex items-center justify-center">
-                                        <img
-                                            src={rescue.photo}
-                                            alt={animalType}
-                                            className="max-w-full max-h-full object-contain"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Location & Weather */}
-                            <div className="card p-4">
-                                <p className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-1.5"><IconMapPin className="h-4 w-4" /> Location & Weather</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* Location Column */}
-                                    <div className="space-y-2">
-                                        <div>
-                                            <p className="text-xs text-slate-500 mb-0.5">Address</p>
-                                            <p className="text-sm text-slate-900 dark:text-white">{rescue.location?.address || 'N/A'}</p>
-                                        </div>
-                                        {spottedDate && (
-                                            <div>
-                                                <p className="text-xs text-slate-500 mb-0.5">Spotted</p>
-                                                <p className="text-sm text-slate-900 dark:text-white">{formatDate(spottedDate)}</p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Weather Column */}
-                                    <div>
-                                        <p className="text-xs font-semibold text-slate-200 mb-1.5 flex items-center gap-1">
-                                            <span>🌤️</span> Current Weather
-                                        </p>
-                                        {weatherLoading ? (
-                                            <div className="flex items-center justify-center py-3">
-                                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-500 border-t-transparent"></div>
-                                                <p className="text-xs text-slate-500 ml-2">Loading...</p>
-                                            </div>
-                                        ) : weather ? (
-                                            <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                        <p className="text-xs text-slate-400">🌡️ Temp</p>
-                                                        <p className="text-base font-bold text-slate-900 dark:text-white">{weather.temperature_2m}°C</p>
-                                                    </div>
-                                                    <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                        <p className="text-xs text-slate-400">💧 Humidity</p>
-                                                        <p className="text-base font-bold text-slate-900 dark:text-white">{weather.relative_humidity_2m}%</p>
-                                                    </div>
-                                                    <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                        <p className="text-xs text-slate-400">💨 Wind</p>
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{weather.wind_speed_10m} km/h</p>
-                                                    </div>
-                                                    <div className="bg-white/5 rounded p-1.5 border border-white/10">
-                                                        <p className="text-xs text-slate-400">☁️ Sky</p>
-                                                        <p className="text-xs font-bold text-slate-900 dark:text-white">{getWeatherDescription(weather.weather_code)}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="bg-white/5 rounded p-2 text-center">
-                                                <p className="text-xs text-slate-500">Unavailable</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Map */}
-                        <div className="card p-4">
-                            <p className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-1.5"><IconMap className="h-4 w-4" /> Animal Location</p>
-                            {rescue.location?.lat && rescue.location?.lng ? (
-                                <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                    <MapContainer
-                                        center={[rescue.location.lat, rescue.location.lng]}
-                                        zoom={15}
-                                        minZoom={defaultMapConfig.minZoom}
-                                        maxZoom={defaultMapConfig.maxZoom}
-                                        maxBounds={defaultMapConfig.maxBounds}
-                                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                                        style={{ height: '100%', width: '100%' }}
-                                    >
-                                        <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                        <MapResizeFix />
-                                        <Marker position={[rescue.location.lat, rescue.location.lng]}>
-                                            <Popup><div className="p-1"><p className="text-xs font-bold capitalize">{animalType} spotted</p><p className="text-xs text-gray-600">{rescue.location.address}</p></div></Popup>
-                                        </Marker>
-                                    </MapContainer>
-                                </div>
-                            ) : (
-                                <div style={{ height: '350px', position: 'relative', zIndex: 1 }} className="rounded border border-white/10 overflow-hidden">
-                                    <MapContainer
-                                        center={defaultMapConfig.center}
-                                        zoom={defaultMapConfig.zoom}
-                                        minZoom={defaultMapConfig.minZoom}
-                                        maxZoom={defaultMapConfig.maxZoom}
-                                        maxBounds={defaultMapConfig.maxBounds}
-                                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                                        style={{ height: '100%', width: '100%' }}
-                                    >
-                                        <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                        <MapResizeFix />
-                                    </MapContainer>
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-10 pointer-events-none">
-                                        <p className="text-xs text-slate-200 bg-slate-900/90 px-2 py-1 rounded shadow">No specific location</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {showConfirmDialog && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-                        <div className="bg-slate-900 border border-white/10 rounded-lg max-w-md w-full p-4">
-                            <h3 className="text-lg font-bold text-white mb-2">Confirm Rescue</h3>
-                            <p className="text-sm text-slate-300 mb-3">Confirm that this animal has been successfully rescued.</p>
-
-                            <div className="space-y-2.5 mb-4">
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-300 mb-1">Contact Number (Optional)</label>
-                                    <input type="tel" value={foundContact} onChange={(e) => setFoundContact(e.target.value)} placeholder="Your contact number" className="input-field text-sm" />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-300 mb-1">Notes (Optional)</label>
-                                    <textarea value={foundNotes} onChange={(e) => setFoundNotes(e.target.value)} placeholder="Additional details about the rescue..." rows="3" className="input-field text-sm" />
-                                </div>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <button onClick={confirmMarkRescued} disabled={isSubmitting} className="btn-primary flex-1 text-sm py-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {isSubmitting ? (
-                                        <span className="flex items-center justify-center gap-2">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                                            Processing...
-                                        </span>
-                                    ) : 'Confirm'}
-                                </button>
-                                <button onClick={() => { setShowConfirmDialog(false); setFoundContact(''); setFoundNotes(''); }} disabled={isSubmitting} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
+                    </>
+                }
+                actions={canMarkRescued && (
+                    <Button variant="primary" icon={IconCheck} onClick={() => setShowConfirmDialog(true)}>
+                        Mark Rescued
+                    </Button>
                 )}
+            />
+
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+                {/* Left ~65% — handler safety first, then condition and history */}
+                <div className="flex flex-col gap-3 lg:col-span-8">
+                    {isDangerous && (
+                        <div
+                            role="alert"
+                            className="flex items-start gap-2 rounded-lg border border-danger-200 bg-danger-50 px-3 py-2 dark:border-danger-500/30 dark:bg-danger-500/10"
+                        >
+                            <IconSiren className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger-600 dark:text-danger-400" />
+                            <p className="text-[13px] leading-snug text-danger-800 dark:text-danger-200">
+                                <span className="font-semibold">Dangerous animal — approach with caution.</span>{' '}
+                                {dangerDetails || 'No further handling detail was provided by the reporter.'}
+                            </p>
+                        </div>
+                    )}
+
+                    <InfoCard title="Rescue Summary" icon={IconClipboardList}>
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                            <MetricCard label="Animal" value={<span className="capitalize">{typeLabel}</span>} icon={IconPawPrint} />
+                            <MetricCard
+                                label="Condition"
+                                value={CONDITION_LABEL[condition] || condition || '—'}
+                                tone={conditionTone === 'neutral' ? undefined : conditionTone}
+                            />
+                            <MetricCard label="Spotted" value={spottedDate ? timeSince(spottedDate) : '—'} icon={IconClock} />
+                            <MetricCard label="Access" value={rescue.accessibility ? <span className="capitalize">{rescue.accessibility}</span> : '—'} />
+                        </div>
+                    </InfoCard>
+
+                    <InfoCard title="Description" icon={IconFileText}>
+                        <p className="max-w-[75ch] text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                            {rescue.description || 'No description provided.'}
+                        </p>
+                    </InfoCard>
+
+                    {healthDetails && (
+                        <InfoCard title="Health Details" icon={IconFirstAid}>
+                            <p className="max-w-[75ch] text-sm leading-relaxed text-slate-700 dark:text-slate-300">{healthDetails}</p>
+                        </InfoCard>
+                    )}
+
+                    <WeatherCard weather={weather} loading={weatherLoading} />
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <InfoCard title="Timeline" icon={IconCalendar}>
+                            <Timeline>
+                                {spottedDate && (
+                                    <TimelineItem
+                                        tone="warning"
+                                        label="Animal spotted"
+                                        time={formatTime(spottedDate)}
+                                        detail={formatDateTime(spottedDate)}
+                                    />
+                                )}
+                                <TimelineItem
+                                    tone="info"
+                                    label="Report submitted"
+                                    time={formatTime(reportedAt)}
+                                    detail={`${formatDateTime(reportedAt)} · ${reporterName || 'Anonymous'}`}
+                                    last={!foundAt}
+                                />
+                                {foundAt && (
+                                    <TimelineItem
+                                        tone="success"
+                                        label="Animal rescued"
+                                        time={formatTime(foundAt)}
+                                        detail={formatDateTime(foundAt)}
+                                        last
+                                    />
+                                )}
+                            </Timeline>
+                        </InfoCard>
+
+                        <InfoCard title="Reporter Information" icon={IconPhone}>
+                            <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                <KeyValueRow label="Reporter" value={reporterName} />
+                                <KeyValueRow label="Phone" value={contactNumber} href={contactNumber ? `tel:${contactNumber}` : undefined} />
+                                <KeyValueRow label="Reported" value={timeSince(reportedAt)} />
+                                {foundByContact
+                                    ? <KeyValueRow label="Rescued by" value={foundByContact} />
+                                    : <KeyValueRow label="Status" value={isActive ? 'Awaiting rescue' : 'Closed'} />}
+                            </dl>
+                        </InfoCard>
+                    </div>
+                </div>
+
+                {/* Right ~35% — evidence, then the map. Weather sits in the left
+                    column so this stack stays short enough to clear the fold. */}
+                <div className="flex flex-col gap-3 lg:col-span-4">
+                    <PhotoCard src={rescue.photo} alt={`${typeLabel} rescue photo`} icon={IconCamera} />
+                    <LocationCard
+                        title="Animal Location"
+                        lat={rescue.location?.lat}
+                        lng={rescue.location?.lng}
+                        label={`${typeLabel} spotted here`}
+                        address={rescue.location?.address}
+                    >
+                        <KeyValueRow label="Address" value={rescue.location?.address} />
+                    </LocationCard>
+                </div>
             </div>
-        </div>
+
+            {showConfirmDialog && (
+                <ConfirmDialog
+                    title="Confirm rescue"
+                    description="This closes the report and removes it from pending rescue queues."
+                    confirmLabel="Mark Rescued"
+                    submitting={isSubmitting}
+                    onCancel={() => { setShowConfirmDialog(false); setFoundContact(''); setFoundNotes(''); }}
+                    onConfirm={confirmMarkRescued}
+                >
+                    <Field label="Contact number (optional)">
+                        <input type="tel" value={foundContact} onChange={e => setFoundContact(e.target.value)} placeholder="Your contact number" className={INPUT} />
+                    </Field>
+                    <Field label="Notes (optional)">
+                        <textarea value={foundNotes} onChange={e => setFoundNotes(e.target.value)} placeholder="Details of the rescue…" rows="3" className={INPUT} />
+                    </Field>
+                </ConfirmDialog>
+            )}
+        </DetailShell>
     );
 }
 
