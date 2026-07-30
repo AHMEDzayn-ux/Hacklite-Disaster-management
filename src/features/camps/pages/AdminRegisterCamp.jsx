@@ -10,6 +10,7 @@ import {
     NEEDS_OPTIONS
 } from '@/features/camps/services/campManagementService';
 import LocationPicker from '@/components/map/LocationPicker';
+import { BTN } from '@/components/ui/tableStyles';
 import { IconTent, IconCheck } from '@/components/icons/Icons';
 
 /**
@@ -226,83 +227,60 @@ function AdminRegisterCamp() {
 
     if (authLoading || !user) {
         return (
-            <div className="page-shell flex items-center justify-center">
+            <div className="flex h-full items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="page-shell py-8 px-4">
-            <div
-                className="absolute inset-0 pointer-events-none opacity-10"
-                style={{
-                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
-                    backgroundSize: '28px 28px',
-                }}
-            ></div>
-
-            <div className="relative z-10 max-w-3xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <Link
-                        to={fromRequest ? '/admin/review-requests' : '/admin/dashboard'}
-                        className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 flex items-center gap-2 transition-colors w-fit"
-                    >
-                        ← {fromRequest ? 'Back to Requests' : 'Dashboard'}
-                    </Link>
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                                <IconTent className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                    {fromRequest ? 'Approve & Register Camp' : 'Register New Camp'}
-                                </h1>
-                            </div>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={autofillTestData}
-                            className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-primary-500/20 text-primary-300 hover:bg-primary-500/30 text-sm font-medium"
-                        >
-                            Test Fill
-                        </button>
-                    </div>
-                </div>
-
+        // The section shell owns the viewport; a form this long scrolls inside it
+        // so the nav and the section tabs stay put.
+        <div className="h-full overflow-y-auto px-4 py-3 sm:px-6">
+            <div className="mx-auto max-w-3xl pb-4">
                 {/* Form */}
-                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:p-6 dark:border-white/10 dark:bg-white/[0.03]">
                     {/* Form Header */}
-                    <div className="mb-6">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                            {fromRequest ? 'Complete Camp Registration' : 'Camp Registration Form'}
-                        </h2>
-                        <p className="text-slate-400 text-sm mt-1">
-                            {fromRequest
-                                ? 'Review the pre-filled data from the public request, complete any missing fields, and confirm registration.'
-                                : 'Register an official relief camp. All fields will be visible to the public.'}
-                        </p>
+                    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                {fromRequest ? 'Complete Camp Registration' : 'Camp Registration Form'}
+                            </h2>
+                            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                                {fromRequest
+                                    ? 'Review the pre-filled data from the public request, complete any missing fields, and confirm registration.'
+                                    : 'Register an official relief camp. All fields will be visible to the public.'}
+                            </p>
+                        </div>
+                        <div className="flex flex-shrink-0 items-center gap-2">
+                            {/* The section tabs cover the page itself; only the request
+                                the admin drilled in from needs a way back. */}
+                            {fromRequest && (
+                                <Link to="/admin/review-requests" className={BTN}>← Requests</Link>
+                            )}
+                            <button type="button" onClick={autofillTestData} className={BTN}>
+                                Test Fill
+                            </button>
+                        </div>
                     </div>
 
                     {/* Request Context */}
                     {fromRequest && prefillData.reason && (
-                        <div className="mb-6 p-4 bg-white/[0.03] border-l-4 border-white/20 rounded-r-lg">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Original Request Reason:</p>
-                            <p className="text-sm text-slate-300">{prefillData.reason}</p>
+                        <div className="mb-5 rounded-r-md border-l-4 border-slate-300 bg-slate-50 p-3 dark:border-white/20 dark:bg-white/[0.03]">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Original request</p>
+                            <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{prefillData.reason}</p>
                             {prefillData.urgency_level && (
-                                <p className="text-sm text-slate-300 mt-2">
+                                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                                     <strong>Urgency:</strong> {prefillData.urgency_level.toUpperCase()}
                                 </p>
                             )}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* === SECTION: Basic Information === */}
                         <section>
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Basic Information
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -356,7 +334,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Location Details === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Location Details
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -457,7 +435,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Capacity === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Capacity
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -495,7 +473,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Contact Information === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Camp-in-Charge Contact
                             </h3>
                             <div className="grid md:grid-cols-2 gap-4">
@@ -558,7 +536,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Facilities === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Available Facilities
                             </h3>
                             <p className="text-sm text-slate-400 mb-3">Select all facilities available at this camp</p>
@@ -581,7 +559,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Current Needs === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Current Needs
                             </h3>
                             <p className="text-sm text-slate-400 mb-3">Select items/resources currently needed at this camp</p>
@@ -604,7 +582,7 @@ function AdminRegisterCamp() {
 
                         {/* === SECTION: Special Needs & Notes === */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">
                                 Additional Information
                             </h3>
                             <div className="space-y-4">
@@ -644,9 +622,10 @@ function AdminRegisterCamp() {
                                 <div className="flex-1">
                                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Camp Admin Login (optional)</h3>
                                     <p className="text-sm text-slate-300 mb-4">
-                                        Enter an email to create a Camp Admin account for this camp. They can log in at the
-                                        Camp Admin portal to add and distribute stock for this camp only. A password is
-                                        generated and shown once after registration — leave blank to skip.
+                                        Enter an email to create a Camp Admin account for this camp. They sign in at the
+                                        same Admin Portal (/admin/login) and land on this camp's inventory, where they can
+                                        add and distribute stock for this camp only. A password is generated and shown
+                                        once after registration — leave blank to skip.
                                     </p>
                                     <div>
                                         <label className="block text-sm font-semibold text-slate-300 mb-2">Camp Admin Email</label>

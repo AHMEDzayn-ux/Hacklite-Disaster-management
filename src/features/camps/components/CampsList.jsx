@@ -69,22 +69,17 @@ function CampsList() {
     const [needsFilter, setNeedsFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('map'); // Default to map view as it's most important
-    const [isInitializing, setIsInitializing] = useState(true); // Always start with loading state
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToCamps() resolves
+    // immediately when another page already opened the shared channel, so a local
+    // "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        const initialize = async () => {
-            if (!isInitialized) {
-                // Only invalidate cache if not initialized yet
-                invalidateCache('camps');
-                await subscribeToCamps();
-            }
-            // Add small delay to ensure data is loaded
-            setTimeout(() => {
-                setIsInitializing(false);
-            }, 100);
-        };
-        initialize();
+        if (!isInitialized) {
+            // Only invalidate cache if not initialized yet
+            invalidateCache('camps');
+            subscribeToCamps();
+        }
         // Don't unsubscribe on unmount to maintain cache
     }, [isInitialized, subscribeToCamps]);
 
@@ -147,7 +142,7 @@ function CampsList() {
     };
 
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
             <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">

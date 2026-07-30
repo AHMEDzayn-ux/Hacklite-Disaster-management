@@ -1,30 +1,50 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/useAuth';
-import { fetchAllInventoryLevels } from '@/features/inventory/services/inventoryService';
+import { fetchAllInventoryLevels, STOCK_COUNT_INTERVAL_HOURS } from '@/features/inventory/services/inventoryService';
+import { PANEL, PANEL_HEAD, TH, TD, BTN, SELECT_SM, INPUT_SM, sortRows, nextSort } from '@/components/ui/tableStyles';
+import SortHeader from '@/components/ui/SortHeader';
+import { hoursSince, relativeTime } from '@/features/inventory/inventoryView';
 import { supabase } from '@/lib/supabase';
-import { PROVINCES, UNKNOWN_PROVINCE, resolveDistrict } from '@/data/sriLankaRegions';
+import { PROVINCES, UNKNOWN_PROVINCE, resolveDistrict, resolveProvince } from '@/data/sriLankaRegions';
 import { IconChevronRight } from '@/components/icons/Icons';
 
 /**
  * Admin Inventory Overview
  * ========================
- * Stock across every camp, clustered Province > District > Camp. The tree is
- * built by walking the province/district constant and attaching camps into it -
- * not by grouping the data - so districts with no camps still render as empty
- * coverage gaps rather than silently disappearing.
+ * Every camp on one flat, sortable sheet - one row per camp, holding the figures
+ * an admin triages on: how much it tracks, how much of that is short, and when
+ * it was last counted. Province and district are columns rather than a nested
+ * tree, so the whole country is scannable and sortable in a single pass instead
+ * of behind a dozen disclosure arrows.
+ *
+ * A row opens that camp's own inventory screen (read-only). Adding stock and
+ * raising requests stay with the camp admin who can actually see the store, so
+ * nothing here writes.
  */
+
+const COLUMNS = [
+    { key: 'name', label: 'Camp' },
+    { key: 'district', label: 'District' },
+    { key: 'province', label: 'Province' },
+    { key: 'itemCount', label: 'Items', className: 'text-right', numeric: true },
+    { key: 'lowCount', label: 'Low stock', className: 'text-right', numeric: true },
+    { key: 'lastCountedMs', label: 'Last counted', numeric: true },
+];
 
 function AdminInventoryOverview() {
     const { user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [levels, setLevels] = useState([]);
-    const [camps, setCamps] = useState({});
+    const [camps, setCamps] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [filter, setFilter] = useState('all'); // 'all' | 'low'
-    // null = follow the low-stock default below; a Set = the user has taken over.
-    const [override, setOverride] = useState(null);
+
+    const [search, setSearch] = useState('');
+    const [province, setProvince] = useState('all');
+    const [lowOnly, setLowOnly] = useState(false);
+    // Shortages first by default - that is what an admin opens this page for.
+    const [sort, setSort] = useState({ key: 'lowCount', dir: 'desc' });
 
     useEffect(() => {
         if (!authLoading && !user) navigate('/admin/login');
@@ -32,344 +52,229 @@ function AdminInventoryOverview() {
 
     const load = useCallback(async () => {
         setLoading(true);
+        setError('');
         const [levelsResult, campsResult] = await Promise.all([
             fetchAllInventoryLevels(),
             supabase.from('camps').select('id, name, district, inventory_thresholds'),
         ]);
         if (levelsResult.success) setLevels(levelsResult.levels || []);
         else setError(levelsResult.error || 'Failed to load inventory');
-
-        const campMap = {};
-        for (const c of campsResult.data || []) campMap[c.id] = c;
-        setCamps(campMap);
+        setCamps(campsResult.data || []);
         setLoading(false);
     }, []);
 
     useEffect(() => { if (user) load(); }, [user, load]);
 
-    const isLowStock = useCallback((row) => {
-        const threshold = camps[row.camp_id]?.inventory_thresholds?.[row.item_name];
-        return threshold != null && row.quantity_on_hand < threshold;
-    }, [camps]);
-
-    const lowStockCount = useMemo(
-        () => levels.filter(isLowStock).length,
-        [levels, isLowStock]
-    );
-
     /**
-     * Province > District > Camp > items.
-     *
-     * In 'low' mode the tree is pruned bottom-up (camps with no low items go,
-     * then districts left with no camps, then provinces left with no districts)
-     * - otherwise the filter would render ~21 empty district headers wrapping a
-     * dozen rows.
+     * One row per camp, whether or not it holds stock: a camp tracking nothing
+     * is a coverage gap worth seeing, not a row to drop.
      */
-    const tree = useMemo(() => {
-        // camp_id -> items, keeping only what the active filter cares about.
-        const itemsByCamp = new Map();
-        for (const row of levels) {
-            const low = isLowStock(row);
-            if (filter === 'low' && !low) continue;
-            if (!itemsByCamp.has(row.camp_id)) itemsByCamp.set(row.camp_id, []);
-            itemsByCamp.get(row.camp_id).push({ ...row, low });
+    const rows = useMemo(() => {
+        const byCamp = new Map();
+        for (const level of levels) {
+            if (!byCamp.has(level.camp_id)) byCamp.set(level.camp_id, []);
+            byCamp.get(level.camp_id).push(level);
         }
 
-        // Canonical district name -> camps sitting in it. Camps whose district
-        // doesn't resolve are collected separately so they can't vanish.
-        const campsByDistrict = new Map();
-        const unresolvedCamps = [];
-        for (const camp of Object.values(camps)) {
-            const items = (itemsByCamp.get(camp.id) || [])
-                .sort((a, b) => (b.low - a.low) || a.item_name.localeCompare(b.item_name));
-            const node = { ...camp, items, lowCount: items.filter(i => i.low).length };
+        return camps.map(camp => {
+            const items = byCamp.get(camp.id) || [];
+            const thresholds = camp.inventory_thresholds || {};
 
-            const district = resolveDistrict(camp.district);
-            if (!district) {
-                unresolvedCamps.push(node);
-                continue;
+            let lowCount = 0;
+            let overdueCount = 0;
+            let lastCountedAt = null;
+            for (const item of items) {
+                const threshold = thresholds[item.item_name];
+                if (threshold != null && Number(item.quantity_on_hand) < threshold) lowCount++;
+                if (hoursSince(item.last_movement_at) > STOCK_COUNT_INTERVAL_HOURS) overdueCount++;
+                if (item.last_movement_at && (!lastCountedAt || new Date(item.last_movement_at) > new Date(lastCountedAt))) {
+                    lastCountedAt = item.last_movement_at;
+                }
             }
-            if (!campsByDistrict.has(district)) campsByDistrict.set(district, []);
-            campsByDistrict.get(district).push(node);
-        }
 
-        const buildDistrict = (name, districtCamps) => {
-            const visible = filter === 'low'
-                ? districtCamps.filter(c => c.lowCount > 0)
-                : districtCamps;
-            visible.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
             return {
-                name,
-                camps: visible,
-                campCount: visible.length,
-                itemCount: visible.reduce((n, c) => n + c.items.length, 0),
-                lowCount: visible.reduce((n, c) => n + c.lowCount, 0),
+                id: camp.id,
+                name: camp.name || camp.id.slice(0, 8),
+                // Show the camp's own spelling when it doesn't match a known
+                // district - silently canonicalising it would hide bad data.
+                district: resolveDistrict(camp.district) || camp.district || '—',
+                province: resolveProvince(camp.district),
+                itemCount: items.length,
+                lowCount,
+                overdueCount,
+                lastCountedAt,
+                // Sorting compares numbers, not date strings.
+                lastCountedMs: lastCountedAt ? new Date(lastCountedAt).getTime() : null,
             };
-        };
-
-        const rollUp = (name, districts) => ({
-            name,
-            districts,
-            campCount: districts.reduce((n, d) => n + d.campCount, 0),
-            itemCount: districts.reduce((n, d) => n + d.itemCount, 0),
-            lowCount: districts.reduce((n, d) => n + d.lowCount, 0),
         });
+    }, [levels, camps]);
 
-        const provinces = PROVINCES.map(p => {
-            const districts = p.districts
-                .map(d => buildDistrict(d, campsByDistrict.get(d) || []))
-                // Empty districts are the point in 'all' view; noise in 'low' view.
-                .filter(d => filter === 'all' || d.campCount > 0);
-            return rollUp(p.name, districts);
-        }).filter(p => filter === 'all' || p.districts.length > 0);
+    const visibleRows = useMemo(() => {
+        const term = search.trim().toLowerCase();
+        const filtered = rows.filter(row => {
+            if (lowOnly && row.lowCount === 0) return false;
+            if (province !== 'all' && row.province !== province) return false;
+            if (term && !`${row.name} ${row.district}`.toLowerCase().includes(term)) return false;
+            return true;
+        });
+        return sortRows(filtered, sort, 'name');
+    }, [rows, search, province, lowOnly, sort]);
 
-        // Bad/missing district data surfaces at the bottom instead of being dropped.
-        const strays = filter === 'low'
-            ? unresolvedCamps.filter(c => c.lowCount > 0)
-            : unresolvedCamps;
-        if (strays.length > 0) {
-            const district = buildDistrict('No district set', strays);
-            provinces.push(rollUp(UNKNOWN_PROVINCE, [district]));
-        }
+    const toggleSort = (key, numeric) => setSort(prev => nextSort(prev, key, numeric));
 
-        return provinces;
-    }, [levels, camps, filter, isLowStock]);
-
-    // Open the page on the problems: anything holding low stock starts expanded.
-    // Derived rather than seeded into state, so it costs no extra render and
-    // re-targets itself when the filter changes - until the user takes over,
-    // at which point `override` wins and we stop second-guessing them.
-    const defaultExpanded = useMemo(() => {
-        const keys = new Set();
-        for (const province of tree) {
-            if (province.lowCount === 0) continue;
-            keys.add(province.name);
-            for (const district of province.districts) {
-                if (district.lowCount > 0) keys.add(`${province.name}/${district.name}`);
-            }
-        }
-        return keys;
-    }, [tree]);
-
-    const expanded = override ?? defaultExpanded;
-
-    const toggle = (key) => setOverride(prev => {
-        const next = new Set(prev ?? defaultExpanded);
-        if (next.has(key)) next.delete(key); else next.add(key);
-        return next;
-    });
-
-    const setAll = (open) => {
-        if (!open) return setOverride(new Set());
-        const all = new Set();
-        for (const province of tree) {
-            all.add(province.name);
-            for (const district of province.districts) all.add(`${province.name}/${district.name}`);
-        }
-        setOverride(all);
-    };
+    const totals = useMemo(() => ({
+        camps: rows.length,
+        stocked: rows.filter(r => r.itemCount > 0).length,
+        low: rows.reduce((n, r) => n + r.lowCount, 0),
+        campsLow: rows.filter(r => r.lowCount > 0).length,
+        overdue: rows.filter(r => r.overdueCount > 0).length,
+    }), [rows]);
 
     if (authLoading || !user) {
         return (
             <div className="page-shell flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+                <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-400 border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="page-shell">
-            <div
-                className="absolute inset-0 pointer-events-none opacity-10"
-                style={{
-                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
-                    backgroundSize: '28px 28px',
-                }}
-            ></div>
-
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-6">
-                {/* Header */}
-                <div className="mb-3 flex items-center gap-3">
-                    <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">
-                        ← Dashboard
-                    </Link>
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white text-2xl shadow-lg shadow-primary-500/30">
-                            📦
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-black text-slate-900 dark:text-white md:text-2xl">Inventory Overview</h1>
-                            <p className="mt-0.5 text-slate-300 text-xs">Stock levels across all relief camps</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setFilter('all')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === 'all'? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
-                        >
-                            All Items ({levels.length})
-                        </button>
-                        <button
-                            onClick={() => setFilter('low')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === 'low'? 'bg-danger-600 text-white shadow-md shadow-danger-500/30' : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'}`}
-                        >
-                            ⚠ Low Stock ({lowStockCount})
-                        </button>
-                    </div>
-                    <div className="flex gap-2">
-                        <button onClick={() => setAll(true)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10">Expand all</button>
-                        <button onClick={() => setAll(false)} className="px-3 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10">Collapse all</button>
-                        <button onClick={load} className="px-4 py-2 bg-white/5 border border-white/10 text-slate-200 rounded-lg text-sm hover:bg-white/10">🔄 Refresh</button>
-                    </div>
-                </div>
-
-                {error && <div className="bg-danger-500/10 border border-danger-400/20 text-danger-300 px-4 py-3 rounded-lg mb-4">{error}</div>}
-
-                {loading ? (
-                    <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-12 text-center text-slate-400">Loading...</div>
-                ) : tree.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-4 py-12 text-center text-slate-400">
-                        {filter === 'low' ? 'No items are below their reorder threshold.' : 'No inventory records yet.'}
-                    </div>
-                ) : (
-                    <div className="space-y-3">
-                        {tree.map(province => (
-                            <ProvinceSection
-                                key={province.name}
-                                province={province}
-                                expanded={expanded}
-                                onToggle={toggle}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
-
-function ProvinceSection({ province, expanded, onToggle }) {
-    const isOpen = expanded.has(province.name);
-    const isEmpty = province.campCount === 0;
-
-    return (
-        <section className="rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md overflow-hidden">
-            <button
-                onClick={() => onToggle(province.name)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${isEmpty ? 'text-slate-500' : ''}`}
-            >
-                <IconChevronRight className={`h-3.5 w-3.5 flex-shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
-                <h2 className={`font-bold ${isEmpty ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>{province.name}</h2>
-                <span className="ml-auto flex items-center gap-3 text-xs">
-                    {province.lowCount > 0 && (
-                        <span className="px-2 py-1 rounded-full bg-danger-500/15 text-danger-300 font-semibold">
-                            ⚠ {province.lowCount} low
+        // 3rem is the admin nav bar (h-12); the sheet scrolls inside what's left.
+        <div className="page-shell flex h-[calc(100dvh-3rem)] flex-col overflow-hidden">
+            <header className="flex flex-none items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-2 dark:border-white/10 dark:bg-slate-950">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {totals.camps} {totals.camps === 1 ? 'camp' : 'camps'} · {levels.length} tracked items
+                    {totals.low > 0 && (
+                        <span className="text-danger-700 dark:text-danger-300">
+                            {' · '}{totals.low} low across {totals.campsLow} {totals.campsLow === 1 ? 'camp' : 'camps'}
                         </span>
                     )}
-                    <span className="text-slate-400">
-                        {province.campCount} {province.campCount === 1 ? 'camp' : 'camps'} · {province.itemCount} items
-                    </span>
-                </span>
-            </button>
+                    {totals.overdue > 0 && ` · ${totals.overdue} overdue a count`}
+                </p>
+                <button onClick={load} disabled={loading} className={BTN + ' px-3 py-1.5 text-sm'}>
+                    {loading ? 'Loading...' : 'Refresh'}
+                </button>
+            </header>
 
-            {isOpen && (
-                <div className="border-t border-white/10 divide-y divide-white/5">
-                    {province.districts.map(district => (
-                        <DistrictSection
-                            key={district.name}
-                            province={province.name}
-                            district={district}
-                            expanded={expanded}
-                            onToggle={onToggle}
-                        />
-                    ))}
+            {error && (
+                <div className="flex-none px-4 pt-3 sm:px-6">
+                    <div className="mx-auto max-w-6xl rounded-md border border-danger-300 bg-danger-50 px-3 py-2 text-sm text-danger-700 dark:border-danger-400/30 dark:bg-danger-500/10 dark:text-danger-300">
+                        {error}
+                    </div>
                 </div>
             )}
-        </section>
-    );
-}
 
-function DistrictSection({ province, district, expanded, onToggle }) {
-    const key = `${province}/${district.name}`;
-    const isOpen = expanded.has(key);
-    const isEmpty = district.campCount === 0;
+            <main className="min-h-0 flex-1 px-4 py-3 sm:px-6 sm:py-4">
+                <div className="mx-auto h-full max-w-6xl">
+                    <section className={PANEL}>
+                        <div className={PANEL_HEAD}>
+                            <div>
+                                <h2 className="text-base font-semibold text-slate-900 dark:text-white">All camps</h2>
+                                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                    Open a camp to read its stock sheet and movement history.
+                                    Stock entry and requests belong to that camp's admin.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <input
+                                    type="search"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search camp or district"
+                                    className={INPUT_SM + ' w-44'}
+                                />
+                                <select value={province} onChange={(e) => setProvince(e.target.value)} className={SELECT_SM}>
+                                    <option value="all">All provinces</option>
+                                    {PROVINCES.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+                                    <option value={UNKNOWN_PROVINCE}>{UNKNOWN_PROVINCE}</option>
+                                </select>
+                                <button
+                                    onClick={() => setLowOnly(v => !v)}
+                                    aria-pressed={lowOnly}
+                                    className={lowOnly
+                                        ? 'rounded-md border border-danger-400/70 bg-danger-50 px-2 py-1 text-xs font-semibold text-danger-700 dark:border-danger-400/40 dark:bg-danger-500/10 dark:text-danger-300'
+                                        : BTN}
+                                >
+                                    Low stock only ({totals.campsLow})
+                                </button>
+                            </div>
+                        </div>
 
-    return (
-        <div className={isEmpty ? 'bg-white/[0.02]' : ''}>
-            <button
-                onClick={() => !isEmpty && onToggle(key)}
-                disabled={isEmpty}
-                className={`w-full flex items-center gap-3 pl-8 pr-4 py-2.5 text-left ${isEmpty ? 'cursor-default' : 'hover:bg-white/5'}`}
-            >
-                {isEmpty ? (
-                    <span className="w-3.5 flex-shrink-0" />
-                ) : (
-                    <IconChevronRight className={`h-3 w-3 flex-shrink-0 text-slate-500 ${isOpen ? 'rotate-90' : ''}`} />
-                )}
-                <h3 className={`text-sm font-semibold ${isEmpty ? 'text-slate-500' : 'text-slate-900 dark:text-white'}`}>{district.name}</h3>
-                <span className="ml-auto flex items-center gap-3 text-xs">
-                    {district.lowCount > 0 && (
-                        <span className="text-danger-400 font-semibold">⚠ {district.lowCount} low</span>
-                    )}
-                    <span className={isEmpty ? 'text-slate-500' : 'text-slate-400'}>
-                        {isEmpty ? 'No camps' : `${district.campCount} ${district.campCount === 1 ? 'camp' : 'camps'} · ${district.itemCount} items`}
-                    </span>
-                </span>
-            </button>
-
-            {isOpen && !isEmpty && (
-                <div className="pl-8 pr-4 pb-4 space-y-4">
-                    {district.camps.map(camp => <CampBlock key={camp.id} camp={camp} />)}
+                        <div className="min-h-0 flex-1 overflow-auto">
+                            <table className="w-full min-w-[52rem] text-sm">
+                                <thead className="sticky top-0 z-10">
+                                    <tr>
+                                        {COLUMNS.map(column => (
+                                            <SortHeader key={column.key} column={column} sort={sort} onSort={toggleSort} />
+                                        ))}
+                                        <th className={TH + ' w-8'}></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {visibleRows.map(row => {
+                                        const empty = row.itemCount === 0;
+                                        return (
+                                            <tr
+                                                key={row.id}
+                                                onClick={() => navigate(`/admin/inventory/${row.id}`)}
+                                                className="cursor-pointer hover:bg-slate-50 dark:hover:bg-white/[0.03]"
+                                            >
+                                                <td className={TD}>
+                                                    <Link
+                                                        to={`/admin/inventory/${row.id}`}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="font-medium text-slate-900 hover:underline dark:text-white"
+                                                    >
+                                                        {row.name}
+                                                    </Link>
+                                                </td>
+                                                <td className={TD + ' text-slate-600 dark:text-slate-300'}>{row.district}</td>
+                                                <td className={TD + ' text-slate-500 dark:text-slate-400'}>{row.province}</td>
+                                                <td className={TD + ' text-right tabular-nums ' + (empty ? 'text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200')}>
+                                                    {row.itemCount}
+                                                </td>
+                                                <td className={TD + ' text-right'}>
+                                                    {row.lowCount > 0 ? (
+                                                        <span className="rounded border border-danger-400/60 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-danger-700 dark:border-danger-400/30 dark:text-danger-300">
+                                                            {row.lowCount}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="tabular-nums text-slate-400 dark:text-slate-500">0</span>
+                                                    )}
+                                                </td>
+                                                <td className={TD}>
+                                                    <span className={row.overdueCount > 0 ? 'text-danger-700 dark:text-danger-300' : 'text-slate-500 dark:text-slate-400'}>
+                                                        {empty ? 'Nothing tracked' : relativeTime(row.lastCountedAt)}
+                                                    </span>
+                                                    {row.overdueCount > 0 && (
+                                                        <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wide text-danger-700 dark:text-danger-300">
+                                                            {row.overdueCount} due
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className={TD + ' text-right'}>
+                                                    <IconChevronRight className="ml-auto h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {visibleRows.length === 0 && (
+                                        <tr>
+                                            <td colSpan={COLUMNS.length + 1} className={TD + ' text-center text-slate-500 dark:text-slate-400'}>
+                                                {loading
+                                                    ? 'Loading...'
+                                                    : rows.length === 0
+                                                        ? 'No camps registered yet.'
+                                                        : 'No camps match these filters.'}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
-            )}
-        </div>
-    );
-}
-
-function CampBlock({ camp }) {
-    return (
-        <div className="rounded-lg border border-white/10 overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white/[0.03] border-b border-white/10">
-                <span className="text-sm font-semibold text-slate-900 dark:text-white">{camp.name || camp.id.slice(0, 8)}</span>
-                {camp.lowCount > 0 && (
-                    <span className="text-xs text-danger-400 font-semibold">⚠ {camp.lowCount} low</span>
-                )}
-                <span className="ml-auto text-xs text-slate-400">{camp.items.length} items</span>
-            </div>
-
-            {camp.items.length === 0 ? (
-                <p className="px-4 py-3 text-xs text-slate-500">No inventory recorded for this camp yet.</p>
-            ) : (
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="text-left text-slate-500 text-xs">
-                            <tr>
-                                <th className="px-4 py-2 font-medium">Item</th>
-                                <th className="px-4 py-2 font-medium">Category</th>
-                                <th className="px-4 py-2 font-medium text-right">Stock</th>
-                                <th className="px-4 py-2 font-medium">Last Movement</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {camp.items.map(item => (
-                                <tr key={`${item.item_name}-${item.category}-${item.unit}`} className={item.low ? 'bg-danger-500/10' : ''}>
-                                    <td className="px-4 py-2 text-slate-200">{item.item_name}</td>
-                                    <td className="px-4 py-2 capitalize text-slate-400">{item.category}</td>
-                                    <td className={`px-4 py-2 text-right font-bold ${item.low ? 'text-danger-400' : 'text-slate-900 dark:text-white'}`}>
-                                        {item.quantity_on_hand} {item.unit}
-                                    </td>
-                                    <td className="px-4 py-2 text-slate-500 text-xs">
-                                        {item.last_movement_at ? new Date(item.last_movement_at).toLocaleString() : '-'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+            </main>
         </div>
     );
 }

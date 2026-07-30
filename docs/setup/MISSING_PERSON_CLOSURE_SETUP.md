@@ -75,24 +75,31 @@ worthwhile follow-up but is not what makes this safe.
 
 ## 3. Configure the SMS gateway
 
-Outbound SMS goes through the same Android SMS Gateway (sms-gate.app) that
-`sms-report` already uses for inbound messages, via its 3rd-party send API.
+Outbound SMS goes through **TextBee** (textbee.dev) — the same Android gateway
+app behind inbound `sms-report` — via `POST /gateway/devices/{deviceId}/send-sms`
+with an `x-api-key` header and body `{recipients: [...], message}`.
 
 Set these as **edge function secrets** (not `VITE_` variables - they must never
 reach the browser):
 
 ```bash
-supabase secrets set SMS_GATEWAY_USERNAME=your_gateway_username
-supabase secrets set SMS_GATEWAY_PASSWORD=your_gateway_password
+supabase secrets set TEXTBEE_API_KEY=your_api_key
+supabase secrets set TEXTBEE_DEVICE_ID=your_device_id
 supabase secrets set PUBLIC_SITE_URL=https://your-deployed-site
 supabase secrets set PUBLIC_BRAND_NAME="Disaster Management LK"
 ```
+
+**Both** TextBee values are required, and both are UUIDs — so it is easy to set
+one to the other's value. That mistake does not crash anything: it surfaces as a
+`401` (bad key) or `404` (bad device id) recorded against a `failed` row in
+`outbound_sms_log`, with TextBee's own message preserved. Check there first if
+messages stop arriving.
 
 Optional:
 
 | Secret | Default |
 | --- | --- |
-| `SMS_GATEWAY_API_URL` | `https://api.sms-gate.app/3rdparty/v1/message` |
+| `TEXTBEE_API_BASE` | `https://api.textbee.dev/api/v1` |
 
 **Without gateway credentials the feature still works.** Closure is recorded,
 the message is written to `outbound_sms_log` with status `not_configured`, and
@@ -148,9 +155,81 @@ administrator, and it cannot time out on the critical path.
 | `personal_number_in_authority_contact` | a `07x` mobile passed off as an official desk (landlines and short codes like 119 / 1990 are fine) |
 | `coercion` | "unless you pay", "will not release her", "don't tell police", "come alone" |
 
-Evasion handling: simple character substitution is undone (`m0n3y` → `money`,
-`5end` → `send`) and high-signal terms are also matched with all punctuation and
-spacing removed, so `b.r.i.b.e` and `o t p` are caught.
+### Matching, and why it works the way it does
+
+Terms are matched **boundary-anchored**, not as bare substrings, and
+de-obfuscation only ever collapses characters *within* a single token. Each field
+is tested in three forms:
+
+| Form | Catches |
+| --- | --- |
+| lowercased, character substitution undone | `m0n3y`, `5end money` |
+| punctuation dropped, spaces kept | `b.r.i.b.e`, `o.t.p`, `pay-first` |
+| runs of three or more lone letters collapsed | `b r i b e` |
+
+Plus one whitespace-free pass, restricted to a short list of long distinctive
+terms (`sendmoney`, `bankaccount`, `westernunion`…) that cannot collide across
+word boundaries.
+
+That structure is not incidental — it is the fix for a real defect. An earlier
+version matched substrings against a form of the text with **all** whitespace
+stripped, which merged adjacent words:
+
+- "he **got p**arents nearby" → `gotparents` → flagged as containing `otp`
+- "she **ran som**ewhere near the canal" → `ransomewhere` → flagged as `ransom`
+- a responder named S**imo**n → flagged as an `imo` messaging handle
+
+A responder with genuine news would have been told their closure looked like
+extortion. Short terms like `otp`, `cvv` and `ransom` are therefore never matched
+against a whitespace-free form, and single words are boundary-anchored so
+`reward` does not fire on "rewarding" and `in cash` does not fire on "cashew".
+
+Some plausible-sounding terms are deliberately **not** in the lists, because they
+have ordinary uses in a rescue note: bare `no police` ("there is no police
+station nearby"), `some money` ("she had some money with her"), `small amount`
+("she drank a small amount of water"), `in cash` ("the fare was paid in cash").
+The demand forms — `send money`, `pay me`, `pay first`, `money first`,
+`give me money` — carry that weight instead.
+
+Regression coverage lives in
+`supabase/functions/_shared/closureScreening.test.ts` — 17 must-pass closures and
+28 must-flag attempts, including every case above. Run it after touching a term
+list:
+
+```bash
+deno test supabase/functions/_shared/closureScreening.test.ts
+```
+
+### Why rules and not a Bayesian classifier
+
+A spam-filter-style Naive Bayes model is the obvious alternative and it is worth
+knowing why it is not the gate here:
+
+- **No training data.** The feature has never run in production, so there are
+  zero labelled closure notes. A model hand-fed synthetic examples is just this
+  term list with the guarantees removed.
+- **Bayesian poisoning is the normal shape of this attack.** A closure note is
+  mostly legitimate narrative with one short demand clause appended — "found her
+  at the hospital, she is fine, her son is with her, now send Rs 50,000". Bag-of-
+  words scoring dilutes: the ham words outvote the demand. A rule that rejects
+  any payment demand outright cannot be diluted.
+- **A flag has to be explainable.** A coordinator reviewing an accusation and a
+  responder being told to rewrite both need "the word `bribe` was found", not
+  "p(abuse) = 0.71".
+
+The right place for a classifier is as a **second, non-blocking** signal once
+labels exist. `flagged_closure_attempts.review_status` (`cleared` / `rejected`)
+is already the labelling pipeline, so after a few hundred reviewed closures a
+model can be trained to route *additional* notes to review — catching the
+paraphrase attacks the term lists miss — while the rules keep the hard reject.
+
+### What this does not catch
+
+Pure paraphrase with no listed term: "I'll tell you where she is once we settle
+things between us." No keyword, no amount, no phone number, so it passes. That is
+the real limit of the approach, and it is why the reporter's SMS carries the
+"never pay anyone" warning regardless of whether the note was clean — the warning
+is the control that does not depend on detection working.
 
 A flag **rejects** the closure. The case stays `Active` - a bad actor must not be
 able to shut down a live search - and no SMS goes out. The submitter sees

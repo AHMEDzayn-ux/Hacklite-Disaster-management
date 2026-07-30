@@ -298,22 +298,58 @@ supabase link --project-ref <your-project-ref>
 supabase functions deploy sms-report
 ```
 
-### 5. Configure Android SMS Gateway
+### 5. Configure the TextBee Webhook
 
-In your Android SMS Gateway app, set up the webhook:
+In the TextBee dashboard (**Webhooks → Create Webhook**):
 
-1. **Webhook URL**: `https://<your-project-ref>.supabase.co/functions/v1/sms-report`
-2. **Method**: POST
-3. **Content-Type**: application/json
-4. **Payload Format**: The function accepts these field names:
-   ```json
-   {
-     "from": "+1234567890", // or "phone" or "sender"
-     "message": "SMS text...", // or "text" or "body"
-     "sentStamp": 1704067200000,
-     "receivedStamp": 1704067200000
-   }
+1. **Delivery URL**: `https://<your-project-ref>.supabase.co/functions/v1/sms-report`
+2. **Events**: **`MESSAGE_RECEIVED` only.** The function hard-returns
+   `{"success": true, "message": "Event ignored"}` for every other event, so
+   `MESSAGE_SENT` / `MESSAGE_DELIVERED` / `MESSAGE_FAILED` would just be noise.
+   (Those three are the hook to add later if you want real delivery
+   confirmation for the outbound closure SMS in `outbound_sms_log`.)
+3. **Signing Secret**: generate one — see step 5b.
+
+**Payload format** — this is what TextBee actually sends, and what
+`sms-report/index.ts` parses. Note it is flat camelCase, *not* the
+`from`/`sentStamp` shape an earlier version of this document claimed:
+
+```json
+{
+  "smsId": "smsId",
+  "sender": "+123456789",
+  "message": "message",
+  "receivedAt": "2025-10-05T13:00:35.208Z",
+  "deviceId": "deviceId",
+  "webhookSubscriptionId": "webhookSubscriptionId",
+  "webhookEvent": "MESSAGE_RECEIVED"
+}
+```
+
+### 5b. Enable signature verification (recommended)
+
+The webhook endpoint runs with `verify_jwt = false` — TextBee cannot mint a
+Supabase JWT — so the HMAC signature is the **only** gate in front of it. With
+`SMS_WEBHOOK_SECRET` unset, anyone who learns the URL can inject fake disaster
+and missing-person reports, poison the AI agents' inputs, and burn your Gemini
+quota.
+
+Turn it on in this order, or you will reject your own traffic:
+
+1. Generate and **save** the signing secret on the TextBee webhook.
+2. Set the *same* value in Supabase:
+   ```bash
+   supabase secrets set SMS_WEBHOOK_SECRET=<the-value-from-textbee>
    ```
+3. Redeploy: `supabase functions deploy sms-report`
+4. Send a test SMS and confirm a row still appears.
+
+The check accepts TextBee's documented digest (HMAC-SHA256, hex, `x-signature`
+header) computed over either the raw request body or its compact
+re-serialization, so the sender's whitespace cannot start rejecting valid
+reports. A request with **no** signature header is rejected once the secret is
+set — the guard is on the secret, not on the header, precisely so that omitting
+the header is not a bypass.
 
 ### 6. Test the SMS System
 

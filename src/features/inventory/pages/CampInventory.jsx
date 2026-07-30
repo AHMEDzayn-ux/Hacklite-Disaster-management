@@ -58,11 +58,14 @@ function CampInventory() {
         setLoading(true);
         const { data: camp } = await supabase.from('camps').select('id, name').eq('id', campId.trim()).single();
         const result = await fetchCampInventoryLevels(campId.trim(), accessCode.trim().toUpperCase());
-        setLoading(false);
         if (!result.success) {
+            setLoading(false);
             setError('Invalid camp or access code.');
             return;
         }
+        // Deliberately leave the spinner up: unlocking triggers the levels
+        // effect below, and clearing it here would paint one frame of
+        // "No items tracked yet" against the still-empty levels array.
         setUnlocked({ campId: campId.trim(), accessCode: accessCode.trim().toUpperCase(), campName: camp?.name || 'Camp' });
     };
 

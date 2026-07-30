@@ -71,21 +71,15 @@ function MissingPersonsList({ role = 'responder' }) {
     const [districtFilter, setDistrictFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'map'
-    const [isInitializing, setIsInitializing] = useState(!isInitialized);
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToMissingPersons()
+    // resolves immediately when another page already opened the shared channel,
+    // so a local "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        if (!isInitialized) {
-            const initialize = async () => {
-                await subscribeToMissingPersons();
-                setIsInitializing(false);
-            };
-            initialize();
-        }
-        // Already initialized: isInitializing was seeded to !isInitialized,
-        // so it is already false here - nothing to do.
+        if (!isInitialized) subscribeToMissingPersons();
         // Don't unsubscribe on unmount to maintain cache
-    }, []);
+    }, [isInitialized, subscribeToMissingPersons]);
 
     // All 25 districts in Sri Lanka (matching EmergencyContacts)
     const allDistricts = [
@@ -202,7 +196,7 @@ function MissingPersonsList({ role = 'responder' }) {
     const mapInsights = buildMapInsights(mappedPersons);
 
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
             <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
@@ -387,7 +381,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                                 : `/missing-persons/${person.id}`;
                                             navigate(detailPath);
                                         }}
-                                        className="flex-1 bg-primary-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-600"
+                                        className="flex-1 rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-900 hover:text-white dark:border-white dark:bg-transparent dark:text-white dark:hover:bg-white dark:hover:text-slate-900"
                                     >
                                         View Details
                                     </button>
@@ -517,7 +511,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                                                     : `/missing-persons/${person.id}`;
                                                                 navigate(detailPath);
                                                             }}
-                                                            className="w-full bg-primary-500 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-primary-600"
+                                                            className="w-full rounded border-2 border-slate-900 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-900 hover:text-white"
                                                         >
                                                             View Details
                                                         </button>

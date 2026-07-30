@@ -70,21 +70,15 @@ function AnimalRescueList({ role = 'responder' }) {
     const [districtFilter, setDistrictFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'map'
-    const [isInitializing, setIsInitializing] = useState(!isInitialized);
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToAnimalRescues()
+    // resolves immediately when another page already opened the shared channel,
+    // so a local "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        if (!isInitialized) {
-            const initialize = async () => {
-                await subscribeToAnimalRescues();
-                setIsInitializing(false);
-            };
-            initialize();
-        }
-        // Already initialized: isInitializing was seeded to !isInitialized,
-        // so it is already false here - nothing to do.
+        if (!isInitialized) subscribeToAnimalRescues();
         // Don't unsubscribe on unmount to maintain cache
-    }, []);
+    }, [isInitialized, subscribeToAnimalRescues]);
 
     // All 25 districts in Sri Lanka
     const allDistricts = [
@@ -246,7 +240,7 @@ function AnimalRescueList({ role = 'responder' }) {
     const mapInsights = buildMapInsights(mappedRescues);
 
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
             <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">

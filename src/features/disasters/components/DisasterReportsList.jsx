@@ -71,21 +71,15 @@ function DisasterReportsList({ role = 'responder' }) {
     const [severityFilter, setSeverityFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('cards');
-    const [isInitializing, setIsInitializing] = useState(!isInitialized);
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToDisasters() resolves
+    // immediately when another page already opened the shared channel, so a local
+    // "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        if (!isInitialized) {
-            const initialize = async () => {
-                await subscribeToDisasters();
-                setIsInitializing(false);
-            };
-            initialize();
-        }
-        // Already initialized: isInitializing was seeded to !isInitialized,
-        // so it is already false here - nothing to do.
+        if (!isInitialized) subscribeToDisasters();
         // Don't unsubscribe on unmount to maintain cache
-    }, []);
+    }, [isInitialized, subscribeToDisasters]);
 
     const allDistricts = [
         'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha',
@@ -219,7 +213,7 @@ function DisasterReportsList({ role = 'responder' }) {
     };
 
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
             <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">

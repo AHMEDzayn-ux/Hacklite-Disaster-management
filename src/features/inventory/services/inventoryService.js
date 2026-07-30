@@ -48,9 +48,39 @@ export const fetchCampInventoryLevels = (campId, accessCode) =>
 /** Admin path: fetch stock across every camp. */
 export const fetchAllInventoryLevels = () => invokeInventoryAsAdmin({ action: 'get-levels' });
 
+/**
+ * Admin path: one camp's stock sheet, with that camp's reorder thresholds -
+ * which the all-camps read deliberately omits, since thresholds are per camp.
+ * This is what lets an admin drill into a single camp and see exactly the sheet
+ * its camp admin sees.
+ */
+export const fetchCampInventoryLevelsAsAdmin = (campId) =>
+    invokeInventoryAsAdmin({ action: 'get-levels', campId });
+
 /** Admin path: record a transaction without needing the camp's code. */
 export const recordInventoryTransactionAsAdmin = (campId, transaction) =>
     invokeInventoryAsAdmin({ action: 'record', campId, ...transaction });
+
+/**
+ * Admin path: the append-only movement ledger for a camp - every receipt,
+ * distribution, correction and count, each with the note recorded at the time.
+ * This is the version history behind a current-stock figure: how it got there
+ * and who said so. Omit campId as a full admin to read every camp.
+ */
+export const fetchInventoryTransactions = (campId, limit = 150) =>
+    invokeInventoryAsAdmin({ action: 'list-transactions', ...(campId ? { campId } : {}), limit });
+
+/**
+ * Admin path: save an edited stock table as a counted sheet.
+ *
+ * `counts` is [{ itemId, unit, quantity }] holding the counted figure for every
+ * row on screen, not just the changed ones - saving the table asserts the whole
+ * sheet was counted. The server writes one ledger row per item: a signed
+ * 'adjusted' correction where the count differs from the ledger, and a
+ * zero-quantity 'verified' row where it agrees. Nothing is ever overwritten.
+ */
+export const saveInventoryCount = (campId, counts, notes) =>
+    invokeInventoryAsAdmin({ action: 'save-count', campId, counts, notes: notes || null });
 
 /** Admin path: issue a new access code for a camp (invalidates the old one). */
 export const regenerateInventoryAccessCode = (campId) =>
@@ -102,3 +132,25 @@ export const CATEGORY_LABELS = {
     food: '🍚 Food', water: '💧 Water', medical: '⚕️ Medical', shelter: '⛺ Shelter',
     clothing: '👕 Clothing', hygiene: '🧼 Hygiene', other: '📦 Other',
 };
+
+/** The same categories without the pictograms, for tables and dense reports. */
+export const CATEGORY_NAMES = {
+    food: 'Food', water: 'Water', medical: 'Medical', shelter: 'Shelter',
+    clothing: 'Clothing', hygiene: 'Hygiene', other: 'Other',
+};
+
+/**
+ * How a ledger row reads in the history. `sign` is how the row moves stock, so
+ * the history can show a signed change without re-deriving it from the type.
+ */
+export const TRANSACTION_TYPES = {
+    received: { label: 'Received', sign: 1 },
+    transferred_in: { label: 'Transferred in', sign: 1 },
+    distributed: { label: 'Distributed', sign: -1 },
+    transferred_out: { label: 'Transferred out', sign: -1 },
+    adjusted: { label: 'Correction', sign: 1 },
+    verified: { label: 'Counted', sign: 0 },
+};
+
+/** Stock is recounted twice a day, so anything older than this is overdue. */
+export const STOCK_COUNT_INTERVAL_HOURS = 12;

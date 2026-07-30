@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { IconShieldLock } from '@/components/icons/Icons';
 
+/**
+ * Admin Portal
+ * ============
+ * The single sign-in for every staff account. There is no separate camp-admin
+ * login: on success the account's role decides where it lands - a camp_admin
+ * goes to its own camp's inventory, everyone else to the admin dashboard.
+ */
 function AdminLogin() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -42,10 +49,10 @@ function AdminLogin() {
         signIn(email, password);
     };
 
-    const handleDemoLogin = () => {
-        setEmail('admin@demo.com');
+    const handleDemoLogin = (demoEmail) => {
+        setEmail(demoEmail);
         setPassword('Demo@1234');
-        signIn('admin@demo.com', 'Demo@1234');
+        signIn(demoEmail, 'Demo@1234');
     };
 
     return (
@@ -81,8 +88,7 @@ function AdminLogin() {
                         </div>
                         <h1 className="text-xl font-bold text-slate-900 dark:text-white">Admin Portal</h1>
                         <p className="text-slate-400 text-sm mt-1">
-
-                            Camp Management & Verification
+                            Admins &amp; camp admins - sign in here
                         </p>
                     </div>
 
@@ -130,20 +136,31 @@ function AdminLogin() {
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={handleDemoLogin}
-                            disabled={loading}
-                            className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-4 rounded-lg border border-white/20 disabled:opacity-50"
-                        >
-                            Use Demo Account
-                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => handleDemoLogin('admin@demo.com')}
+                                disabled={loading}
+                                className="btn-outline py-3 disabled:opacity-50"
+                            >
+                                Demo Super Admin
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleDemoLogin('campadmin@demo.com')}
+                                disabled={loading}
+                                className="btn-outline py-3 disabled:opacity-50"
+                            >
+                                Demo Camp Admin
+                            </button>
+                        </div>
                     </form>
 
                     {/* Info */}
                     <div className="mt-6 pt-6 border-t border-white/10">
                         <p className="text-xs text-slate-500 text-center">
-                            This portal is for authorized personnel only.
+                            This portal is for authorized personnel only. You are taken to
+                            your own screens based on your account role.
                             <br />
                             For camp requests, please use the public form.
                         </p>

@@ -31,7 +31,7 @@ const donorName = donation => (donation.is_anonymous ? 'Anonymous donor' : donat
  * designations and messages are all shown rather than summarised away.
  */
 function RecentDonations({ limit = 8 }) {
-    const { donations } = useDonationStore();
+    const { donations, isInitialized } = useDonationStore();
 
     const successful = useMemo(
         () => donations
@@ -71,8 +71,16 @@ function RecentDonations({ limit = 8 }) {
 
             {recent.length === 0 ? (
                 <div className="px-3 py-8 text-center">
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">No donations recorded yet.</p>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Be the first to contribute to this appeal.</p>
+                    {/* An empty ledger and a ledger that hasn't loaded look identical
+                        in the data — only claim "no donations" once the fetch is in. */}
+                    {isInitialized ? (
+                        <>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">No donations recorded yet.</p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Be the first to contribute to this appeal.</p>
+                        </>
+                    ) : (
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Loading donations…</p>
+                    )}
                 </div>
             ) : (
                 <ul className="m-0 max-h-[22rem] list-none divide-y divide-slate-200 overflow-y-auto p-0 scroll-panel dark:divide-white/10">

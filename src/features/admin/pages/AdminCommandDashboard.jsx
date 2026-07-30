@@ -19,7 +19,7 @@ import {
 } from '@/features/admin/services/aiAgentService';
 import { defaultMapConfig } from '@/lib/mapConfig';
 import MapResizeFix from '@/components/map/MapResizeFix';
-import { IconSiren, IconBolt, IconClock, IconGlobe } from '@/components/icons/Icons';
+import { IconBolt, IconClock, IconGlobe } from '@/components/icons/Icons';
 
 /**
  * Emergency Command Dashboard
@@ -73,37 +73,45 @@ function AdminCommandDashboard() {
     const [running, setRunning] = useState(false);
     const [runProgress, setRunProgress] = useState('');
     const [error, setError] = useState('');
+    // Distinguishes "still fetching" from "genuinely nothing to show" so the
+    // panels never claim a queue is empty before their query has come back.
+    const [dataLoading, setDataLoading] = useState(true);
 
     useEffect(() => {
         if (!authLoading && !user) navigate('/admin/login');
     }, [user, authLoading, navigate]);
 
     const loadAll = useCallback(async () => {
-        const [campsRes, disastersRes, sitRes, queueRes, plansRes, inFlightRes, routesRes, requestsRes] = await Promise.all([
-            supabase.from('camps').select('id, name, district, latitude, longitude, capacity, current_occupancy').eq('status', 'Active'),
-            supabase.from('disasters').select('id, disaster_type, severity, description, location, damage_index, status').eq('status', 'Active'),
-            fetchLatestSituationReports(),
-            fetchLatestPriorityQueue(),
-            fetchPendingAllocationPlans(),
-            fetchInFlightAllocationPlans(),
-            fetchLatestRoutePlans(),
-            fetchOpenCampRequests(),
-        ]);
+        setDataLoading(true);
+        try {
+            const [campsRes, disastersRes, sitRes, queueRes, plansRes, inFlightRes, routesRes, requestsRes] = await Promise.all([
+                supabase.from('camps').select('id, name, district, latitude, longitude, capacity, current_occupancy').eq('status', 'Active'),
+                supabase.from('disasters').select('id, disaster_type, severity, description, location, damage_index, status').eq('status', 'Active'),
+                fetchLatestSituationReports(),
+                fetchLatestPriorityQueue(),
+                fetchPendingAllocationPlans(),
+                fetchInFlightAllocationPlans(),
+                fetchLatestRoutePlans(),
+                fetchOpenCampRequests(),
+            ]);
 
-        setCamps((campsRes.data || []).filter(c => c.latitude != null && c.longitude != null));
-        setDisasters(disastersRes.data || []);
-        setSituationReports(sitRes.data || []);
-        setPriorityQueue(queueRes.data || []);
-        setAllocationPlans(plansRes.data || []);
-        setInFlightPlans(inFlightRes.data || []);
-        setRoutePlans(routesRes.data || []);
-        setCampRequests(requestsRes.data || []);
+            setCamps((campsRes.data || []).filter(c => c.latitude != null && c.longitude != null));
+            setDisasters(disastersRes.data || []);
+            setSituationReports(sitRes.data || []);
+            setPriorityQueue(queueRes.data || []);
+            setAllocationPlans(plansRes.data || []);
+            setInFlightPlans(inFlightRes.data || []);
+            setRoutePlans(routesRes.data || []);
+            setCampRequests(requestsRes.data || []);
 
-        const agentNames = ['situation_awareness', 'incident_prioritization', 'resource_allocation', 'route_optimization', 'volunteer_assignment'];
-        const histories = await Promise.all(agentNames.map(name => fetchAgentRunHistory(name, 1)));
-        const historyMap = {};
-        agentNames.forEach((name, i) => { historyMap[name] = histories[i].data?.[0] || null; });
-        setRunHistory(historyMap);
+            const agentNames = ['situation_awareness', 'incident_prioritization', 'resource_allocation', 'route_optimization', 'volunteer_assignment'];
+            const histories = await Promise.all(agentNames.map(name => fetchAgentRunHistory(name, 1)));
+            const historyMap = {};
+            agentNames.forEach((name, i) => { historyMap[name] = histories[i].data?.[0] || null; });
+            setRunHistory(historyMap);
+        } finally {
+            setDataLoading(false);
+        }
     }, []);
 
     useEffect(() => { if (user) loadAll(); }, [user, loadAll]);
@@ -193,14 +201,7 @@ function AdminCommandDashboard() {
             ></div>
 
             <header className="relative z-10 border-b border-white/10 bg-white/[0.03] backdrop-blur-md">
-                <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-4">
-                        <Link to="/admin/dashboard" className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm">← Dashboard</Link>
-                        <h1 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
-                            <IconSiren className="h-5 w-5 text-danger-400" />
-                            Emergency Command Dashboard
-                        </h1>
-                    </div>
+                <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-end flex-wrap gap-3">
                     <button
                         onClick={runFullPipeline}
                         disabled={running}
@@ -298,7 +299,9 @@ function AdminCommandDashboard() {
                     <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                         <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">🙋 Open Camp Requests ({campRequests.length})</h3>
                         <div className="space-y-2">
-                            {campRequests.length === 0 && <p className="text-xs text-slate-500">No camp has requested supplies.</p>}
+                            {campRequests.length === 0 && (
+                                <p className="text-xs text-slate-500">{dataLoading ? 'Loading…' : 'No camp has requested supplies.'}</p>
+                            )}
                             {campRequests.map(request => {
                                 const requested = Number(request.quantity_requested);
                                 const covered = Number(request.quantity_fulfilled) + (plannedByRequest[request.id] || 0);
@@ -326,7 +329,9 @@ function AdminCommandDashboard() {
                     <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                         <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">📦 Pending Resource Allocations ({allocationPlans.length})</h3>
                         <div className="space-y-2">
-                            {allocationPlans.length === 0 && <p className="text-xs text-slate-500">No pending recommendations.</p>}
+                            {allocationPlans.length === 0 && (
+                                <p className="text-xs text-slate-500">{dataLoading ? 'Loading…' : 'No pending recommendations.'}</p>
+                            )}
                             {allocationPlans.map(plan => (
                                 <div key={plan.id} className="border border-white/10 bg-white/5 rounded-lg p-2 text-xs">
                                     <p className="font-medium text-slate-900 dark:text-white">{plan.quantity} {plan.unit || 'units'} {plan.item_name || plan.resource_category}</p>
@@ -356,7 +361,9 @@ function AdminCommandDashboard() {
                     <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4">
                         <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm">🚚 Shipments In Transit ({inFlightPlans.length})</h3>
                         <div className="space-y-2">
-                            {inFlightPlans.length === 0 && <p className="text-xs text-slate-500">No shipments awaiting dispatch or delivery.</p>}
+                            {inFlightPlans.length === 0 && (
+                                <p className="text-xs text-slate-500">{dataLoading ? 'Loading…' : 'No shipments awaiting dispatch or delivery.'}</p>
+                            )}
                             {inFlightPlans.map(plan => {
                                 const route = routePlans.find(r => r.allocation_plan_id === plan.id);
                                 return (
@@ -400,7 +407,9 @@ function AdminCommandDashboard() {
                                     <p className="text-slate-400 truncate">{item.disasters?.description}</p>
                                 </Link>
                             ))}
-                            {priorityQueue.length === 0 && <p className="text-xs text-slate-500">No active incidents queued.</p>}
+                            {priorityQueue.length === 0 && (
+                                <p className="text-xs text-slate-500">{dataLoading ? 'Loading…' : 'No active incidents queued.'}</p>
+                            )}
                         </div>
                     </div>
 
@@ -419,7 +428,9 @@ function AdminCommandDashboard() {
                                     <p className="text-slate-300">{report.narrative_summary}</p>
                                 </div>
                             ))}
-                            {situationReports.length === 0 && <p className="text-xs text-slate-500">Run AI Analysis to generate SITREPs.</p>}
+                            {situationReports.length === 0 && (
+                                <p className="text-xs text-slate-500">{dataLoading ? 'Loading…' : 'Run AI Analysis to generate SITREPs.'}</p>
+                            )}
                         </div>
                     </div>
 

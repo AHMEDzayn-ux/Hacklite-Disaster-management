@@ -57,7 +57,13 @@ function FlaggedClosuresPanel() {
             setError(null);
         } catch (err) {
             console.error('Error loading flagged closures:', err);
-            setError(err.message);
+            setAttempts([]);
+            // PGRST205 is PostgREST's "relation not in the schema cache", i.e. the
+            // migration has not been applied. That is a deployment step, not a
+            // fault, so say so instead of showing a raw driver message.
+            setError(err?.code === 'PGRST205' || /schema cache/i.test(err?.message || '')
+                ? { setup: true, message: 'Screening is active, but the review table has not been created in this project yet. Apply migration 20260730000002 (supabase db push) to see flagged closures here.' }
+                : { setup: false, message: err?.message || 'Unknown error' });
         } finally {
             setLoading(false);
         }
@@ -90,7 +96,7 @@ function FlaggedClosuresPanel() {
     const pendingCount = attempts.filter(a => a.review_status === 'pending').length;
 
     return (
-        <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-5">
+        <section className="flex-none rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
                 <div className="flex items-center gap-3">
                     <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300">
@@ -118,13 +124,15 @@ function FlaggedClosuresPanel() {
                 </button>
             </div>
 
-            {error && (
-                <p className="mt-4 rounded-lg border border-danger-500/30 bg-danger-500/10 px-3 py-2 text-sm text-danger-300">
-                    Could not load flagged closures: {error}
-                </p>
-            )}
-
-            {loading ? (
+            {/* An error and "nothing pending" are contradictory - only ever show one. */}
+            {error ? (
+                <div className={`mt-4 flex items-start gap-2 rounded-lg border px-3 py-2 text-sm ${error.setup
+                    ? 'border-amber-500/30 bg-amber-500/10 text-amber-200'
+                    : 'border-danger-500/30 bg-danger-500/10 text-danger-300'}`}>
+                    <IconSiren className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <p>{error.setup ? error.message : `Could not load flagged closures: ${error.message}`}</p>
+                </div>
+            ) : loading ? (
                 <p className="mt-4 text-sm text-slate-400">Loading…</p>
             ) : attempts.length === 0 ? (
                 <p className="mt-4 flex items-center gap-2 text-sm text-slate-400">

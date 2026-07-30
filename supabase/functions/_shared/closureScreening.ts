@@ -51,8 +51,12 @@ const PAYMENT_TERMS = [
     'processing fee', 'facilitation fee', 'my fee', 'my charges', 'my commission',
     'send money', 'transfer money', 'send cash', 'wire money', 'money first',
     'pay me', 'pay first', 'payment first', 'pay up', 'give me money', 'need money',
-    'want money', 'small amount', 'some money', 'cash only', 'in cash',
-    'western union', 'moneygram', 'ez cash', 'ezcash', 'mcash', 'genie', 'frimi',
+    'want money', 'cash only',
+    // Deliberately absent: "some money", "small amount", "in cash". Each has an
+    // ordinary use in a rescue note ("she had some money with her", "she drank a
+    // small amount of water"), and the demand forms above already cover the
+    // phrasings that matter.
+    'western union', 'moneygram', 'ez cash', 'ezcash', 'mcash', 'frimi',
     'gift card', 'giftcard', 'google play card', 'voucher code', 'reload my',
     'top up my', 'topup my',
     // Sinhala / Tamil, native script and common romanisations
@@ -76,7 +80,11 @@ const COERCION_TERMS = [
     'only after payment', 'only after you pay', 'once you pay', 'if you pay',
     'unless you pay', 'after payment', 'no money no', 'keep this quiet',
     'keep quiet', 'do not tell police', "don't tell police", 'dont tell police',
-    'no police', 'without police', 'come alone', 'meet me alone',
+    'not tell the police', 'do not involve police', 'dont involve police',
+    'without police', 'without the police', 'no police involved',
+    'come alone', 'meet me alone',
+    // Deliberately absent: bare "no police" - "there is no police station nearby"
+    // is a normal thing to write when explaining why someone went to a hospital.
 ]
 
 const MESSAGING_TERMS = [
@@ -99,13 +107,16 @@ const EMAIL = /[^\s@]+@[^\s@]+\.[a-z]{2,}/i
 
 const URL_LIKE = /https?:\/\/|www\.|\b[a-z0-9-]{2,}\.(?:com|net|org|lk|io|me|info|xyz|link)\b/i
 
-// Terms rare enough that matching them with all punctuation and spacing removed
-// is safe, which catches the obvious evasions: "b.r.i.b.e", "o t p", "pay-first".
-const SQUEEZED_PAYMENT_TERMS = [
-    'bribe', 'ransom', 'giftcard', 'westernunion', 'sendmoney', 'payfirst', 'moneyfirst',
+// Terms an attacker may write with the spaces already removed ("sendmoney"). Only
+// long, distinctive sequences belong here: this list is the one matched against
+// text with whitespace stripped, so a short entry would collide across word
+// boundaries. "ransom" is deliberately absent - it hides inside "ran somewhere".
+const JOINED_PAYMENT_TERMS = [
+    'sendmoney', 'sendcash', 'payfirst', 'paymefirst', 'moneyfirst', 'giftcard',
+    'westernunion', 'moneygram',
 ]
-const SQUEEZED_CREDENTIAL_TERMS = [
-    'otp', 'cvv', 'bankaccount', 'accountnumber',
+const JOINED_CREDENTIAL_TERMS = [
+    'bankaccount', 'accountnumber', 'cardnumber', 'onetimepassword',
 ]
 
 // --- normalisation ---------------------------------------------------------
@@ -116,18 +127,66 @@ const LEET: Record<string, string> = {
 
 /** Lowercase and undo simple character substitution, so "m0n3y" reads as "money". */
 function normalise(text: string): string {
-    return text.toLowerCase().replace(/[01345 7@$]/g, ch => (ch === ' ' ? ' ' : LEET[ch] ?? ch))
+    return text.toLowerCase().replace(/[013457@$]/g, ch => LEET[ch] ?? ch)
 }
 
-/** Strip everything that is not a letter, collapsing "b r i b e" and "o.t.p" into one token. */
-function squeeze(text: string): string {
-    // a-z plus the Sinhala (U+0D80-U+0DFF) and Tamil (U+0B80-U+0BFF) blocks.
-    return normalise(text).replace(/[^a-z඀-෿஀-௿]/g, '')
+/**
+ * The forms of a field that term lists are tested against.
+ *
+ * Every variant preserves word boundaries. An earlier version stripped all
+ * whitespace, which merged adjacent words and produced exactly the failure that
+ * matters most here: "he got parents nearby" became "gotparents" and tripped the
+ * `otp` rule, "she ran somewhere" became "ransomewhere" and tripped `ransom`. A
+ * responder with genuine news was told their closure looked like extortion. So
+ * de-obfuscation now only ever collapses characters *within* one token.
+ */
+function variantsOf(raw: string): string[] {
+    const soft = normalise(raw)
+    return [
+        soft,
+        // "b.r.i.b.e", "o.t.p", "pay-first" - punctuation dropped, spaces kept.
+        soft.replace(/[^\p{L}\p{N}\s]/gu, ''),
+        // "b r i b e" - a run of three or more lone letters, collapsed in place.
+        soft.replace(/\b\p{L}(?:[\s._*-]+\p{L}){2,}\b/gu, run => run.replace(/[^\p{L}]/gu, '')),
+    ]
 }
 
-function containsAny(haystack: string, terms: string[]): boolean {
-    return terms.some(term => haystack.includes(term))
+/** Whitespace-free form, matched only against JOINED_TERMS. */
+function joined(raw: string): string {
+    return normalise(raw).replace(/[^\p{L}\p{N}]/gu, '')
 }
+
+type Matcher = string | RegExp
+
+/**
+ * Compile a term list once. ASCII terms become boundary-anchored regexes, so
+ * "imo" no longer fires on "Simon" and "reward" no longer fires on "rewarding".
+ * Sinhala and Tamil terms stay plain substrings - \b and \p{L} boundaries are
+ * unreliable for those scripts, and they carry no English-word collision risk.
+ */
+function compileTerms(terms: string[]): Matcher[] {
+    return terms.map(term => {
+        if (!/^[\x20-\x7F]+$/.test(term)) return term
+        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        return new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, 'u')
+    })
+}
+
+function matchesAny(haystacks: string[], matchers: Matcher[]): boolean {
+    return matchers.some(matcher => haystacks.some(text =>
+        typeof matcher === 'string' ? text.includes(matcher) : matcher.test(text)
+    ))
+}
+
+const PAYMENT_MATCHERS = compileTerms(PAYMENT_TERMS)
+const CREDENTIAL_MATCHERS = compileTerms(CREDENTIAL_TERMS)
+const COERCION_MATCHERS = compileTerms(COERCION_TERMS)
+const MESSAGING_MATCHERS = compileTerms(MESSAGING_TERMS)
+// Not compiled: the whitespace-free form has no word boundaries left to anchor
+// to, which is precisely why only long, distinctive terms are allowed in these
+// two lists. They are matched as plain substrings.
+const JOINED_PAYMENT_MATCHERS: Matcher[] = JOINED_PAYMENT_TERMS
+const JOINED_CREDENTIAL_MATCHERS: Matcher[] = JOINED_CREDENTIAL_TERMS
 
 // --- screening -------------------------------------------------------------
 
@@ -166,30 +225,30 @@ export function screenClosureText(fields: ScreeningField[]): ScreeningResult {
         if (!value || !value.trim()) continue
 
         const raw = value
-        const soft = normalise(raw)
-        const hard = squeeze(raw)
+        const texts = variantsOf(raw)
+        const spaceless = [joined(raw)]
 
         const hit = (reason: FlagReason) => { reasons.add(reason); flaggedFields.add(key) }
 
-        if (containsAny(soft, PAYMENT_TERMS) || containsAny(hard, SQUEEZED_PAYMENT_TERMS)) {
+        if (matchesAny(texts, PAYMENT_MATCHERS) || matchesAny(spaceless, JOINED_PAYMENT_MATCHERS)) {
             hit('payment_demand')
         }
-        if (containsAny(soft, CREDENTIAL_TERMS) || containsAny(hard, SQUEEZED_CREDENTIAL_TERMS)) {
+        if (matchesAny(texts, CREDENTIAL_MATCHERS) || matchesAny(spaceless, JOINED_CREDENTIAL_MATCHERS)) {
             hit('financial_credentials')
         }
         if (MONEY_AMOUNT.test(raw)) {
             hit('money_amount')
         }
-        if (containsAny(soft, COERCION_TERMS)) {
+        if (matchesAny(texts, COERCION_MATCHERS)) {
             hit('coercion')
         }
 
         if (key === 'authority_contact') {
             // An official hotline is fine here; a personal mobile is the tell.
             if (LK_MOBILE.test(raw.replace(/[()]/g, ''))) hit('personal_number_in_authority_contact')
-            if (EMAIL.test(raw) || URL_LIKE.test(raw) || containsAny(soft, MESSAGING_TERMS)) hit('off_platform_contact')
+            if (EMAIL.test(raw) || URL_LIKE.test(raw) || matchesAny(texts, MESSAGING_MATCHERS)) hit('off_platform_contact')
         } else {
-            if (ANY_PHONE.test(raw.replace(/[()]/g, '')) || EMAIL.test(raw) || URL_LIKE.test(raw) || containsAny(soft, MESSAGING_TERMS)) {
+            if (ANY_PHONE.test(raw.replace(/[()]/g, '')) || EMAIL.test(raw) || URL_LIKE.test(raw) || matchesAny(texts, MESSAGING_MATCHERS)) {
                 hit('off_platform_contact')
             }
         }

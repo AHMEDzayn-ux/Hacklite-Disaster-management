@@ -74,6 +74,14 @@ body:has(.home-shell) {
   overflow-y: auto;
 }
 
+/* Admin screens render under the 3rem (h-12) admin nav bar. Left at min-h-dvh
+   they'd stand a nav-bar's worth taller than the viewport on every page, so the
+   whole portal would scroll by 48px with nothing at the bottom. Give back the
+   height the bar takes. */
+.admin-shell .page-shell {
+  min-height: calc(100dvh - 3rem);
+}
+
 @layer base {
   body {
     @apply bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100;

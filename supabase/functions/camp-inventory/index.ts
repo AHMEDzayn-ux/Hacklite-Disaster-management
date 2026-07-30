@@ -28,8 +28,15 @@ function generateAccessCode(): string {
 
 const URGENCY_LEVELS = ['low', 'normal', 'high', 'critical']
 
+interface CountEntry {
+  itemId: string
+  unit?: string
+  quantity: number
+}
+
 interface RequestBody {
-  action: 'record' | 'get-levels' | 'regenerate-code' | 'create-request' | 'list-requests' | 'cancel-request' | 'list-items'
+  action: 'record' | 'get-levels' | 'regenerate-code' | 'create-request' | 'list-requests'
+    | 'cancel-request' | 'list-items' | 'list-transactions' | 'save-count'
   campId: string
   accessCode?: string
   itemId?: string
@@ -41,6 +48,8 @@ interface RequestBody {
   notes?: string
   urgency?: string
   requestId?: string
+  counts?: CountEntry[]
+  limit?: number
 }
 
 interface CatalogItem {
@@ -82,9 +91,8 @@ async function resolveCatalogItem(supabase: any, body: RequestBody): Promise<Cat
 // 'admin'      - full admin/super_admin, any camp
 // 'camp_admin' - scoped to campAdminCampId only
 // 'code'       - volunteer holding a camp's access code, scoped to body.campId
-type Access =
-  | { ok: true; kind: 'admin' | 'camp_admin' | 'code'; campAdminCampId: string | null; userId: string | null }
-  | { ok: false; reason: string }
+type Granted = { ok: true; kind: 'admin' | 'camp_admin' | 'code'; campAdminCampId: string | null; userId: string | null }
+type Access = Granted | { ok: false; reason: string }
 
 async function resolveAccess(supabase: any, req: Request, body: RequestBody): Promise<Access> {
   const authHeader = req.headers.get('Authorization')
@@ -129,6 +137,27 @@ async function currentStock(supabase: any, campId: string, itemName: string, cat
     .eq('unit', unit)
     .maybeSingle()
   return Number(data?.quantity_on_hand ?? 0)
+}
+
+// A camp's whole stock sheet as a lookup, so a multi-item count resolves every
+// item against one read instead of one query per row.
+async function stockSheet(supabase: any, campId: string): Promise<Map<string, number>> {
+  const { data } = await supabase
+    .from('camp_inventory_levels')
+    .select('item_name, category, unit, quantity_on_hand')
+    .eq('camp_id', campId)
+  const sheet = new Map<string, number>()
+  for (const row of data ?? []) {
+    sheet.set(`${row.item_name}|${row.category}|${row.unit}`, Number(row.quantity_on_hand ?? 0))
+  }
+  return sheet
+}
+
+function actorName(access: Granted, supplied?: string): string {
+  if (supplied) return supplied
+  if (access.kind === 'admin') return 'admin'
+  if (access.kind === 'camp_admin') return 'camp_admin'
+  return 'volunteer'
 }
 
 Deno.serve(async (req: Request) => {
@@ -184,6 +213,103 @@ Deno.serve(async (req: Request) => {
 
     const { data: camp } = await supabase.from('camps').select('inventory_thresholds').eq('id', campId).single()
     return json(200, { success: true, levels: data, thresholds: camp?.inventory_thresholds ?? {} })
+  }
+
+  // The raw ledger behind the current-stock figures: every receipt,
+  // distribution, correction and count, with the note recorded at the time.
+  // Because the ledger is append-only this is also the item's version history -
+  // how the stock reached the number now on screen, and who said so.
+  if (body.action === 'list-transactions') {
+    if (access.kind === 'code') return json(403, { error: 'An access code cannot read the movement history' })
+
+    const limit = Math.min(Math.max(Number(body.limit) || 150, 1), 500)
+    let query = supabase
+      .from('inventory_transactions')
+      .select('id, item_id, item_name, category, unit, transaction_type, quantity, recorded_by_name, notes, recorded_at')
+      .order('recorded_at', { ascending: false })
+      .limit(limit)
+
+    // A full admin with no camp specified sees every camp; a camp_admin is
+    // pinned to its own camp whatever the body asks for.
+    if (!(access.kind === 'admin' && !body.campId)) {
+      const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
+      if (!campId) return json(400, { error: 'campId is required' })
+      query = query.eq('camp_id', campId)
+    }
+
+    const { data, error } = await query
+    if (error) return json(500, { error: 'Failed to fetch movement history', details: error.message })
+
+    return json(200, { success: true, transactions: data })
+  }
+
+  // Saving the edited stock table. The ledger is append-only, so this is never
+  // an UPDATE of past rows: each item becomes one new row - an 'adjusted' row
+  // carrying the signed difference between the counted figure and what the
+  // ledger says, or a zero-quantity 'verified' row when the count agreed. Both
+  // advance the item's last-counted time, which is what the twice-daily
+  // freshness check on the camp admin screen reads.
+  if (body.action === 'save-count') {
+    if (access.kind === 'code') return json(403, { error: 'An access code cannot save a stock count - a camp admin login is required' })
+
+    const campId = access.kind === 'camp_admin' ? access.campAdminCampId : body.campId
+    if (!campId) return json(400, { error: 'campId is required' })
+    if (!Array.isArray(body.counts) || body.counts.length === 0) {
+      return json(400, { error: 'counts must be a non-empty array' })
+    }
+    if (body.counts.length > 250) return json(400, { error: 'Too many items in a single count' })
+
+    const sheet = await stockSheet(supabase, campId)
+    const recordedBy = actorName(access, body.recordedByName)
+    const rows: Record<string, unknown>[] = []
+    const seen = new Set<string>()
+
+    for (const entry of body.counts) {
+      if (!entry?.itemId) return json(400, { error: 'Every counted row needs an itemId' })
+      if (typeof entry.quantity !== 'number' || !Number.isFinite(entry.quantity) || entry.quantity < 0) {
+        return json(400, { error: 'A counted quantity must be a number of zero or more' })
+      }
+
+      const item = await resolveCatalogItem(supabase, { ...body, itemId: entry.itemId, itemName: undefined })
+      if ('error' in item) return json(400, { error: item.error })
+
+      const unit = entry.unit || item.default_unit
+      const key = `${item.name}|${item.category}|${unit}`
+      // The same item twice in one count is a client bug, and the second row
+      // would be measured against a stale on-hand figure - reject it rather
+      // than write a wrong correction.
+      if (seen.has(key)) return json(400, { error: `${item.name} appears twice in the same count` })
+      seen.add(key)
+
+      // An item the camp has never held isn't being corrected, it's arriving -
+      // record it as 'received' so the history reads as the opening stock it
+      // is. A new row entered at zero has nothing to receive, so it becomes a
+      // plain verification: the camp now tracks the item and holds none.
+      const known = sheet.has(key)
+      const onHand = sheet.get(key) ?? 0
+      const delta = Math.round((entry.quantity - onHand) * 100) / 100
+
+      rows.push({
+        camp_id: campId,
+        item_id: item.id,
+        item_name: item.name,
+        category: item.category,
+        unit,
+        transaction_type: delta === 0 ? 'verified' : (known ? 'adjusted' : 'received'),
+        quantity: delta,
+        recorded_by_name: recordedBy,
+        notes: body.notes || null,
+      })
+    }
+
+    const { error } = await supabase.from('inventory_transactions').insert(rows)
+    if (error) return json(500, { error: 'Failed to save the stock count', details: error.message })
+
+    return json(200, {
+      success: true,
+      counted: rows.length,
+      corrected: rows.filter(r => r.quantity !== 0).length,
+    })
   }
 
   if (body.action === 'list-items') {
@@ -250,7 +376,30 @@ Deno.serve(async (req: Request) => {
     const { data, error } = await query
     if (error) return json(500, { error: 'Failed to fetch requests', details: error.message })
 
-    return json(200, { success: true, requests: data })
+    // A request on its own only says what was asked for. Whether a coordinator
+    // acted on it lives in the allocation plans raised against it, so attach
+    // those - without them the camp that raised the request has no way to tell
+    // "nobody has looked at this yet" from "approved and on its way".
+    const requests = data ?? []
+    if (requests.length > 0) {
+      const { data: plans } = await supabase
+        .from('allocation_plans')
+        .select('id, request_id, status, quantity, unit, item_name, generated_at, reviewed_at, dispatched_at, delivered_at, delivery_notes, received_by_name, from_camp:from_camp_id (name)')
+        .in('request_id', requests.map((r: any) => r.id))
+        .order('generated_at', { ascending: false })
+
+      const byRequest = new Map<string, any[]>()
+      for (const plan of plans ?? []) {
+        const list = byRequest.get(plan.request_id) ?? []
+        list.push(plan)
+        byRequest.set(plan.request_id, list)
+      }
+      for (const request of requests) {
+        request.plans = byRequest.get(request.id) ?? []
+      }
+    }
+
+    return json(200, { success: true, requests })
   }
 
   if (body.action === 'cancel-request') {
@@ -292,7 +441,12 @@ Deno.serve(async (req: Request) => {
     if (!['received', 'distributed', 'adjusted'].includes(transactionType)) {
       return json(400, { error: 'transactionType must be received, distributed, or adjusted' })
     }
-    if (typeof quantity !== 'number' || quantity <= 0) {
+    if (typeof quantity !== 'number' || !Number.isFinite(quantity) || quantity === 0) {
+      return json(400, { error: 'quantity must be a non-zero number' })
+    }
+    // Only a correction may reduce stock with a negative figure; a receipt or a
+    // distribution states its own direction and must be positive.
+    if (quantity < 0 && transactionType !== 'adjusted') {
       return json(400, { error: 'quantity must be a positive number' })
     }
 
@@ -300,18 +454,17 @@ Deno.serve(async (req: Request) => {
     if ('error' in item) return json(400, { error: item.error })
     const unit = body.unit || item.default_unit
 
-    // Can't distribute more than is on hand - otherwise the live view sums to
-    // negative stock. Corrections that legitimately reduce below zero go
-    // through 'adjusted', not 'distributed'.
-    if (transactionType === 'distributed') {
+    // Can't take out more than is on hand - otherwise the live view sums to
+    // negative stock, which no physical store can be in.
+    if (transactionType === 'distributed' || quantity < 0) {
       const onHand = await currentStock(supabase, campId, item.name, item.category, unit)
-      if (quantity > onHand) {
-        return json(400, { error: `Cannot distribute ${quantity} - only ${onHand} on hand` })
+      const removing = Math.abs(quantity)
+      if (removing > onHand) {
+        return json(400, { error: `Cannot remove ${removing} - only ${onHand} on hand` })
       }
     }
 
-    const recordedBy = recordedByName ||
-      (access.kind === 'admin' ? 'admin' : access.kind === 'camp_admin' ? 'camp_admin' : 'volunteer')
+    const recordedBy = actorName(access, recordedByName)
 
     const { data, error } = await supabase.from('inventory_transactions').insert({
       camp_id: campId,

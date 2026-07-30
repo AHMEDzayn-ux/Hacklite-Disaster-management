@@ -12,7 +12,6 @@ import {
     IconShieldCheck,
     IconUsers,
     IconGlobe,
-    IconTent,
 } from '@/components/icons/Icons';
 
 const REPORT_ITEMS = [
@@ -54,18 +53,11 @@ function RoleSelection() {
             {/* Portal Links - Top Right */}
             <div className="absolute top-4 right-4 z-20 flex items-center gap-2 sm:top-6 sm:right-6 sm:gap-3 lg:top-8 lg:right-10 animate-fade-in-up">
                 <button
-                    onClick={() => navigate('/camp-admin/login')}
-                    className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-slate-300 transition-colors duration-150 hover:border-white/30 hover:text-slate-900 dark:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-4 sm:py-2.5 sm:text-sm"
-                >
-                    <IconTent className="h-4 w-4" />
-                    <span className="hidden sm:inline">Camp Admin</span>
-                </button>
-                <button
                     onClick={() => navigate('/admin/login')}
                     className="flex items-center gap-2 rounded-full border border-white bg-white px-3 py-2 text-xs font-bold text-slate-900 shadow-sm transition-colors duration-150 hover:bg-primary-600 hover:text-white hover:border-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-5 sm:py-2.5 sm:text-sm"
                 >
                     <IconShieldLock className="h-4 w-4" />
-                    <span className="hidden sm:inline">Admin Portal</span>
+                    <span className="hidden sm:inline">Admin Login</span>
                 </button>
             </div>
 
