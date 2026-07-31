@@ -98,7 +98,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                 <div className="bg-white/5 rounded p-2 border border-white/10">
                                     <p className="text-xs text-slate-400">FROM</p>
                                     <p className="font-medium text-white">{plan.from_camp?.name || 'Unknown camp'}</p>
-                                    <p className="text-xs text-slate-500">{plan.from_camp?.district}</p>
+                                    <p className="text-xs text-slate-400">{plan.from_camp?.district}</p>
                                     <p className="text-xs mt-1 text-slate-300">
                                         Current stock: {loadingStock ? '…' : <span className="font-semibold text-white">{stock.from} units</span>}
                                         {!loadingStock && <span className="text-danger-400"> → {Math.max(0, stock.from - plan.quantity)} after</span>}
@@ -107,7 +107,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                                 <div className="bg-white/5 rounded p-2 border border-white/10">
                                     <p className="text-xs text-slate-400">TO</p>
                                     <p className="font-medium text-white">{plan.to_camp?.name || 'Unknown camp'}</p>
-                                    <p className="text-xs text-slate-500">{plan.to_camp?.district}</p>
+                                    <p className="text-xs text-slate-400">{plan.to_camp?.district}</p>
                                     <p className="text-xs mt-1 text-slate-300">
                                         Current stock: {loadingStock ? '…' : <span className="font-semibold text-white">{stock.to} units</span>}
                                         {!loadingStock && <span className="text-success-400"> → {stock.to + plan.quantity} after</span>}
@@ -139,7 +139,7 @@ function AllocationReviewModal({ plan, onClose, onDecided }) {
                         </div>
 
                         <div className="flex gap-3 justify-end">
-                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50">Cancel</button>
+                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50 transition-colors">Cancel</button>
                             <button onClick={() => handleDecision('reject')} disabled={processing} className="btn-danger disabled:opacity-50">Reject</button>
                             <button onClick={() => handleDecision('approve')} disabled={processing} className="btn-success disabled:opacity-50">
                                 {processing ? 'Processing…' : 'Approve & Transfer'}

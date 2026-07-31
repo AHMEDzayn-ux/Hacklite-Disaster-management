@@ -1,20 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletIconFix';
 import { redIcon, orangeIcon, greenIcon, blueIcon, greyIcon } from '@/lib/leafletIconFix';
-import HeatmapLayer from '@/components/map/HeatmapLayer';
-import MapFrame from '@/components/map/MapFrame';
 import { Donut, VBars, HBars, TrendLine, CHART_COLORS } from '@/components/ui/Charts';
 import { useMissingPersonStore, useDisasterStore, useAnimalRescueStore, useCampStore } from '@/store';
-import { defaultMapConfig, districtBounds, allDistricts } from '@/lib/mapConfig';
-import DisasterReportsList from '@/features/disasters/components/DisasterReportsList';
-import MissingPersonsList from '@/features/missing-persons/components/MissingPersonsList';
-import AnimalRescueList from '@/features/animal-rescue/components/AnimalRescueList';
-import CampsList from '@/features/camps/components/CampsList';
+import { defaultMapConfig, sriLankaFitBounds, districtBounds, allDistricts } from '@/lib/mapConfig';
 import {
-    IconLifeBuoy,
     IconGrid,
     IconBolt,
     IconSearch,
@@ -190,9 +183,9 @@ function Card({ title, icon: Icon, right, children, className = '' }) {
     return (
         <div className={`rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-xl p-4 hover:border-white/20 ${className}`}>
             {(title || right) && (
-                <div className="flex items-center justify-between mb-3 gap-2">
+                <div className="flex items-center justify-between mb-3 gap-2 flex-shrink-0">
                     {title && (
-                        <h3 className="flex items-center gap-1.5 font-semibold text-white text-sm truncate min-w-0">
+                        <h3 className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white text-sm truncate min-w-0">
                             {Icon && <Icon className="h-4 w-4 text-primary-300 flex-shrink-0" />}
                             <span className="truncate">{title}</span>
                         </h3>
@@ -209,8 +202,6 @@ const ICON_BADGE = {
     primary: 'bg-primary-500/15 text-primary-300',
     danger: 'bg-danger-500/15 text-danger-300',
     success: 'bg-success-500/15 text-success-300',
-    orange: 'bg-orange-500/15 text-orange-300',
-    emerald: 'bg-emerald-500/15 text-emerald-300',
     slate: 'bg-white/10 text-slate-300',
 };
 
@@ -219,18 +210,18 @@ function KPI({ value, label, sub, accent = 'text-white', icon: Icon, iconColor =
         <button
             type="button"
             onClick={onClick}
-            className={`group rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-4 text-left w-full ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
+            title={sub || undefined}
+            className={`group flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] backdrop-blur-md px-2.5 py-2 text-left w-full transition-colors duration-150 ${onClick ? 'hover:border-white/25 hover:bg-white/[0.08] hover:shadow-lg' : 'cursor-default hover:border-white/20'}`}
         >
-            <div className="flex items-start justify-between gap-2">
-                <p className={`text-3xl font-extrabold leading-none ${accent}`}>{value}</p>
-                {Icon && (
-                    <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${ICON_BADGE[iconColor]}`}>
-                        <Icon className="h-5 w-5" />
-                    </span>
-                )}
+            {Icon && (
+                <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${ICON_BADGE[iconColor]}`}>
+                    <Icon className="h-3.5 w-3.5" />
+                </span>
+            )}
+            <div className="min-w-0 leading-tight">
+                <p className={`text-lg font-extrabold leading-none truncate ${accent}`}>{value}</p>
+                <p className="text-[11px] font-medium text-slate-400 mt-0.5 truncate">{label}</p>
             </div>
-            <p className="text-sm font-medium text-slate-400 mt-2 leading-tight">{label}</p>
-            {sub && <p className="text-xs text-slate-500 mt-0.5 leading-tight truncate">{sub}</p>}
         </button>
     );
 }
@@ -260,7 +251,7 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
     const [range, setRange] = useState('7d');
     const [district, setDistrict] = useState('all');
     const [view, setView] = useState('overview');
-    const [layers, setLayers] = useState({ disaster: true, missing: true, animal: true, camp: true, heat: false });
+    const [layers, setLayers] = useState({ disaster: true, missing: true, animal: true, camp: true });
 
     const A = useMemo(
         () => computeAnalytics({ disasters, missingPersons, animalRescues, camps, range, district }),
@@ -269,52 +260,64 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[320px]">
+            <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-500 border-t-transparent" />
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
-            {/* Global filter bar */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 sticky top-0 z-20">
-                <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
-                    {Object.keys(RANGE_CONF).map(r => (
-                        <button
-                            key={r}
-                            onClick={() => setRange(r)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${range === r ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
-                        </button>
-                    ))}
-                </div>
-                <select
-                    value={district}
-                    onChange={e => setDistrict(e.target.value)}
-                    className="text-xs bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50"
-                >
-                    <option value="all" className="bg-slate-900 text-white">All districts</option>
-                    {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
-                </select>
-                <div className="ml-auto flex rounded-xl bg-white/5 border border-white/10 p-0.5">
-                    {SUBVIEWS.map(s => (
-                        <button
-                            key={s.key}
-                            onClick={() => setView(s.key)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 ${view === s.key ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30' : 'text-slate-200 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
-                        </button>
-                    ))}
-                </div>
+        <div className="flex flex-col lg:flex-row gap-4 h-full min-h-0 flex-1">
+            {/* Left: live incident map — Sri Lanka is tall/narrow, so this column is
+                sized from the map's own aspect ratio rather than a fixed half-width,
+                giving the space that would've been empty sea back to the right column. */}
+            <div className="h-[50vh] lg:h-full lg:aspect-[3/5] min-h-0 flex flex-col flex-shrink-0">
+                <MapPanel A={A} layers={layers} setLayers={setLayers} navigate={navigate} />
             </div>
 
-            {view === 'overview' && <OverviewView A={A} layers={layers} setLayers={setLayers} navigate={navigate} range={range} />}
-            {view === 'analytics' && <AnalyticsView A={A} />}
-            {view === 'categories' && <CategoriesView A={A} />}
-            {view === 'ai' && <AiView A={A} />}
+            {/* Right: filter bar + KPIs / analytics / categories / AI insights */}
+            <div className="flex-1 min-w-0 h-full min-h-0 flex flex-col gap-4">
+                {/* Global filter bar */}
+                <div className="rounded-2xl border border-white/10 bg-white/95 dark:bg-white/[0.05] backdrop-blur-md p-2 flex flex-wrap items-center gap-2 flex-shrink-0 z-20">
+                    <div className="flex rounded-xl bg-white/5 border border-white/10 p-0.5">
+                        {Object.keys(RANGE_CONF).map(r => (
+                            <button
+                                key={r}
+                                onClick={() => setRange(r)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${range === r ? 'border-2 border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white dark:bg-transparent' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}
+                            >
+                                {r === '24h' ? '24h' : r === '7d' ? '7 days' : '30 days'}
+                            </button>
+                        ))}
+                    </div>
+                    <select
+                        value={district}
+                        onChange={e => setDistrict(e.target.value)}
+                        className="text-xs bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400/50 transition-colors"
+                    >
+                        <option value="all" className="bg-slate-900 text-white">All districts</option>
+                        {allDistricts.map(d => <option key={d} value={d} className="bg-slate-900 text-white">{d}</option>)}
+                    </select>
+                    <div className="ml-auto flex rounded-xl bg-white/5 border border-white/10 p-0.5">
+                        {SUBVIEWS.map(s => (
+                            <button
+                                key={s.key}
+                                onClick={() => setView(s.key)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 ${view === s.key ? 'border-2 border-slate-900 dark:border-white text-slate-900 dark:text-white bg-white dark:bg-transparent' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}
+                            >
+                                <s.icon className="h-3.5 w-3.5" /><span className="hidden sm:inline">{s.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex-1 min-h-0 overflow-y-auto">
+                    {view === 'overview' && <OverviewStats A={A} range={range} navigate={navigate} />}
+                    {view === 'analytics' && <AnalyticsView A={A} />}
+                    {view === 'categories' && <CategoriesView A={A} />}
+                    {view === 'ai' && <AiView A={A} />}
+                </div>
+            </div>
         </div>
     );
 }
@@ -323,11 +326,104 @@ function CommandCenter({ disasters, missingPersons, animalRescues, camps, loadin
 // OVERVIEW: mission KPIs, AI summary, live map, needs-attention, timeline
 // ---------------------------------------------------------------------------
 
-function OverviewView({ A, layers, setLayers, navigate, range }) {
+// Fits the map to Sri Lanka's coastline on mount using Leaflet's own
+// fitBounds() rather than a guessed center/zoom, so the island fills the
+// viewport regardless of the container's actual rendered size. minZoom is
+// locked to whatever zoom that fit produces, so users can't zoom out past
+// the island (maxBounds stays generous so it never fights the fit at load).
+function FitSriLanka() {
+    const map = useMap();
+    useEffect(() => {
+        const fit = () => {
+            map.invalidateSize();
+            map.fitBounds(sriLankaFitBounds, { padding: [4, 4] });
+            map.setMinZoom(map.getZoom());
+        };
+        fit();
+        // Window 'resize' only fires on actual browser resizes — our column width
+        // is driven by flex/aspect-ratio layout (header wraps, tab switches, etc.)
+        // which changes the container's real size without that event ever firing,
+        // leaving fitBounds() centered on a stale size. Watch the container itself.
+        const ro = new ResizeObserver(fit);
+        ro.observe(map.getContainer());
+        return () => ro.disconnect();
+    }, [map]);
+    return null;
+}
+
+function MapPanel({ A, layers, setLayers, navigate }) {
     return (
-        <div className="space-y-4">
+        <Card
+            icon={IconMap}
+            className="h-full flex flex-col"
+            right={
+                <div className="flex flex-1 gap-1">
+                    {['disaster', 'missing', 'animal', 'camp'].map(k => (
+                        <button
+                            key={k}
+                            onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
+                            className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full border-[1.5px] bg-white text-slate-600 transition-colors duration-150 dark:bg-white/5 dark:text-slate-300 ${layers[k] ? '' : 'border-slate-200 opacity-50 hover:opacity-100 dark:border-white/10'}`}
+                            style={layers[k] ? { borderColor: KIND_META[k].color } : undefined}
+                        >
+                            <span className="text-xs leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
+                        </button>
+                    ))}
+                </div>
+            }
+        >
+            <div className="flex-1 min-h-0 h-full rounded-2xl border border-white/15 overflow-hidden shadow-xl">
+                <MapContainer
+                    center={defaultMapConfig.center}
+                    zoom={defaultMapConfig.zoom}
+                    minZoom={defaultMapConfig.minZoom}
+                    maxZoom={defaultMapConfig.maxZoom}
+                    maxBounds={defaultMapConfig.maxBounds}
+                    maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
+                    style={{ height: '100%', width: '100%' }}
+                    preferCanvas
+                >
+                    <FitSriLanka />
+                    <TileLayer
+                        attribution='&copy; OpenStreetMap'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {['disaster', 'missing', 'animal'].map(k => layers[k] && A.map.markers[k].map(m => (
+                        <Marker key={`${k}-${m.id}`} position={[m.lat, m.lng]} icon={KIND_META[k].marker}>
+                            <Popup>
+                                <div className="text-xs">
+                                    <p className="font-bold">{KIND_META[k].icon} {m.title}</p>
+                                    {m.severity && <p>Severity: <strong className="capitalize">{m.severity}</strong></p>}
+                                    {m.condition && <p>Condition: <strong className="capitalize">{m.condition}</strong></p>}
+                                    <p className="text-gray-500">{m.address || m.district || 'Location on map'}</p>
+                                    <p className="text-gray-500">Waiting: {timeAgo(m.created_at)} · {m.active ? 'Active' : 'Resolved'}</p>
+                                    {m.description && <p className="text-gray-600 mt-1 line-clamp-2">{m.description}</p>}
+                                    <button onClick={() => navigate(m.link)} className="mt-1 text-primary-600 font-semibold">Open report →</button>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    )))}
+                    {layers.camp && A.map.markers.camp.map(c => (
+                        <Marker key={`camp-${c.id}`} position={[c.lat, c.lng]} icon={c.full ? greyIcon : blueIcon}>
+                            <Popup>
+                                <div className="text-xs">
+                                    <p className="font-bold">⛺ {c.title}</p>
+                                    <p className="text-gray-500">{c.district}</p>
+                                    <p>Occupancy: <strong>{c.occ}/{c.cap}</strong> ({c.pct}%)</p>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    ))}
+                </MapContainer>
+            </div>
+        </Card>
+    );
+}
+
+function OverviewStats({ A, range, navigate }) {
+    return (
+        <div className="flex flex-col gap-4 h-full min-h-0">
             {/* Mission KPI cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-shrink-0">
                 <KPI value={A.kpi.activeReports} label="Active Reports" sub={`${A.kpi.newInWindow} new / ${RANGE_CONF[range].label}`} accent="text-primary-300" icon={IconBolt} iconColor="primary" />
                 <KPI value={A.kpi.highPriority} label="High Priority" sub={`${A.kpi.critical} critical`} accent="text-danger-400" icon={IconSiren} iconColor="danger" />
                 <KPI value={A.kpi.resolvedToday} label="Resolved 24h" accent="text-success-400" icon={IconCheck} iconColor="success" />
@@ -336,132 +432,42 @@ function OverviewView({ A, layers, setLayers, navigate, range }) {
                 <KPI value={fmtDuration(A.kpi.avgResponseH)} label="Avg Response" sub="report → resolved" accent="text-white" icon={IconClock} iconColor="slate" />
             </div>
 
-            {/* AI operational summary */}
-            <Card icon={IconInfo} title="AI Operational Summary" right={<span className="text-xs text-slate-500">derived live · {RANGE_CONF[range].label}</span>}>
-                <p className="text-sm text-slate-300 leading-relaxed">{A.summary.narrative}</p>
-                {A.summary.chips.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2.5">
-                        {A.summary.chips.map((c, i) => (
-                            <span key={i} className={`text-xs font-medium px-2 py-0.5 rounded-full ${c.tone}`}>{c.text}</span>
-                        ))}
-                    </div>
-                )}
-            </Card>
-
-            {/* Live incident map */}
-            <Card
-                icon={IconMap}
-                title="Live Incident Map"
-                right={
-                    <div className="flex flex-wrap gap-1">
-                        {['disaster', 'missing', 'animal', 'camp'].map(k => (
-                            <button
-                                key={k}
-                                onClick={() => setLayers(l => ({ ...l, [k]: !l[k] }))}
-                                className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers[k] ? 'text-white border-white/40 shadow-lg' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
-                                style={layers[k] ? { background: KIND_META[k].color, boxShadow: `0 6px 18px -4px ${KIND_META[k].color}99` } : undefined}
-                            >
-                                <span className="text-base leading-none">{KIND_META[k].icon}</span> {A.map.counts[k]}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setLayers(l => ({ ...l, heat: !l.heat }))}
-                            className={`flex items-center gap-1.5 text-sm font-bold px-3.5 py-2 rounded-full border-2 ${layers.heat ? 'bg-orange-600 text-white border-white/40 shadow-lg shadow-orange-500/50' : 'text-slate-300 border-white/15 bg-white/10 opacity-60 hover:opacity-100 hover:bg-white/20'}`}
-                        >
-                            <span className="text-base leading-none">🔥</span> Heat
-                        </button>
-                    </div>
-                }
-            >
-                <div className="flex justify-center">
-                    <MapFrame height={420} className="rounded-2xl border border-white/15 overflow-hidden shadow-xl">
-                    <MapContainer
-                        center={defaultMapConfig.center}
-                        zoom={defaultMapConfig.zoom}
-                        minZoom={defaultMapConfig.minZoom}
-                        maxZoom={defaultMapConfig.maxZoom}
-                        maxBounds={defaultMapConfig.maxBounds}
-                        maxBoundsViscosity={defaultMapConfig.maxBoundsViscosity}
-                        style={{ height: '100%', width: '100%' }}
-                        preferCanvas
-                    >
-                        <TileLayer
-                            attribution='&copy; OpenStreetMap'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        {layers.heat && <HeatmapLayer points={A.map.heat} />}
-                        {['disaster', 'missing', 'animal'].map(k => layers[k] && A.map.markers[k].map(m => (
-                            <Marker key={`${k}-${m.id}`} position={[m.lat, m.lng]} icon={KIND_META[k].marker}>
-                                <Popup>
-                                    <div className="text-xs">
-                                        <p className="font-bold">{KIND_META[k].icon} {m.title}</p>
-                                        {m.severity && <p>Severity: <strong className="capitalize">{m.severity}</strong></p>}
-                                        {m.condition && <p>Condition: <strong className="capitalize">{m.condition}</strong></p>}
-                                        <p className="text-gray-500">{m.address || m.district || 'Location on map'}</p>
-                                        <p className="text-gray-500">Waiting: {timeAgo(m.created_at)} · {m.active ? 'Active' : 'Resolved'}</p>
-                                        {m.description && <p className="text-gray-600 mt-1 line-clamp-2">{m.description}</p>}
-                                        <button onClick={() => navigate(m.link)} className="mt-1 text-primary-600 font-semibold">Open report →</button>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        )))}
-                        {layers.camp && A.map.markers.camp.map(c => (
-                            <Marker key={`camp-${c.id}`} position={[c.lat, c.lng]} icon={c.full ? greyIcon : blueIcon}>
-                                <Popup>
-                                    <div className="text-xs">
-                                        <p className="font-bold">⛺ {c.title}</p>
-                                        <p className="text-gray-500">{c.district}</p>
-                                        <p>Occupancy: <strong>{c.occ}/{c.cap}</strong> ({c.pct}%)</p>
-                                    </div>
-                                </Popup>
-                            </Marker>
-                        ))}
-                    </MapContainer>
-                    </MapFrame>
-                </div>
-            </Card>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Needs attention */}
-                <Card icon={IconBolt} title="Needs Immediate Attention">
-                    {A.urgentFeed.length === 0 ? (
-                        <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
-                    ) : (
-                        <div className="divide-y divide-white/10 -mx-1">
-                            {A.urgentFeed.map(item => (
-                                <div key={`${item.kind}-${item.id}`} onClick={() => navigate(item.link)} className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg">
+            {/* Needs attention */}
+            <Card icon={IconBolt} title="Needs Immediate Attention" className="flex-1 min-h-0 flex flex-col">
+                {A.urgentFeed.length === 0 ? (
+                    <p className="text-sm text-slate-500 py-6 text-center">Nothing urgent in this scope right now.</p>
+                ) : (
+                    <div className="divide-y divide-white/10 -mx-1 flex-1 min-h-0 overflow-y-auto">
+                        {A.urgentFeed.map(item => {
+                            const isCritical = item.icon === '🚨';
+                            const isHigh = item.icon === '⚠️';
+                            const badge = item.kind === 'disaster'
+                                ? { text: isCritical ? 'Critical' : 'High', tone: isCritical ? 'bg-danger-500/15 text-danger-300' : 'bg-amber-500/15 text-amber-300' }
+                                : { text: 'Missing', tone: 'bg-primary-500/15 text-primary-300' };
+                            return (
+                                <div
+                                    key={`${item.kind}-${item.id}`}
+                                    onClick={() => navigate(item.link)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.link); } }}
+                                    role="button"
+                                    tabIndex={0}
+                                    className="py-2 px-1 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
+                                >
                                     <div className="flex items-center gap-2 min-w-0">
                                         <span className="text-base flex-shrink-0">{item.icon}</span>
                                         <div className="min-w-0">
-                                            <p className="text-xs font-semibold text-white truncate">{item.title}</p>
+                                            <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{item.title}</p>
                                             <p className="text-xs text-slate-400 truncate">{item.subtitle}</p>
                                         </div>
                                     </div>
+                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${badge.tone}`}>{badge.text}</span>
                                     <span className="text-xs font-medium text-slate-500 flex-shrink-0">{item.meta}</span>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
-
-                {/* Live activity timeline */}
-                <Card icon={IconClock} title="Live Activity Timeline">
-                    {A.timeline.length === 0 ? (
-                        <p className="text-sm text-slate-500 py-6 text-center">No recent activity.</p>
-                    ) : (
-                        <div className="relative pl-4 max-h-[340px] overflow-y-auto">
-                            <span className="absolute left-1 top-1 bottom-1 w-px bg-white/10" />
-                            {A.timeline.map((ev, i) => (
-                                <div key={i} onClick={() => ev.link && navigate(ev.link)} className={`relative pb-2.5 ${ev.link ? 'cursor-pointer group' : ''}`}>
-                                    <span className="absolute -left-3 top-1 w-2 h-2 rounded-full ring-2 ring-slate-900" style={{ background: ev.color }} />
-                                    <p className="text-xs text-slate-300 group-hover:text-primary-300">{ev.icon} {ev.text}</p>
-                                    <p className="text-xs text-slate-500">{ev.time}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
-            </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </Card>
         </div>
     );
 }
@@ -474,17 +480,17 @@ function AnalyticsView({ A }) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card icon={IconGrid} title="Report Distribution">
-                <Donut data={A.distribution} centerLabel={A.kpi.totalReports} centerSub="reports" />
+                <Donut data={A.distribution} size={100} thickness={16} centerLabel={A.kpi.totalReports} centerSub="reports" />
             </Card>
 
             <Card icon={IconBolt} title="Priority Breakdown (active disasters)">
-                <VBars data={A.priority} height={140} />
+                <VBars data={A.priority} height={90} />
             </Card>
 
             <Card icon={IconBolt} title="Resolution Trend" right={<span className="text-xs text-slate-500">incoming vs resolved</span>}>
                 <TrendLine
                     series={[
-                        { label: 'Incoming', color: CHART_COLORS[7], values: A.trend.incoming },
+                        { label: 'Incoming', color: CHART_COLORS[3], values: A.trend.incoming },
                         { label: 'Resolved', color: CHART_COLORS[2], values: A.trend.resolved },
                     ]}
                     labels={A.trend.labels}
@@ -492,7 +498,7 @@ function AnalyticsView({ A }) {
             </Card>
 
             <Card icon={IconClock} title="Response Time" right={<span className="text-xs text-slate-500">avg hrs to resolve</span>}>
-                <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[4], values: A.responseTrend.values }]} labels={A.responseTrend.labels} />
+                <TrendLine series={[{ label: 'Avg response (h)', color: CHART_COLORS[5], values: A.responseTrend.values }]} labels={A.responseTrend.labels} height={110} />
             </Card>
 
             <Card icon={IconMapPin} title="District Analytics" right={<span className="text-xs text-slate-500">active reports</span>}>
@@ -517,39 +523,39 @@ function CategoriesView({ A }) {
             {/* Missing persons */}
             <Card icon={IconUserSearch} title="Missing Person Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.missing.total} label="Total" accent="text-white" />
+                    <MiniStat value={c.missing.total} label="Total" accent="text-slate-900 dark:text-white" />
                     <MiniStat value={c.missing.found} label="Found" accent="text-success-400" />
-                    <MiniStat value={c.missing.searching} label="Searching" accent="text-orange-400" />
+                    <MiniStat value={c.missing.searching} label="Searching" accent="text-slate-900 dark:text-white" />
                 </div>
-                <TrendLine series={[{ label: 'New cases', color: CHART_COLORS[3], values: c.missing.trend }]} labels={A.trend.labels} height={130} />
+                <TrendLine series={[{ label: 'New cases', color: CHART_COLORS[3], values: c.missing.trend }]} labels={A.trend.labels} height={100} />
             </Card>
 
             {/* Disasters */}
             <Card icon={IconSiren} title="Disaster Analytics">
                 <div className="grid grid-cols-4 gap-2 mb-3">
-                    <MiniStat value={c.disaster.byType.flood || 0} label="Flood" accent="text-primary-300" />
-                    <MiniStat value={c.disaster.byType.landslide || 0} label="Landslide" accent="text-amber-400" />
-                    <MiniStat value={c.disaster.byType.fire || 0} label="Fire" accent="text-danger-400" />
-                    <MiniStat value={c.disaster.byType.cyclone || 0} label="Storm" accent="text-cyan-400" />
+                    <MiniStat value={c.disaster.byType.flood || 0} label="Flood" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={c.disaster.byType.landslide || 0} label="Landslide" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={c.disaster.byType.fire || 0} label="Fire" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={c.disaster.byType.cyclone || 0} label="Storm" accent="text-slate-900 dark:text-white" />
                 </div>
-                <Donut data={c.disaster.donut} size={116} thickness={18} centerLabel={c.disaster.donut.reduce((s, d) => s + d.value, 0)} centerSub="types" />
+                <Donut data={c.disaster.donut} size={92} thickness={14} centerLabel={c.disaster.donut.reduce((s, d) => s + d.value, 0)} centerSub="types" />
             </Card>
 
             {/* Animals */}
             <Card icon={IconPawPrint} title="Animal Rescue Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.animal.pending} label="Pending" accent="text-orange-400" />
+                    <MiniStat value={c.animal.pending} label="Pending" accent="text-slate-900 dark:text-white" />
                     <MiniStat value={c.animal.completed} label="Completed" accent="text-success-400" />
-                    <MiniStat value={c.animal.total} label="Total" accent="text-white" />
+                    <MiniStat value={c.animal.total} label="Total" accent="text-slate-900 dark:text-white" />
                 </div>
-                <VBars data={c.animal.byType} height={120} />
+                <VBars data={c.animal.byType} height={80} />
             </Card>
 
             {/* Camps */}
             <Card icon={IconTent} title="Relief Camp Analytics">
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                    <MiniStat value={c.camp.active} label="Active Camps" accent="text-primary-300" />
-                    <MiniStat value={`${c.camp.occupancyPct}%`} label="Occupancy" accent={c.camp.occupancyPct >= 85 ? 'text-danger-400' : 'text-white'} />
+                    <MiniStat value={c.camp.active} label="Active Camps" accent="text-slate-900 dark:text-white" />
+                    <MiniStat value={`${c.camp.occupancyPct}%`} label="Occupancy" accent={c.camp.occupancyPct >= 85 ? 'text-danger-400' : 'text-slate-900 dark:text-white'} />
                     <MiniStat value={c.camp.nearFull} label="Near Full" accent="text-danger-400" />
                 </div>
                 <HBars data={c.camp.byDistrict} valueSuffix="%" max={100} />
@@ -570,7 +576,7 @@ function AiView({ A }) {
                 {A.hotspots.map((h, i) => (
                     <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md p-3">
                         <p className="text-xs font-medium text-slate-400">{h.icon} {h.label}</p>
-                        <p className="text-lg font-bold text-white mt-1 truncate">{h.value}</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 truncate">{h.value}</p>
                         <p className="text-xs text-slate-500 truncate">{h.detail}</p>
                     </div>
                 ))}
@@ -602,7 +608,7 @@ function AiView({ A }) {
                             {A.duplicates.map((d, i) => (
                                 <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-xs font-semibold text-white">{d.icon} {d.title}</p>
+                                        <p className="text-xs font-semibold text-slate-900 dark:text-white">{d.icon} {d.title}</p>
                                         <span className="text-xs font-bold text-danger-300 bg-danger-500/15 rounded-full px-2 py-0.5">{d.count} reports</span>
                                     </div>
                                     <p className="text-xs text-slate-400">{d.location} · primary submitted {d.primaryAgo}</p>
@@ -622,7 +628,7 @@ function AiView({ A }) {
                         {A.recommendations.map((r, i) => (
                             <div key={i} className="border border-white/10 bg-white/5 rounded-lg p-2.5 flex flex-col">
                                 <div className="flex items-start justify-between gap-2">
-                                    <p className="text-xs font-semibold text-white">{r.icon} {r.action}</p>
+                                    <p className="text-xs font-semibold text-slate-900 dark:text-white">{r.icon} {r.action}</p>
                                     <span className={`text-xs font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 ${r.confidence >= 75 ? 'bg-success-500/15 text-success-300' : r.confidence >= 50 ? 'bg-amber-500/15 text-amber-300' : 'bg-white/10 text-slate-400'}`}>{r.confidence}%</span>
                                 </div>
                                 <p className="text-xs text-slate-400 mt-1 flex-1">{r.reason}</p>
@@ -685,10 +691,10 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
     // ---- Priority breakdown
     const sevCount = s => activeDisasters.filter(i => i.severity === s).length;
     const priority = [
-        { label: 'Critical', value: sevCount('critical'), color: CHART_COLORS[1] },
-        { label: 'High', value: sevCount('high'), color: CHART_COLORS[7] },
-        { label: 'Moderate', value: sevCount('moderate'), color: CHART_COLORS[3] },
-        { label: 'Low', value: sevCount('low'), color: CHART_COLORS[0] },
+        { label: 'Critical', value: sevCount('critical'), color: '#dc2626' },
+        { label: 'High', value: sevCount('high'), color: '#64748b' },
+        { label: 'Moderate', value: sevCount('moderate'), color: '#94a3b8' },
+        { label: 'Low', value: sevCount('low'), color: '#cbd5e1' },
     ];
 
     // ---- Trends (incoming vs resolved) + labels
@@ -751,7 +757,6 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
                 return { id: c.id, lat: c.latitude, lng: c.longitude, title: c.name, district: c.district, cap: cap_, occ, pct, full: pct >= 90 };
             }),
         },
-        heat: activeDisasters.filter(geo).map(i => ({ lat: i.lat, lng: i.lng, weight: (i.damage ?? 30) / 100 })),
     };
 
     // ---- Needs attention feed
@@ -781,13 +786,14 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
     const allAnimals = incidents.filter(i => i.kind === 'animal');
     const allDisasters = incidents.filter(i => i.kind === 'disaster');
 
+    const NEUTRAL_SLOTS = CHART_COLORS.slice(3);
     const disByType = {};
     allDisasters.forEach(i => { disByType[i.type] = (disByType[i.type] || 0) + 1; });
-    const disasterDonut = topN(disByType, 6).map(([label, value], i) => ({ label: cap(label.replace('-', ' ')), value, color: CHART_COLORS[i % CHART_COLORS.length] }));
+    const disasterDonut = topN(disByType, 6).map(([label, value], i) => ({ label: cap(label.replace('-', ' ')), value, color: NEUTRAL_SLOTS[i % NEUTRAL_SLOTS.length] }));
 
     const animalTypeGroups = { Dogs: ['dog'], Cats: ['cat'], Livestock: ['cattle', 'goat'], Birds: ['bird'], Wildlife: ['wildlife'], Other: ['other'] };
     const animalByType = Object.entries(animalTypeGroups).map(([label, types], i) => ({
-        label, color: CHART_COLORS[i % CHART_COLORS.length],
+        label, color: NEUTRAL_SLOTS[i % NEUTRAL_SLOTS.length],
         value: allAnimals.filter(a => types.includes(a.type)).length,
     })).filter(d => d.value > 0);
 
@@ -821,7 +827,7 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
             active: activeCamps.length,
             occupancyPct: totalCap > 0 ? Math.round((totalOcc / totalCap) * 100) : 0,
             nearFull: nearFull.length,
-            byDistrict: topN(campByDistrict, 6).map(([label, value]) => ({ label, value, color: value >= 85 ? CHART_COLORS[1] : CHART_COLORS[0] })),
+            byDistrict: topN(campByDistrict, 6).map(([label, value]) => ({ label, value, color: value >= 85 ? CHART_COLORS[1] : CHART_COLORS[3] })),
         },
     };
 
@@ -910,43 +916,17 @@ function computeAnalytics({ disasters, missingPersons, animalRescues, camps, ran
     if (topMissing && topMissing[1] >= 2) recommendations.push({ icon: '👥', action: `Assign search team to ${topMissing[0]}`, reason: `${topMissing[1]} active missing-person case(s) clustered here.`, confidence: Math.min(80, 45 + topMissing[1] * 8), impact: 'Concentrates search effort' });
     if (topRising && topRising[1] >= 3) recommendations.push({ icon: '📡', action: `Pre-position resources in ${topRising[0]}`, reason: `Report volume up +${topRising[1]} vs the previous window — an emerging hotspot.`, confidence: 60, impact: 'Gets ahead of the surge' });
 
-    // ---- AI operational summary narrative + chips
-    const topDistrictStr = districtRanking[0] ? districtRanking[0].label : 'no single district';
-    const scope = district === 'all' ? 'across all districts' : `in ${district}`;
-    const narrative = active.length === 0
-        ? `No active reports ${scope} in the selected scope. Operations are clear.`
-        : `${active.length} active report(s) ${scope}: ${activeDisasters.length} disaster(s), ${activeMissing.length} missing-person case(s), and ${activeAnimals.length} animal rescue(s). `
-        + `${highPriority} are high-priority (${critical} critical). Highest activity is in ${topDistrictStr}. `
-        + `${kpi.newInWindow} report(s) came in over the last ${RANGE_CONF[range].label}, and average resolution time is ${fmtDuration(avgResponseH)}.`
-        + (topResource ? ` Most-referenced need: ${topResource.label}.` : '');
-    const chips = [];
-    if (topFlood) chips.push({ text: `🌊 Flood hotspot: ${topFlood[0]}`, tone: 'bg-primary-500/15 text-primary-300' });
-    if (trapped > 0) chips.push({ text: `🆘 ${trapped} trapped mentions`, tone: 'bg-danger-500/15 text-danger-300' });
-    if (nearFull.length > 0) chips.push({ text: `⛺ ${nearFull.length} camps near full`, tone: 'bg-amber-500/15 text-amber-300' });
-    if (duplicates.length > 0) chips.push({ text: `🔄 ${duplicates.length} duplicate clusters`, tone: 'bg-white/10 text-slate-300' });
-
     return {
         kpi, distribution, priority, trend, responseTrend, districtRanking, resourceDemand,
         map, urgentFeed, timeline, categories, hotspots, duplicates, insights, recommendations,
-        summary: { narrative, chips },
     };
 }
 
 // ---------------------------------------------------------------------------
-// Page shell — top-level category tabs wrapping the Command Center + lists
+// Page shell — wraps the Command Center (the single operational pane)
 // ---------------------------------------------------------------------------
 
-const TABS = [
-    { key: 'command', label: 'Command Center', icon: IconGrid },
-    { key: 'disasters', label: 'Disasters', icon: IconSiren },
-    { key: 'missing', label: 'Missing Persons', icon: IconUserSearch },
-    { key: 'animals', label: 'Animal Rescues', icon: IconPawPrint },
-    { key: 'camps', label: 'Camps', icon: IconTent },
-];
-
 function RespondDashboard() {
-    const [activeTab, setActiveTab] = useState('command');
-
     const { missingPersons, isInitialized: mpInit, subscribeToMissingPersons } = useMissingPersonStore();
     const { disasters, isInitialized: dInit, subscribeToDisasters } = useDisasterStore();
     const { animalRescues, isInitialized: arInit, subscribeToAnimalRescues } = useAnimalRescueStore();
@@ -962,18 +942,11 @@ function RespondDashboard() {
 
     const loading = !mpInit || !dInit || !arInit || !cInit;
 
-    const tabCounts = {
-        disasters: disasters.filter(d => !isResolved(d.status)).length,
-        missing: missingPersons.filter(p => !isResolved(p.status)).length,
-        animals: animalRescues.filter(a => !isResolved(a.status)).length,
-        camps: camps.filter(c => !isResolved(c.status)).length,
-    };
-
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className="relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
             {/* Slow-moving colour blobs for depth */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-slate-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-success-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-24 left-1/4 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>
@@ -986,55 +959,14 @@ function RespondDashboard() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1800px] px-4 pt-4 pb-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between flex-wrap gap-4 mb-3">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-success-500 text-white shadow-lg shadow-success-500/30">
-                            <IconLifeBuoy className="h-5 w-5" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2.5">
-                                <h1 className="text-xl md:text-2xl font-black text-white leading-tight">Responder Operations Center</h1>
-                                <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
-                                    <span className="absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
-                                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success-500"></span>
-                                </span>
-                            </div>
-                            <p className="text-slate-300 text-xs mt-0.5">Live incidents, AI-derived insights and resource decision support</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Top-level tabs */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                    {TABS.map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`px-3 py-1.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 ${activeTab === tab.key ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 -translate-y-0.5' : 'bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10 hover:text-white'}`}
-                        >
-                            <tab.icon className="h-4 w-4" />
-                            {tab.label}
-                            {tab.key !== 'command' && (
-                                <span className={`text-xs font-bold rounded-full px-1.5 ${activeTab === tab.key ? 'bg-white/20' : 'bg-white/10 text-slate-300'}`}>{tabCounts[tab.key]}</span>
-                            )}
-                        </button>
-                    ))}
-                </div>
-
-                {activeTab === 'command' && (
-                    <CommandCenter
-                        disasters={disasters}
-                        missingPersons={missingPersons}
-                        animalRescues={animalRescues}
-                        camps={camps}
-                        loading={loading}
-                    />
-                )}
-                {activeTab === 'disasters' && <DisasterReportsList role="responder" />}
-                {activeTab === 'missing' && <MissingPersonsList role="responder" />}
-                {activeTab === 'animals' && <AnimalRescueList role="responder" />}
-                {activeTab === 'camps' && <CampsList role="responder" />}
+            <div className="relative z-10 mx-auto w-full max-w-[1800px] px-3 pt-3 pb-3 sm:px-4 lg:px-6 flex-1 min-h-0 flex flex-col">
+                <CommandCenter
+                    disasters={disasters}
+                    missingPersons={missingPersons}
+                    animalRescues={animalRescues}
+                    camps={camps}
+                    loading={loading}
+                />
             </div>
         </div>
     );

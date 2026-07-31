@@ -8,9 +8,11 @@ import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
 import MapResizeFix from '@/components/map/MapResizeFix';
 import MapFrame from '@/components/map/MapFrame';
+import MapInsightsPanel from '@/components/map/MapInsightsPanel';
+import { INSIGHT_TONE } from '@/lib/mapInsightTones';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
-import { IconUserSearch, IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconPhone, IconInfo, IconCheck } from '@/components/icons/Icons';
+import { IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconShieldLock, IconInfo, IconCheck } from '@/components/icons/Icons';
 
 // Custom marker icons for different statuses
 const activeIcon = redIcon;
@@ -69,21 +71,15 @@ function MissingPersonsList({ role = 'responder' }) {
     const [districtFilter, setDistrictFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'map'
-    const [isInitializing, setIsInitializing] = useState(!isInitialized);
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToMissingPersons()
+    // resolves immediately when another page already opened the shared channel,
+    // so a local "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        if (!isInitialized) {
-            const initialize = async () => {
-                await subscribeToMissingPersons();
-                setIsInitializing(false);
-            };
-            initialize();
-        }
-        // Already initialized: isInitializing was seeded to !isInitialized,
-        // so it is already false here - nothing to do.
+        if (!isInitialized) subscribeToMissingPersons();
         // Don't unsubscribe on unmount to maintain cache
-    }, []);
+    }, [isInitialized, subscribeToMissingPersons]);
 
     // All 25 districts in Sri Lanka (matching EmergencyContacts)
     const allDistricts = [
@@ -152,10 +148,57 @@ function MissingPersonsList({ role = 'responder' }) {
         return 'Just now';
     };
 
+    // Records actually plotted on the map (same geo filter as the markers
+    // below) - insights are derived from exactly what the user can see.
+    const mappedPersons = filteredPersons.filter(p => {
+        const location = p.last_seen_location || p.lastSeenLocation;
+        return location && location.lat && location.lng;
+    });
+
+    const buildMapInsights = (persons) => {
+        if (persons.length === 0) return { stats: [], insights: [] };
+
+        const byDistrict = {};
+        persons.forEach(p => {
+            const location = p.last_seen_location || p.lastSeenLocation;
+            const district = getDistrictFromAddress(location?.address || '');
+            if (district) byDistrict[district] = (byDistrict[district] || 0) + 1;
+        });
+        const topDistrict = Object.entries(byDistrict).sort((a, b) => b[1] - a[1])[0];
+
+        const active = persons.filter(p => p.status === 'Active');
+        const found = persons.filter(p => p.status === 'Resolved');
+        const oldestActive = [...active].sort((a, b) =>
+            new Date(a.last_seen_date || a.lastSeenDate) - new Date(b.last_seen_date || b.lastSeenDate)
+        )[0];
+
+        const stats = [
+            { icon: '📍', label: 'Most Affected Area', value: topDistrict ? topDistrict[0] : '—', detail: topDistrict ? `${topDistrict[1]} case(s) mapped` : 'no district data' },
+            { icon: '🔍', label: 'Active Cases', value: active.length, detail: `of ${persons.length} mapped` },
+            { icon: '✅', label: 'Found', value: found.length, detail: 'resolved' },
+            { icon: '⏱️', label: 'Longest Active', value: oldestActive ? getTimeSince(oldestActive.last_seen_date || oldestActive.lastSeenDate) : '—', detail: oldestActive ? oldestActive.name : 'no active cases' },
+        ];
+
+        const insights = [];
+        if (topDistrict && topDistrict[1] >= 2) {
+            insights.push({ icon: '📈', tone: INSIGHT_TONE.warn, text: `${topDistrict[1]} active/mapped cases are clustered in ${topDistrict[0]} — consider concentrating search efforts there.` });
+        }
+        if (oldestActive) {
+            insights.push({ icon: '🕒', tone: INSIGHT_TONE.danger, text: `${oldestActive.name || 'A missing person'} has been missing longest in this view — last seen ${getTimeSince(oldestActive.last_seen_date || oldestActive.lastSeenDate)}.` });
+        }
+        if (active.length === 0) {
+            insights.push({ icon: '✅', tone: INSIGHT_TONE.ok, text: 'No active missing person cases in this view.' });
+        }
+
+        return { stats, insights };
+    };
+
+    const mapInsights = buildMapInsights(mappedPersons);
+
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -167,7 +210,9 @@ function MissingPersonsList({ role = 'responder' }) {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className={viewMode === 'map'
+            ? 'relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col'
+            : 'page-shell'}>
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -176,98 +221,89 @@ function MissingPersonsList({ role = 'responder' }) {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
-                {/* Header */}
-                <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-fuchsia-500 text-white shadow-lg shadow-fuchsia-500/30">
-                        <IconUserSearch className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-black text-white md:text-2xl">Missing Persons</h1>
-                        <p className="mt-0.5 text-sm text-slate-300">Reported missing persons in Sri Lanka</p>
-                    </div>
-                </div>
-
-                {/* View Mode Toggle */}
-                <div className="mb-3 flex justify-center">
-                    <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
-                        <button
-                            onClick={() => setViewMode('cards')}
-                            className={`flex items-center gap-2 px-4 py-1.5 text-sm font-semibold rounded-lg ${viewMode === 'cards'
-                                ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                : 'text-slate-300 hover:bg-white/10'
-                                }`}
-                        >
-                            <IconGrid className="h-4 w-4" />
-                            Card View
-                        </button>
-                        <button
-                            onClick={() => setViewMode('map')}
-                            className={`flex items-center gap-2 px-4 py-1.5 text-sm font-semibold rounded-lg ${viewMode === 'map'
-                                ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                : 'text-slate-300 hover:bg-white/10'
-                                }`}
-                        >
-                            <IconMap className="h-4 w-4" />
-                            Map View
-                        </button>
-                    </div>
-                </div>
-
-                {/* Filters */}
-                <div className="card mb-3 p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                            <input
-                                type="text"
-                                placeholder="Search by name or location..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="input-field pl-10"
-                            />
-                        </div>
-                        <div className="md:w-48">
-                            <select
-                                value={districtFilter}
-                                onChange={(e) => setDistrictFilter(e.target.value)}
-                                className="input-field"
-                            >
-                                <option value="all">All Districts</option>
-                                {allDistricts.map(district => (
-                                    <option key={district} value={district}>
-                                        {district}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex gap-2">
+            <div className={`relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 w-full ${viewMode === 'map' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
+                {/* Header + Filters — one compact row so map view keeps most of the viewport */}
+                <div className="card mb-3 p-3 flex-shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
                             <button
                                 onClick={() => setStatusFilter('all')}
-                                className={`px-4 py-2 rounded-lg font-medium ${statusFilter === 'all'
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium ${statusFilter === 'all'
                                     ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+                                    : 'text-slate-300 hover:bg-white/10'
                                     }`}
                             >
                                 All ({missingPersons.length})
                             </button>
                             <button
                                 onClick={() => setStatusFilter('active')}
-                                className={`px-4 py-2 rounded-lg font-medium ${statusFilter === 'active'
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium ${statusFilter === 'active'
                                     ? 'bg-danger-500 text-white shadow-md shadow-danger-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+                                    : 'text-slate-300 hover:bg-white/10'
                                     }`}
                             >
                                 Active ({activeCount})
                             </button>
                             <button
                                 onClick={() => setStatusFilter('found')}
-                                className={`px-4 py-2 rounded-lg font-medium ${statusFilter === 'found'
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium ${statusFilter === 'found'
                                     ? 'bg-success-500 text-white shadow-md shadow-success-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+                                    : 'text-slate-300 hover:bg-white/10'
                                     }`}
                             >
                                 Found ({foundCount})
+                            </button>
+                        </div>
+
+                        <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block" />
+
+                        <div className="relative">
+                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                            <input
+                                type="text"
+                                placeholder="Search by name or location..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-48"
+                            />
+                        </div>
+                        <select
+                            value={districtFilter}
+                            onChange={(e) => setDistrictFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Districts</option>
+                            {allDistricts.map(district => (
+                                <option key={district} value={district} className="text-slate-900">
+                                    {district}
+                                </option>
+                            ))}
+                        </select>
+
+                        <span className="ml-auto text-xs text-slate-500">
+                            {filteredPersons.length} of {missingPersons.length}
+                        </span>
+
+                        <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
+                            <button
+                                onClick={() => setViewMode('cards')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'cards'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    : 'text-slate-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                <IconGrid className="h-3.5 w-3.5" />
+                                Cards
+                            </button>
+                            <button
+                                onClick={() => setViewMode('map')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'map'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    : 'text-slate-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                <IconMap className="h-3.5 w-3.5" />
+                                Map
                             </button>
                         </div>
                     </div>
@@ -294,7 +330,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                     {/* Details */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between mb-2">
-                                            <h3 className="text-lg font-bold text-white truncate">{person.name || 'Unknown'}</h3>
+                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">{person.name || 'Unknown'}</h3>
                                             <span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusBadge(person.status).className}`}>
                                                 {getStatusBadge(person.status).text}
                                             </span>
@@ -323,11 +359,14 @@ function MissingPersonsList({ role = 'responder' }) {
                                             {person.additionalInfo}
                                         </p>
                                     )}
-                                    {person.foundByContact && (
+                                    {/* Closure summary — where the person is, never who to call. */}
+                                    {(person.found_person_location || person.found_at || person.foundAt) && (
                                         <div className="mt-2 p-2 bg-success-500/10 rounded-lg">
-                                            <p className="flex items-center gap-1 text-xs text-success-300 font-medium">
-                                                <IconCheck className="h-3.5 w-3.5" />
-                                                Contact: {person.foundByContact}
+                                            <p className="flex items-start gap-1 text-xs text-success-300 font-medium">
+                                                <IconCheck className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                                                {person.found_person_location
+                                                    ? `Found · now at ${person.found_person_location}`
+                                                    : 'Found · case closed'}
                                             </p>
                                         </div>
                                     )}
@@ -342,25 +381,21 @@ function MissingPersonsList({ role = 'responder' }) {
                                                 : `/missing-persons/${person.id}`;
                                             navigate(detailPath);
                                         }}
-                                        className="flex-1 bg-primary-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-600"
+                                        className="flex-1 rounded-lg border-2 border-slate-900 bg-white px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-900 hover:text-white dark:border-white dark:bg-transparent dark:text-white dark:hover:bg-white dark:hover:text-slate-900"
                                     >
                                         View Details
                                     </button>
-                                    {(person.contactNumber || person.contact_number) && (
-                                        <a
-                                            href={`tel:${person.contactNumber || person.contact_number}`}
-                                            className="flex items-center gap-1.5 px-3 py-2 border border-white/15 bg-white/5 text-slate-200 rounded-lg text-sm font-medium hover:bg-white/10"
-                                        >
-                                            <IconPhone className="h-3.5 w-3.5" />
-                                            Call
-                                        </a>
-                                    )}
                                 </div>
 
-                                {/* Reporter Info */}
+                                {/*
+                                  Reporter name and phone are withheld from this card. The reporter is
+                                  reached only by the platform's automated closure SMS, so a stranger
+                                  can never open with "I found her, call me and we'll discuss".
+                                */}
                                 <div className="mt-2 pt-2 border-t border-white/10">
-                                    <p className="text-xs text-slate-500">
-                                        Reported by <span className="font-medium text-slate-300">{person.reporter_name || person.reporterName}</span> &middot; {formatDate(person.reported_at || person.reportedAt || person.created_at)}
+                                    <p className="flex items-center gap-1 text-xs text-slate-500">
+                                        <IconShieldLock className="h-3.5 w-3.5 flex-shrink-0" />
+                                        Reporter contact withheld &middot; reported {formatDate(person.reported_at || person.reportedAt || person.created_at)}
                                     </p>
                                 </div>
                             </div>
@@ -370,24 +405,15 @@ function MissingPersonsList({ role = 'responder' }) {
 
                 {/* Map View */}
                 {viewMode === 'map' && (
-                    <div>
-                        {/* Warning Note */}
-                        <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
-                            <div className="flex items-start gap-3">
-                                <IconInfo className="h-5 w-5 flex-shrink-0 text-amber-300 mt-0.5" />
-                                <div>
-                                    <h4 className="text-sm font-semibold text-amber-200 mb-1">Map View Limitation</h4>
-                                    <p className="text-sm text-amber-100/80">
-                                        Only missing persons with valid location coordinates are displayed on the map.
-                                        <span className="font-medium text-amber-100"> Switch to Card View</span> to see all reports including those without map coordinates.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col lg:flex-row gap-4 items-start">
-                        <div className="rounded-2xl overflow-hidden border border-white/10 w-full lg:w-auto">
-                            <MapFrame height={600}>
+                    <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 items-start">
+                        <div className="w-full h-[50vh] lg:h-full flex-1 min-w-0">
+                            <MapFrame
+                                height="100%"
+                                className="rounded-xl border border-white/10"
+                                resizable
+                                fillWidth
+                                minHeight={320}
+                            >
                             <MapContainer
                                 center={[7.8731, 80.7718]} // Center of Sri Lanka
                                 zoom={7}
@@ -485,7 +511,7 @@ function MissingPersonsList({ role = 'responder' }) {
                                                                     : `/missing-persons/${person.id}`;
                                                                 navigate(detailPath);
                                                             }}
-                                                            className="w-full bg-primary-500 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-primary-600"
+                                                            className="w-full rounded border-2 border-slate-900 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-900 hover:text-white"
                                                         >
                                                             View Details
                                                         </button>
@@ -499,27 +525,21 @@ function MissingPersonsList({ role = 'responder' }) {
                             </MapFrame>
                         </div>
 
-                        {/* Map Legend and Info */}
-                        <div className="card p-4 w-full lg:w-64 lg:flex-shrink-0 space-y-4">
-                            <div className="flex items-center gap-2">
-                                <span className="h-4 w-4 rounded-full bg-danger-500 flex-shrink-0"></span>
-                                <span className="text-sm font-medium text-slate-200">Active ({filteredPersons.filter(p => p.status === 'Active').length})</span>
+                        {/* Sidebar: warning note + legend */}
+                        <div className="w-full lg:w-72 lg:flex-shrink-0 flex flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:pr-1 scroll-panel">
+                            {/* Warning Note */}
+                            <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                                <IconInfo className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                                <span>Only missing persons with coordinates are shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="h-4 w-4 rounded-full bg-success-500 flex-shrink-0"></span>
-                                <span className="text-sm font-medium text-slate-200">Resolved ({filteredPersons.filter(p => p.status === 'Resolved').length})</span>
+
+                            {/* Marker color key — counts already shown in the filter tabs above */}
+                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
+                                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-danger-500 rounded-full inline-block"></span> Active</span>
+                                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Resolved</span>
                             </div>
-                            <div className="text-sm text-slate-400">
-                                Total: {filteredPersons.filter(p => {
-                                    const location = p.last_seen_location || p.lastSeenLocation;
-                                    return location && location.lat && location.lng;
-                                }).length} on map
-                            </div>
-                            <p className="flex items-start gap-1.5 text-xs text-slate-400 pt-2 border-t border-white/10">
-                                <IconInfo className="h-4 w-4 flex-shrink-0" />
-                                Records without valid coordinates are not displayed on the map. Switch to Card View to see all reports.
-                            </p>
-                        </div>
+
+                            <MapInsightsPanel stats={mapInsights.stats} insights={mapInsights.insights} />
                         </div>
                     </div>
                 )}

@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { IconShieldLock } from '@/components/icons/Icons';
 
+/**
+ * Admin Portal
+ * ============
+ * The single sign-in for every staff account. There is no separate camp-admin
+ * login: on success the account's role decides where it lands - a camp_admin
+ * goes to its own camp's inventory, everyone else to the admin dashboard.
+ */
 function AdminLogin() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -42,18 +49,19 @@ function AdminLogin() {
         signIn(email, password);
     };
 
-    const handleDemoLogin = () => {
-        setEmail('admin@demo.com');
+    const handleDemoLogin = (demoEmail) => {
+        setEmail(demoEmail);
         setPassword('Demo@1234');
-        signIn('admin@demo.com', 'Demo@1234');
+        signIn(demoEmail, 'Demo@1234');
     };
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 font-sans">
+        <div className="page-shell flex items-center justify-center px-4 font-sans">
             <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
-                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -top-24 -left-24 w-[28rem] h-[28rem] bg-slate-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] bg-danger-500/10 rounded-full blur-3xl"></div>
             </div>
+
 
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
@@ -67,20 +75,20 @@ function AdminLogin() {
                 {/* Back to Home */}
                 <button
                     onClick={() => navigate('/')}
-                    className="text-slate-400 hover:text-white mb-8 flex items-center gap-2"
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white mb-5 flex items-center gap-2 text-sm transition-colors"
                 >
                     ← Back to Home
                 </button>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md shadow-2xl p-8">
                     {/* Header */}
-                    <div className="text-center mb-8">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/20 text-primary-300">
-                            <IconShieldLock className="h-8 w-8" />
+                    <div className="text-center mb-6">
+                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-slate-300 ring-1 ring-inset ring-white/10">
+                            <IconShieldLock className="h-6 w-6" />
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Admin Portal</h1>
-                        <p className="text-slate-400 mt-2">
-                            Camp Management & Verification
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Admin Portal</h1>
+                        <p className="text-slate-400 text-sm mt-1">
+                            Admins &amp; camp admins - sign in here
                         </p>
                     </div>
 
@@ -123,25 +131,36 @@ function AdminLogin() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:shadow-lg hover:shadow-primary-500/40 text-white font-bold py-3 px-4 rounded-lg shadow-md shadow-primary-500/25 disabled:opacity-50"
+                            className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 font-bold py-2.5 px-4 rounded-lg transition-colors duration-150 disabled:opacity-50"
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={handleDemoLogin}
-                            disabled={loading}
-                            className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-4 rounded-lg border border-white/20 disabled:opacity-50"
-                        >
-                            Use Demo Account
-                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => handleDemoLogin('admin@demo.com')}
+                                disabled={loading}
+                                className="btn-outline py-3 disabled:opacity-50"
+                            >
+                                Demo Super Admin
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleDemoLogin('campadmin@demo.com')}
+                                disabled={loading}
+                                className="btn-outline py-3 disabled:opacity-50"
+                            >
+                                Demo Camp Admin
+                            </button>
+                        </div>
                     </form>
 
                     {/* Info */}
                     <div className="mt-6 pt-6 border-t border-white/10">
                         <p className="text-xs text-slate-500 text-center">
-                            This portal is for authorized personnel only.
+                            This portal is for authorized personnel only. You are taken to
+                            your own screens based on your account role.
                             <br />
                             For camp requests, please use the public form.
                         </p>

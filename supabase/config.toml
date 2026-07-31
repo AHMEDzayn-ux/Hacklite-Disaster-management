@@ -1,0 +1,75 @@
+project_id = "imwsvbyqivsfyomrkppa"
+
+# Per-function JWT verification.
+# ==============================
+# This file exists to stop a routine `supabase functions deploy <name>` from
+# silently breaking things. The CLI defaults verify_jwt to TRUE, but most of the
+# functions here are called by parties that cannot present a Supabase JWT:
+# the TextBee SMS webhook, the Tasker call-recording gateway, the Stripe webhook,
+# and the GitHub Actions cron. Redeploying one of those without the setting
+# below turns it into a 401 at the edge, before any of its own auth logic runs -
+# and the symptom (SMS reports silently stop arriving) looks nothing like the
+# cause.
+#
+# "verify_jwt = false" does NOT mean unauthenticated. Each of these functions
+# does its own check:
+#   - sms-report / receive-call-recording: HMAC signature or x-agent-cron-secret
+#   - the AI agents: authenticateAgentCaller (admin JWT or cron secret)
+#   - stripe-webhook: Stripe signature
+#   - camp-management / secure-admin-delete: admin JWT checked in the body
+# The ones left at the default (true) are the ones where Supabase's own gate is
+# the right gate.
+
+# --- Public / machine callers: must stay false -----------------------------
+[functions.sms-report]
+verify_jwt = false
+
+[functions.receive-call-recording]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.create-payment-intent]
+verify_jwt = false
+
+# --- Called from the browser with the anon key (works either way, kept as deployed) ---
+[functions.volunteer-suggestions]
+verify_jwt = false
+
+[functions.volunteer-self-service]
+verify_jwt = false
+
+[functions.camp-inventory]
+verify_jwt = false
+
+[functions.camp-management]
+verify_jwt = false
+
+[functions.secure-admin-delete]
+verify_jwt = false
+
+# --- AI/OR agents: cron reaches them without a JWT, agentAuth does the real check ---
+[functions.situation-awareness-agent]
+verify_jwt = false
+
+[functions.incident-prioritization-agent]
+verify_jwt = false
+
+[functions.resource-allocation-agent]
+verify_jwt = false
+
+[functions.route-optimization-agent]
+verify_jwt = false
+
+[functions.volunteer-assignment-agent]
+verify_jwt = false
+
+[functions.call-transcription-agent]
+verify_jwt = false
+
+# --- Left at the default (verify_jwt = true) -------------------------------
+# allocation-plan-review  : admin-only, no machine caller.
+# resolve-missing-person  : called from the browser, where supabase-js always
+#                           sends the anon key as a bearer token, so the default
+#                           gate costs nothing and keeps casual curl out.

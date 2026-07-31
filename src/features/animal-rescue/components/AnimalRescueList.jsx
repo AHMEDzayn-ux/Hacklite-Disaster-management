@@ -8,6 +8,8 @@ import '@/lib/leafletIconFix';
 import { redIcon, greenIcon } from '@/lib/leafletIconFix';
 import MapResizeFix from '@/components/map/MapResizeFix';
 import MapFrame from '@/components/map/MapFrame';
+import MapInsightsPanel from '@/components/map/MapInsightsPanel';
+import { INSIGHT_TONE } from '@/lib/mapInsightTones';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import LazyImage from '@/components/ui/LazyImage';
 import { IconPawPrint, IconSearch, IconGrid, IconMap, IconMapPin, IconClock, IconX, IconInfo } from '@/components/icons/Icons';
@@ -68,21 +70,15 @@ function AnimalRescueList({ role = 'responder' }) {
     const [districtFilter, setDistrictFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'map'
-    const [isInitializing, setIsInitializing] = useState(!isInitialized);
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToAnimalRescues()
+    // resolves immediately when another page already opened the shared channel,
+    // so a local "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        if (!isInitialized) {
-            const initialize = async () => {
-                await subscribeToAnimalRescues();
-                setIsInitializing(false);
-            };
-            initialize();
-        }
-        // Already initialized: isInitializing was seeded to !isInitialized,
-        // so it is already false here - nothing to do.
+        if (!isInitialized) subscribeToAnimalRescues();
         // Don't unsubscribe on unmount to maintain cache
-    }, []);
+    }, [isInitialized, subscribeToAnimalRescues]);
 
     // All 25 districts in Sri Lanka
     const allDistricts = [
@@ -195,10 +191,58 @@ function AnimalRescueList({ role = 'responder' }) {
         navigate(route);
     };
 
+    // Records actually plotted on the map (same geo filter as the markers
+    // below) - insights are derived from exactly what the user can see.
+    const mappedRescues = filteredRescues.filter(r => r.location && r.location.lat && r.location.lng);
+
+    const buildMapInsights = (rescuesOnMap) => {
+        if (rescuesOnMap.length === 0) return { stats: [], insights: [] };
+
+        const byDistrict = {};
+        const byType = {};
+        rescuesOnMap.forEach(r => {
+            const district = getDistrictFromAddress(r.location?.address || '');
+            if (district) byDistrict[district] = (byDistrict[district] || 0) + 1;
+            const type = r.animalType || 'other';
+            byType[type] = (byType[type] || 0) + 1;
+        });
+        const topDistrict = Object.entries(byDistrict).sort((a, b) => b[1] - a[1])[0];
+        const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0];
+
+        const active = rescuesOnMap.filter(r => r.status === 'Active');
+        const rescued = rescuesOnMap.filter(r => r.status === 'Resolved');
+        const critical = active.filter(r => r.condition === 'critical' || r.condition === 'injured' || r.condition === 'trapped');
+
+        const stats = [
+            { icon: '📍', label: 'Most Affected Area', value: topDistrict ? topDistrict[0] : '—', detail: topDistrict ? `${topDistrict[1]} case(s) mapped` : 'no district data' },
+            { icon: '🚨', label: 'Critical Cases', value: critical.length, detail: `of ${active.length} pending` },
+            { icon: '✅', label: 'Rescued', value: rescued.length, detail: `of ${rescuesOnMap.length} mapped` },
+            { icon: topType ? getAnimalTypeIcon(topType[0]) : '🐾', label: 'Top Animal Type', value: topType ? topType[0] : '—', detail: topType ? `${topType[1]} case(s)` : 'no data' },
+        ];
+
+        const insights = [];
+        if (topDistrict && topDistrict[1] >= 2) {
+            insights.push({ icon: '📈', tone: INSIGHT_TONE.warn, text: `${topDistrict[1]} rescue cases are clustered in ${topDistrict[0]} — the most affected area in this view.` });
+        }
+        if (critical.length > 0) {
+            insights.push({ icon: '🚨', tone: INSIGHT_TONE.danger, text: `${critical.length} animal(s) in critical, injured or trapped condition need urgent rescue${topDistrict ? `, mostly around ${topDistrict[0]}` : ''}.` });
+        }
+        if (topType && topType[1] >= 2) {
+            insights.push({ icon: getAnimalTypeIcon(topType[0]), tone: INSIGHT_TONE.info, text: `${getAnimalTypeIcon(topType[0])} ${topType[0]} rescues are the most common here (${topType[1]} cases).` });
+        }
+        if (active.length === 0) {
+            insights.push({ icon: '✅', tone: INSIGHT_TONE.ok, text: 'No pending animal rescues in this view.' });
+        }
+
+        return { stats, insights };
+    };
+
+    const mapInsights = buildMapInsights(mappedRescues);
+
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -210,7 +254,9 @@ function AnimalRescueList({ role = 'responder' }) {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className={viewMode === 'map'
+            ? 'relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col'
+            : 'page-shell'}>
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -219,102 +265,83 @@ function AnimalRescueList({ role = 'responder' }) {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
-                {/* Header with view toggle */}
-                <div className="mb-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="flex items-center gap-5">
-                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-                                <IconPawPrint className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black text-white md:text-2xl">
-                                    {role === 'responder' ? 'Animal Rescue Operations' : 'Animal Rescue Reports'}
-                                </h1>
-                                <p className="mt-0.5 text-sm text-slate-300">
-                                    {activeCount} need{activeCount !== 1 ? '' : 's'} rescue &middot; {rescuedCount} rescue{rescuedCount !== 1 ? 's' : ''} completed
-                                </p>
-                            </div>
-                        </div>
+            <div className={`relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 w-full ${viewMode === 'map' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
+                {/* Header + Filters — one compact row so map view keeps most of the viewport */}
+                <div className="card mb-3 p-3 flex-shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2 py-1 bg-danger-500/15 text-danger-300 rounded-full font-medium text-sm">
+                            {activeCount} Need{activeCount !== 1 ? '' : 's'} Rescue
+                        </span>
+                        <span className="text-slate-400 text-sm">{rescuedCount} rescued</span>
 
-                        {/* View Toggle */}
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setViewMode('cards')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${viewMode === 'cards'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
-                                    }`}
-                            >
-                                <IconGrid className="h-4 w-4" />
-                                Card View
-                            </button>
-                            <button
-                                onClick={() => setViewMode('map')}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${viewMode === 'map'
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                    : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
-                                    }`}
-                            >
-                                <IconMap className="h-4 w-4" />
-                                Map View
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                        <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block" />
 
-                {/* Filters */}
-                <div className="card mb-3 p-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Search</label>
-                            <div className="relative">
-                                <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                                <input
-                                    type="text"
-                                    placeholder="Animal type, location..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="input-field pl-10"
-                                />
-                            </div>
+                        <div className="relative">
+                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                            <input
+                                type="text"
+                                placeholder="Animal type, location..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
+                            />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
-                            <select
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                                className="input-field"
-                            >
-                                <option value="all">All Status</option>
-                                <option value="active">Needs Rescue</option>
-                                <option value="rescued">Rescued</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">District</label>
-                            <select
-                                value={districtFilter}
-                                onChange={(e) => setDistrictFilter(e.target.value)}
-                                className="input-field"
-                            >
-                                <option value="all">All Districts</option>
-                                {allDistricts.map(district => (
-                                    <option key={district} value={district}>{district}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex items-end">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Status</option>
+                            <option value="active" className="text-slate-900">Needs Rescue</option>
+                            <option value="rescued" className="text-slate-900">Rescued</option>
+                        </select>
+                        <select
+                            value={districtFilter}
+                            onChange={(e) => setDistrictFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Districts</option>
+                            {allDistricts.map(district => (
+                                <option key={district} value={district} className="text-slate-900">{district}</option>
+                            ))}
+                        </select>
+                        {(searchTerm || statusFilter !== 'all' || districtFilter !== 'all') && (
                             <button
                                 onClick={() => {
                                     setSearchTerm('');
                                     setStatusFilter('all');
                                     setDistrictFilter('all');
                                 }}
-                                className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-medium rounded-lg flex items-center justify-center gap-2"
+                                className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 px-2 py-1.5"
                             >
                                 <IconX className="h-3.5 w-3.5" />
-                                Clear Filters
+                                Clear
+                            </button>
+                        )}
+                        <span className="ml-auto text-xs text-slate-500">
+                            {filteredRescues.length} of {animalRescues.length}
+                        </span>
+
+                        <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5">
+                            <button
+                                onClick={() => setViewMode('cards')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'cards'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    : 'text-slate-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                <IconGrid className="h-3.5 w-3.5" />
+                                Cards
+                            </button>
+                            <button
+                                onClick={() => setViewMode('map')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${viewMode === 'map'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                                    : 'text-slate-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                <IconMap className="h-3.5 w-3.5" />
+                                Map
                             </button>
                         </div>
                     </div>
@@ -329,11 +356,11 @@ function AnimalRescueList({ role = 'responder' }) {
                                 <div className="mb-4 flex justify-center text-primary-300">
                                     <IconPawPrint className="h-12 w-12" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-white mb-2">No Rescue Reports</h3>
+                                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Rescue Reports</h3>
                                 <p className="text-slate-400">No animal rescue reports match your filters.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {filteredRescues.map((rescue) => {
                                     const statusBadge = getStatusBadge(rescue.status);
                                     const conditionBadge = getConditionBadge(rescue.condition);
@@ -345,74 +372,71 @@ function AnimalRescueList({ role = 'responder' }) {
                                             onClick={() => handleRescueClick(rescue)}
                                             className="card hover:border-white/25 hover:bg-white/[0.08] cursor-pointer"
                                         >
-                                            {/* Animal Photo */}
-                                            <div className="relative mb-4">
-                                                <LazyImage
-                                                    src={rescue.photo}
-                                                    alt={rescue.animalType}
-                                                    className="w-full h-48 rounded-lg bg-white/5"
-                                                    aspectRatio="16/9"
-                                                />
-                                                <div className="absolute top-2 right-2">
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusBadge.className}`}>
-                                                        {statusBadge.text}
-                                                    </span>
+                                            <div className="flex gap-4">
+                                                {/* Animal Photo */}
+                                                <div className="flex-shrink-0">
+                                                    <LazyImage
+                                                        src={rescue.photo}
+                                                        alt={rescue.animalType}
+                                                        className="w-24 h-24 rounded-lg border border-white/10 bg-white/5"
+                                                        aspectRatio="1/1"
+                                                    />
                                                 </div>
-                                                {rescue.isDangerous && (
-                                                    <div className="absolute top-2 left-2">
-                                                        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-danger-500/20 text-danger-300">
-                                                            ⚠️ Dangerous
+
+                                                {/* Animal Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2 truncate">
+                                                            <span>{animalIcon}</span>
+                                                            {rescue.animalType}
+                                                            {rescue.breed && <span className="text-sm font-normal text-slate-400">({rescue.breed})</span>}
+                                                        </h3>
+                                                        <span className={`px-2 py-1 rounded text-xs font-semibold flex-shrink-0 ${statusBadge.className}`}>
+                                                            {statusBadge.text}
                                                         </span>
                                                     </div>
-                                                )}
+
+                                                    <div className="flex flex-wrap gap-2 mb-2">
+                                                        <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${conditionBadge.className}`}>
+                                                            {conditionBadge.text}
+                                                        </span>
+                                                        {rescue.isDangerous && (
+                                                            <span className="px-2 py-1 rounded text-xs font-semibold bg-danger-500/20 text-danger-300">
+                                                                ⚠️ Dangerous
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <p className="text-sm text-slate-300 line-clamp-2">{rescue.description}</p>
+                                                </div>
                                             </div>
 
-                                            {/* Animal Info */}
-                                            <div className="space-y-3">
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <h3 className="text-lg font-bold text-white capitalize flex items-center gap-2">
-                                                        <span>{animalIcon}</span>
-                                                        {rescue.animalType}
-                                                        {rescue.breed && <span className="text-sm font-normal text-slate-400">({rescue.breed})</span>}
-                                                    </h3>
+                                            {rescue.healthDetails && (
+                                                <p className="text-sm text-slate-400 italic line-clamp-2 mt-3">
+                                                    {rescue.healthDetails}
+                                                </p>
+                                            )}
+
+                                            <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                                                <div className="flex items-start gap-2">
+                                                    <IconMapPin className="h-4 w-4 flex-shrink-0 text-slate-500 mt-0.5" />
+                                                    <span className="text-sm text-slate-300 line-clamp-2">{rescue.location?.address || 'Unknown'}</span>
                                                 </div>
-
-                                                <p className="text-sm text-slate-300 line-clamp-2">{rescue.description}</p>
-
-                                                {/* Condition Badge */}
-                                                <div>
-                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${conditionBadge.className}`}>
-                                                        {conditionBadge.text}
-                                                    </span>
+                                                <div className="flex items-center gap-2">
+                                                    <IconClock className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                                                    <span className="text-sm text-slate-400">Reported {getTimeSince(rescue.reported_at || rescue.reportedAt || rescue.created_at)}</span>
                                                 </div>
-
-                                                {rescue.healthDetails && (
-                                                    <p className="text-sm text-slate-400 italic line-clamp-2">
-                                                        {rescue.healthDetails}
-                                                    </p>
-                                                )}
-
-                                                <div className="pt-2 border-t border-white/10 space-y-2">
-                                                    <div className="flex items-start gap-2">
-                                                        <IconMapPin className="h-4 w-4 flex-shrink-0 text-slate-500 mt-0.5" />
-                                                        <span className="text-sm text-slate-300 line-clamp-2">{rescue.location?.address || 'Unknown'}</span>
-                                                    </div>
+                                                {rescue.accessibility && (
                                                     <div className="flex items-center gap-2">
-                                                        <IconClock className="h-4 w-4 flex-shrink-0 text-slate-500" />
-                                                        <span className="text-sm text-slate-400">Reported {getTimeSince(rescue.reported_at || rescue.reportedAt || rescue.created_at)}</span>
+                                                        <span className="text-slate-500 text-sm">🔧</span>
+                                                        <span className="text-sm text-slate-400 capitalize">{rescue.accessibility} access</span>
                                                     </div>
-                                                    {rescue.accessibility && (
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-slate-500 text-sm">🔧</span>
-                                                            <span className="text-sm text-slate-400 capitalize">{rescue.accessibility} access</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <button className="btn-primary w-full mt-4">
-                                                    View Details
-                                                </button>
+                                                )}
                                             </div>
+
+                                            <button className="btn-primary w-full mt-3">
+                                                View Details
+                                            </button>
                                         </div>
                                     );
                                 })}
@@ -421,24 +445,16 @@ function AnimalRescueList({ role = 'responder' }) {
                     </>
                 ) : (
                     // Map View
-                    <div>
-                        {/* Warning Note */}
-                        <div className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 backdrop-blur-md">
-                            <div className="flex items-start gap-3">
-                                <IconInfo className="h-5 w-5 flex-shrink-0 text-amber-300 mt-0.5" />
-                                <div>
-                                    <h4 className="text-sm font-semibold text-amber-200 mb-1">Map View Limitation</h4>
-                                    <p className="text-sm text-amber-100/80">
-                                        Only animal rescue requests with valid location coordinates are displayed on the map.
-                                        <span className="font-medium text-amber-100"> Switch to Card View</span> to see all requests including those without map coordinates.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col lg:flex-row gap-4 items-start">
-                            <div className="card p-0 overflow-hidden w-full lg:w-auto">
-                                <MapFrame height={600}>
+                    <div className="flex-1 min-h-0 flex flex-col">
+                        <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 items-start">
+                            <div className="w-full h-[50vh] lg:h-full flex-1 min-w-0">
+                                <MapFrame
+                                    height="100%"
+                                    className="rounded-xl border border-white/10"
+                                    resizable
+                                    fillWidth
+                                    minHeight={260}
+                                >
                                 <MapContainer
                                     center={[7.8731, 80.7718]}
                                     zoom={7}
@@ -528,26 +544,23 @@ function AnimalRescueList({ role = 'responder' }) {
                                 </MapFrame>
                             </div>
 
-                            {/* Map Legend */}
-                            <div className="card p-4 w-full lg:w-64 lg:flex-shrink-0 space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-danger-500 rounded-full flex-shrink-0"></div>
-                                    <span className="text-sm font-medium text-slate-200">Needs Rescue ({activeCount})</span>
+                            {/* Sidebar: warning note + legend */}
+                            <div className="w-full lg:w-72 lg:flex-shrink-0 flex flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:pr-1 scroll-panel">
+                                <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                                    <IconInfo className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                                    <span>Only requests with coordinates are shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 bg-success-500 rounded-full flex-shrink-0"></div>
-                                    <span className="text-sm font-medium text-slate-200">Rescued ({rescuedCount})</span>
+
+                                {/* Marker color key — counts already shown in the filter bar above */}
+                                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-danger-500 rounded-full inline-block"></span> Needs Rescue</span>
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Rescued</span>
+                                    {districtFilter !== 'all' && (
+                                        <span className="flex items-center gap-1.5"><span className="w-3 h-1 bg-primary-500 inline-block"></span> {districtFilter}</span>
+                                    )}
                                 </div>
-                                {districtFilter !== 'all' && (
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-6 h-1 bg-primary-500 flex-shrink-0"></div>
-                                        <span className="text-sm font-medium text-slate-200">{districtFilter} District</span>
-                                    </div>
-                                )}
-                                <p className="flex items-start gap-1.5 text-xs text-slate-400 pt-2 border-t border-white/10">
-                                    <IconInfo className="h-4 w-4 flex-shrink-0" />
-                                    Records without valid coordinates are not displayed on the map. Switch to Card View to see all reports.
-                                </p>
+
+                                <MapInsightsPanel stats={mapInsights.stats} insights={mapInsights.insights} />
                             </div>
                         </div>
                     </div>

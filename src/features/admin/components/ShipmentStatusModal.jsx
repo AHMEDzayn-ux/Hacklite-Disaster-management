@@ -113,7 +113,7 @@ function ShipmentStatusModal({ plan, routeInfo, onClose, onUpdated }) {
                         )}
 
                         <div className="flex gap-3 justify-end">
-                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50">Cancel</button>
+                            <button onClick={onClose} disabled={processing} className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg font-medium disabled:opacity-50 transition-colors">Cancel</button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={processing || (nextAction === 'deliver' && !receivedByName.trim())}

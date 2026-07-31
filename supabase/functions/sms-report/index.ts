@@ -10,7 +10,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { encode as hexEncode } from 'https://deno.land/std@0.208.0/encoding/hex.ts'
 import { callGeminiForJSON } from '../_shared/geminiClient.ts'
 import { geocodeAddress } from '../_shared/geocode.ts'
-import { buildExtractionPrompt, insertParsedReport, ParsedReport, ReportSource } from '../_shared/reportExtraction.ts'
+import { buildExtractionPrompt, insertParsedReport, looksLikeMachineSms, ParsedReport, ReportSource } from '../_shared/reportExtraction.ts'
 
 // CORS headers for cross-origin requests
 const corsHeaders = {
@@ -30,7 +30,14 @@ interface SMSGatewayPayload {
   webhookEvent: 'MESSAGE_RECEIVED' | 'STATUS_UPDATE'
 }
 
-// Verify HMAC SHA256 signature
+// Verify HMAC SHA256 signature.
+//
+// TextBee's documented receiver computes the digest over `JSON.stringify(payload)`
+// - the parsed body re-serialized - while the canonical thing to authenticate is
+// the raw bytes that arrived. Those match only while TextBee transmits compact
+// JSON. verifyRequestSignature() below tries the raw body first and falls back to
+// a compact re-serialization, so a change in the sender's whitespace cannot start
+// rejecting legitimate reports.
 async function verifySignature(payload: string, signature: string, secret: string): Promise<boolean> {
   try {
     const encoder = new TextEncoder()
@@ -63,6 +70,31 @@ async function verifySignature(payload: string, signature: string, secret: strin
     console.error('Signature verification error:', error)
     return false
   }
+}
+
+/**
+ * Authenticate one webhook request.
+ *
+ * Accepts the signature over either the raw body or its compact re-serialization
+ * (see the note on verifySignature above). Returns false when the header is
+ * missing: with a secret configured, an unsigned request must fail rather than
+ * skip the check, or the signature is decorative - anyone could bypass it by
+ * simply omitting the header.
+ */
+async function verifyRequestSignature(rawBody: string, signature: string, secret: string): Promise<boolean> {
+  if (await verifySignature(rawBody, signature, secret)) return true
+
+  try {
+    const canonical = JSON.stringify(JSON.parse(rawBody))
+    if (canonical !== rawBody && await verifySignature(canonical, signature, secret)) {
+      console.log('Signature matched the re-serialized body rather than the raw bytes')
+      return true
+    }
+  } catch {
+    // Body was not JSON; the raw-body attempt above was the only option.
+  }
+
+  return false
 }
 
 // Log SMS processing for debugging/audit
@@ -123,10 +155,27 @@ Deno.serve(async (req) => {
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY')
     const webhookSecret = Deno.env.get('SMS_WEBHOOK_SECRET')
 
-    // Verify X-Signature header if webhook secret is configured
+    // Verify the X-Signature header whenever a webhook secret is configured.
+    //
+    // Note the shape: the guard is on the SECRET, not on the header. It used to be
+    // `if (webhookSecret && signature)`, which skipped verification entirely for a
+    // request that simply left the header off - so the signature protected nothing
+    // and anyone with the URL could inject reports. This endpoint runs with
+    // verify_jwt = false (TextBee cannot mint a Supabase JWT), so this check is the
+    // only gate in front of it.
+    //
+    // Leaving SMS_WEBHOOK_SECRET unset keeps the endpoint open, which is a
+    // deliberate choice for a deployment that has not configured signing yet.
     const signature = req.headers.get('x-signature')
-    if (webhookSecret && signature) {
-      const isValid = await verifySignature(rawBody, signature, webhookSecret)
+    if (webhookSecret) {
+      if (!signature) {
+        console.error('Rejected unsigned webhook: SMS_WEBHOOK_SECRET is set but no x-signature header was sent')
+        return new Response(
+          JSON.stringify({ error: 'Missing signature' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      const isValid = await verifyRequestSignature(rawBody, signature, webhookSecret)
       if (!isValid) {
         console.error('Invalid webhook signature')
         return new Response(
@@ -180,6 +229,23 @@ Deno.serve(async (req) => {
 
     console.log(`Processing SMS [${smsId}] from ${senderPhone} received at ${receivedAt}: ${smsMessage.substring(0, 100)}...`)
 
+    // A gateway phone receives far more bank alerts, reload receipts and promos
+    // than emergencies, and every one of them used to be filed as a public
+    // "disaster" - including a BOC transaction SMS that put an account number and
+    // balance into a table with a public_read policy. Drop machine traffic here,
+    // before the Gemini call, so it costs nothing and never reaches the model.
+    //
+    // Deliberately no reply: replying to a shortcode is pointless at best, and
+    // an SMS loop with an auto-responder at worst.
+    const machineCheck = looksLikeMachineSms(senderPhone, smsMessage)
+    if (machineCheck.machine) {
+      console.log(`Ignoring machine-generated SMS [${smsId}] from ${senderPhone} (${machineCheck.reason})`)
+      return new Response(
+        JSON.stringify({ success: true, ignored: true, reason: machineCheck.reason }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Build prompt and call Gemini AI - same extraction module call-transcription-agent uses for call transcripts.
     const prompt = buildExtractionPrompt(smsMessage, { sourceLabel: 'SMS message', defaultReporterName: 'SMS Reporter' })
     const geminiResult = await callGeminiForJSON<ParsedReport>(prompt, geminiApiKey, { maxOutputTokens: 2048, temperature: 0.1 })
@@ -194,6 +260,19 @@ Deno.serve(async (req) => {
           error: 'Could not parse message',
           reply: 'We could not understand your message. Please try again with more details about the emergency, location, and your name.'
         }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Second gate: the model's own verdict, for machine traffic and off-topic
+    // texts the pattern filter above does not recognise. Not an error - the
+    // pipeline worked, there was simply nothing to file.
+    if (parsedReport.category === 'not_a_report') {
+      console.log(`SMS [${smsId}] classified as not_a_report; nothing inserted`)
+      await logSMSProcessing(supabase, senderPhone, smsMessage, 'not_a_report', true, null, null, smsId, deviceId)
+
+      return new Response(
+        JSON.stringify({ success: true, ignored: true, reason: 'not an emergency report' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }

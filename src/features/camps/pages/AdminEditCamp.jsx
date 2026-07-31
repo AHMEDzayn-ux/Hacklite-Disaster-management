@@ -5,8 +5,8 @@ import { supabase } from '@/lib/supabase';
 import { checkIsAdmin } from '@/features/admin/services/adminService';
 import { SRI_LANKA_DISTRICTS, CAMP_TYPES, FACILITY_OPTIONS, NEEDS_OPTIONS } from '@/features/camps/services/campManagementService';
 import LocationPicker from '@/components/map/LocationPicker';
+import { BTN } from '@/components/ui/tableStyles';
 import { regenerateInventoryAccessCode } from '@/features/inventory/services/inventoryService';
-import { IconTent } from '@/components/icons/Icons';
 
 /**
  * Admin Edit Camp
@@ -272,7 +272,7 @@ function AdminEditCamp() {
 
     if (authLoading || !user) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="flex h-full items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
             </div>
         );
@@ -280,9 +280,9 @@ function AdminEditCamp() {
 
     if (!adminStatus.isAdmin) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="flex h-full items-center justify-center">
                 <div className="relative z-10 text-center">
-                    <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Access Denied</h1>
                     <p className="text-slate-400 mb-4">You need admin privileges to access this page.</p>
                     <Link to="/admin/dashboard" className="btn-primary">Return to Dashboard</Link>
                 </div>
@@ -292,7 +292,7 @@ function AdminEditCamp() {
 
     if (loading) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="flex h-full items-center justify-center">
                 <div className="relative z-10 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
                     <p className="text-slate-400">Loading camp data...</p>
@@ -303,9 +303,9 @@ function AdminEditCamp() {
 
     if (!camp) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center">
+            <div className="flex h-full items-center justify-center">
                 <div className="relative z-10 text-center">
-                    <h1 className="text-2xl font-bold text-white mb-4">Camp Not Found</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Camp Not Found</h1>
                     <Link to="/admin/manage-camps" className="btn-primary">Back to Camps</Link>
                 </div>
             </div>
@@ -313,66 +313,43 @@ function AdminEditCamp() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans py-8 px-4">
-            <div
-                className="absolute inset-0 pointer-events-none opacity-10"
-                style={{
-                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)',
-                    backgroundSize: '28px 28px',
-                }}
-            ></div>
-
-            <div className="relative z-10 max-w-3xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <Link to="/admin/manage-camps" className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 w-fit">
-                        ← Back to Camps
-                    </Link>
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                                <IconTent className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-white">Edit Camp</h1>
-                            </div>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={autofillTestData}
-                            className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-primary-500/20 text-primary-300 hover:bg-primary-500/30 text-sm font-medium"
-                        >
-                            Test Fill
-                        </button>
+        // The section shell owns the viewport; this form scrolls inside it so the
+        // nav and the section tabs stay put.
+        <div className="h-full overflow-y-auto px-4 py-3 sm:px-6">
+            <div className="mx-auto max-w-3xl pb-4">
+                {/* Which camp is being edited - the section tabs can't say that. */}
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{camp.name}</h2>
+                        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                            ID <span className="font-mono">{camp.id}</span>
+                        </p>
                     </div>
-                </div>
-
-                {/* Camp Info Header */}
-                <div className="card mb-6">
-                    <h2 className="text-2xl font-bold text-white">{camp.name || camp.camp_name}</h2>
-                    <p className="text-slate-400 mt-1">
-                        ID: <span className="font-mono text-sm text-slate-300">{camp.id}</span>
-                    </p>
+                    <div className="flex flex-shrink-0 items-center gap-2">
+                        <Link to="/admin/manage-camps" className={BTN}>← Camps</Link>
+                        <Link to={`/admin/inventory/${camp.id}`} className={BTN}>Stock</Link>
+                        <button type="button" onClick={autofillTestData} className={BTN}>Test Fill</button>
+                    </div>
                 </div>
 
                 {/* Error/Success Messages */}
                 {error && (
-                    <div className="bg-danger-500/10 border border-danger-400/30 text-danger-300 px-4 py-3 rounded-lg mb-6">
+                    <div className="mb-3 rounded-md border border-danger-300 bg-danger-50 px-3 py-2 text-sm text-danger-700 dark:border-danger-400/30 dark:bg-danger-500/10 dark:text-danger-300">
                         {error}
                     </div>
                 )}
                 {success && (
-                    <div className="bg-success-500/10 border border-success-400/30 text-success-300 px-4 py-3 rounded-lg mb-6">
+                    <div className="mb-3 rounded-md border border-success-300 bg-success-50 px-3 py-2 text-sm text-success-700 dark:border-success-400/30 dark:bg-success-500/10 dark:text-success-300">
                         {success}
                     </div>
                 )}
 
                 {/* Form */}
-                <div className="bg-white/[0.05] border border-white/10 backdrop-blur-md rounded-xl shadow-xl p-6 md:p-8">
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:p-6 dark:border-white/10 dark:bg-white/[0.03]">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Basic Information */}
                         <section>
-                            <h3 className="text-lg font-bold text-white mb-4">Basic Information</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Basic Information</h3>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -395,9 +372,9 @@ function AdminEditCamp() {
                                         onChange={handleInputChange}
                                         className="input-field"
                                     >
-                                        <option value="">Select Type</option>
+                                        <option value="" className="text-slate-900">Select Type</option>
                                         {CAMP_TYPES.map(type => (
-                                            <option key={type.value} value={type.value}>{type.label}</option>
+                                            <option key={type.value} value={type.value} className="text-slate-900">{type.label}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -409,9 +386,9 @@ function AdminEditCamp() {
                                         onChange={handleInputChange}
                                         className="input-field"
                                     >
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                        <option value="Closed">Closed</option>
+                                        <option value="Active" className="text-slate-900">Active</option>
+                                        <option value="Inactive" className="text-slate-900">Inactive</option>
+                                        <option value="Closed" className="text-slate-900">Closed</option>
                                     </select>
                                 </div>
                                 <div>
@@ -422,9 +399,9 @@ function AdminEditCamp() {
                                         onChange={handleInputChange}
                                         className="input-field"
                                     >
-                                        <option value="">Select District</option>
+                                        <option value="" className="text-slate-900">Select District</option>
                                         {SRI_LANKA_DISTRICTS.map(district => (
-                                            <option key={district} value={district}>{district}</option>
+                                            <option key={district} value={district} className="text-slate-900">{district}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -444,7 +421,7 @@ function AdminEditCamp() {
 
                         {/* Capacity Section */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Capacity</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Capacity</h3>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">Total Capacity</label>
@@ -474,7 +451,7 @@ function AdminEditCamp() {
                                 <div className="mt-4">
                                     <div className="flex justify-between text-sm mb-1">
                                         <span className="text-slate-400">Occupancy</span>
-                                        <span className="font-medium text-white">
+                                        <span className="font-medium text-slate-900 dark:text-white">
                                             {Math.round((formData.current_occupancy / formData.capacity) * 100)}%
                                         </span>
                                     </div>
@@ -493,7 +470,7 @@ function AdminEditCamp() {
 
                         {/* Contact Information */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Contact Information</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Contact Information</h3>
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -536,7 +513,7 @@ function AdminEditCamp() {
 
                         {/* Location */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Location</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Location</h3>
                             <div className="grid md:grid-cols-2 gap-4 mb-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">Address</label>
@@ -590,7 +567,7 @@ function AdminEditCamp() {
 
                         {/* Facilities */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Facilities Available</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Facilities Available</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {FACILITY_OPTIONS.map(facility => (
                                     <label key={facility.value} className="flex items-center gap-2 p-2 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 text-slate-300">
@@ -610,7 +587,7 @@ function AdminEditCamp() {
 
                         {/* Current Needs */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Current Urgent Needs</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Current Urgent Needs</h3>
                             <p className="text-sm text-slate-400 mb-4">Select items that the camp urgently requires</p>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                 {NEEDS_OPTIONS.map(need => (
@@ -631,20 +608,20 @@ function AdminEditCamp() {
 
                         {/* Inventory Access Code */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-2">Inventory Access Code</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Inventory Access Code</h3>
                             <p className="text-sm text-slate-400 mb-4">
                                 Share this code with a volunteer so they can log camp inventory (received/distributed supplies) at
                                 <span className="font-mono text-slate-300"> /camp-inventory</span> without needing an account.
                             </p>
                             <div className="flex items-center gap-4">
-                                <div className="font-mono text-2xl tracking-widest bg-white/5 text-white px-4 py-2 rounded-lg border border-white/15">
+                                <div className="font-mono text-2xl tracking-widest bg-white/5 text-slate-900 dark:text-white px-4 py-2 rounded-lg border border-white/15">
                                     {camp.inventory_access_code || 'Not set'}
                                 </div>
                                 <button
                                     type="button"
                                     onClick={handleRegenerateCode}
                                     disabled={regeneratingCode}
-                                    className="px-4 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg disabled:opacity-50"
+                                    className="px-4 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     {regeneratingCode ? 'Generating...' : camp.inventory_access_code ? 'Regenerate Code' : 'Generate Code'}
                                 </button>
@@ -653,7 +630,7 @@ function AdminEditCamp() {
 
                         {/* Additional Information */}
                         <section className="border-t border-white/10 pt-6">
-                            <h3 className="text-lg font-bold text-white mb-4">Additional Information</h3>
+                            <h3 className="mb-3 border-b border-slate-200 pb-1.5 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:border-white/10 dark:text-slate-400">Additional Information</h3>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -686,7 +663,7 @@ function AdminEditCamp() {
                         <div className="pt-6 border-t border-white/10 flex gap-4 justify-end">
                             <Link
                                 to="/admin/manage-camps"
-                                className="px-6 py-2 border border-white/20 bg-white/5 text-white hover:bg-white/10 rounded-lg"
+                                className="px-6 py-2 border border-white/20 bg-white/5 text-slate-900 dark:text-white hover:bg-white/10 rounded-lg transition-colors"
                             >
                                 Cancel
                             </Link>

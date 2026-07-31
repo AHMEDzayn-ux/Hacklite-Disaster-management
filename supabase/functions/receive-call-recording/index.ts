@@ -11,26 +11,43 @@
 // call-transcription-agent (transcribe -> extract -> insert into
 // disasters/missing_persons/animal_rescues), completely unchanged.
 //
-// POST multipart/form-data:
+// POST multipart/form-data (manual/Tasker uploads):
 //   audio         - the recording file (required)
 //   timestamp     - ISO datetime the call happened, per the device (optional)
 //   phone_number  - caller's number, if the device/recorder knows it (optional)
 //   location      - device's approximate location at record time (optional, informational only)
 //   device_id     - identifies which gateway phone this came from (optional)
 //
-// Auth: INTENTIONALLY NONE. This endpoint is public by explicit request -
-// anyone who has the URL can upload a recording, no header/token required.
-// That means anyone on the internet can also trigger a real Gemini call and
-// (if it parses as one) a real row on the live disasters/missing_persons/
-// animal_rescues dashboard - including a deliberately fabricated report. The
-// only remaining guardrails are the file-type/size checks below; there is no
-// rate limiting. If abuse becomes a problem, reintroducing the
-// x-agent-cron-secret header check (still used internally to call
-// call-transcription-agent below, and by every other agent function) is the
-// straightforward fix.
+// POST raw audio body (MacroDroid's "File" content body - raw bytes, plain
+// Content-Type like audio/mpeg, no multipart field name), metadata as query
+// params instead since there are no form fields to read them from:
+//   ?phone_number=&location=&device_id=&timestamp=&filename=
+//
+// Auth: none. Deployed with --no-verify-jwt and no app-level check either -
+// MacroDroid's HTTP Request action can't easily set a per-request secret
+// without extra plugins, so this is a fully public, unauthenticated
+// endpoint. Anyone with the URL can push audio here; the only mitigations
+// are the file-type/size checks below.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { isAllowedAudioExt, MAX_AUDIO_BYTES } from '../_shared/audio.ts'
+import { isAllowedAudioExt, MAX_AUDIO_BYTES, guessMimeType } from '../_shared/audio.ts'
+
+// Maps a raw Content-Type header (as MacroDroid sends it) to one of the
+// extensions in _shared/audio.ts - "audio/mpeg" is the common mp3
+// content-type but doesn't match the "mp3" extension key by string
+// equality, so it needs its own lookup.
+const EXT_BY_MIME: Record<string, string> = {
+  'audio/mpeg': 'mp3', 'audio/mp3': 'mp3', 'audio/x-mpeg': 'mp3',
+  'audio/wav': 'wav', 'audio/x-wav': 'wav', 'audio/wave': 'wav',
+  'audio/mp4': 'm4a', 'audio/x-m4a': 'm4a', 'audio/m4a': 'm4a',
+  'audio/aac': 'aac', 'audio/ogg': 'ogg', 'audio/flac': 'flac',
+  'audio/x-flac': 'flac', 'audio/webm': 'webm', 'audio/amr': 'amr',
+  'audio/3gpp': 'amr',
+}
+function extFromMimeType(contentType: string): string {
+  const bare = contentType.split(';')[0].trim().toLowerCase()
+  return EXT_BY_MIME[bare] || 'mp3'
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,14 +57,14 @@ const corsHeaders = {
 
 const MAX_METADATA_LENGTH = 200
 
-function sanitizeMetadata(value: FormDataEntryValue | null): string | null {
+function sanitizeMetadata(value: FormDataEntryValue | string | null): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
   if (!trimmed) return null
   return trimmed.slice(0, MAX_METADATA_LENGTH)
 }
 
-function parseRecordedAt(value: FormDataEntryValue | null): string {
+function parseRecordedAt(value: FormDataEntryValue | string | null): string {
   if (typeof value === 'string') {
     const parsed = new Date(value)
     if (!isNaN(parsed.getTime())) return parsed.toISOString()
@@ -77,33 +94,68 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    let formData: FormData
-    try {
-      formData = await req.formData()
-    } catch {
-      return jsonResponse({ success: false, error: 'Expected multipart/form-data' }, 400)
+    const contentType = req.headers.get('content-type') || ''
+    const url = new URL(req.url)
+
+    let audioName: string
+    let audioType: string
+    let audioSize: number
+    let audioBody: File | ArrayBuffer
+    let callerPhone: string | null
+    let deviceLocation: string | null
+    let deviceId: string | null
+    let recordedAt: string
+
+    if (contentType.includes('multipart/form-data')) {
+      // Manual/Tasker uploads: a true multipart form with an "audio" field.
+      let formData: FormData
+      try {
+        formData = await req.formData()
+      } catch {
+        return jsonResponse({ success: false, error: 'Expected multipart/form-data' }, 400)
+      }
+
+      const audio = formData.get('audio')
+      if (!(audio instanceof File) || audio.size === 0) {
+        return jsonResponse({ success: false, error: 'Missing required "audio" file field' }, 400)
+      }
+
+      audioName = audio.name
+      audioType = audio.type
+      audioSize = audio.size
+      audioBody = audio
+      callerPhone = sanitizeMetadata(formData.get('phone_number'))
+      deviceLocation = sanitizeMetadata(formData.get('location'))
+      deviceId = sanitizeMetadata(formData.get('device_id'))
+      recordedAt = parseRecordedAt(formData.get('timestamp'))
+    } else {
+      // MacroDroid's "File" content body: raw bytes, plain Content-Type.
+      // No form fields available, so metadata comes from query params.
+      const buffer = await req.arrayBuffer()
+      if (buffer.byteLength === 0) {
+        return jsonResponse({ success: false, error: 'Empty request body' }, 400)
+      }
+
+      audioName = sanitizeMetadata(url.searchParams.get('filename')) || `recording.${extFromMimeType(contentType)}`
+      audioType = contentType || guessMimeType(audioName)
+      audioSize = buffer.byteLength
+      audioBody = buffer
+      callerPhone = sanitizeMetadata(url.searchParams.get('phone_number'))
+      deviceLocation = sanitizeMetadata(url.searchParams.get('location'))
+      deviceId = sanitizeMetadata(url.searchParams.get('device_id'))
+      recordedAt = parseRecordedAt(url.searchParams.get('timestamp'))
     }
 
-    const audio = formData.get('audio')
-    if (!(audio instanceof File) || audio.size === 0) {
-      return jsonResponse({ success: false, error: 'Missing required "audio" file field' }, 400)
+    if (!isAllowedAudioExt(audioName)) {
+      return jsonResponse({ success: false, error: `Unsupported audio file type: ${audioName}` }, 400)
     }
 
-    if (!isAllowedAudioExt(audio.name)) {
-      return jsonResponse({ success: false, error: `Unsupported audio file type: ${audio.name}` }, 400)
-    }
-
-    if (audio.size > MAX_AUDIO_BYTES) {
+    if (audioSize > MAX_AUDIO_BYTES) {
       return jsonResponse({
         success: false,
-        error: `Recording too large (${Math.round(audio.size / 1024 / 1024)}MB). Max ${Math.round(MAX_AUDIO_BYTES / 1024 / 1024)}MB per file.`,
+        error: `Recording too large (${Math.round(audioSize / 1024 / 1024)}MB). Max ${Math.round(MAX_AUDIO_BYTES / 1024 / 1024)}MB per file.`,
       }, 413)
     }
-
-    const callerPhone = sanitizeMetadata(formData.get('phone_number'))
-    const deviceLocation = sanitizeMetadata(formData.get('location'))
-    const deviceId = sanitizeMetadata(formData.get('device_id'))
-    const recordedAt = parseRecordedAt(formData.get('timestamp'))
 
     // gateway/<year>/<month>/<uuid>.<ext> keeps device-pushed recordings
     // browsable by date, separate from the flat recordings/ folder manual
@@ -111,12 +163,12 @@ Deno.serve(async (req) => {
     const now = new Date()
     const year = now.getUTCFullYear()
     const month = String(now.getUTCMonth() + 1).padStart(2, '0')
-    const ext = audio.name.split('.').pop()?.toLowerCase() || 'bin'
+    const ext = audioName.split('.').pop()?.toLowerCase() || 'bin'
     const filePath = `gateway/${year}/${month}/${crypto.randomUUID()}.${ext}`
 
     const { error: uploadError } = await supabase.storage
       .from('call-recordings')
-      .upload(filePath, audio, { contentType: audio.type || undefined })
+      .upload(filePath, audioBody, { contentType: audioType || undefined })
 
     if (uploadError) {
       console.error('Storage upload failed:', uploadError)
@@ -127,7 +179,7 @@ Deno.serve(async (req) => {
       .from('call_recordings')
       .insert({
         storage_path: filePath,
-        original_filename: audio.name,
+        original_filename: audioName,
         uploaded_by: null,
         caller_phone: callerPhone,
         status: 'pending',

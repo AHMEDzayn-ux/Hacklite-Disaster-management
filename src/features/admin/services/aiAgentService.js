@@ -134,6 +134,22 @@ export const fetchInFlightAllocationPlans = async () => {
     }
 };
 
+// The demand side of the allocation engine: what camps have actually asked
+// for. Every pending plan traces back to one of these via request_id.
+export const fetchOpenCampRequests = async () => {
+    try {
+        const { data, error } = await supabase
+            .from('camp_resource_requests')
+            .select('*, camps:camp_id(id, name, district)')
+            .eq('status', 'open')
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        return { success: true, data: data || [] };
+    } catch (error) {
+        return { success: false, error: error.message, data: [] };
+    }
+};
+
 export const fetchLatestRoutePlans = async () => {
     try {
         const { data, error } = await supabase

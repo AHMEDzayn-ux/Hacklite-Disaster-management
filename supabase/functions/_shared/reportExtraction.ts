@@ -44,9 +44,57 @@ export interface AnimalRescueReportData {
 }
 
 export interface ParsedReport {
-    category: 'disaster' | 'missing_person' | 'animal_rescue'
+    /**
+     * 'not_a_report' is the escape hatch. Without it the model is forced to pick
+     * one of the three real categories, and a gateway phone receives far more
+     * bank alerts, reload confirmations and promotions than emergencies - each of
+     * which then becomes a public "disaster". One live example: a BOC transaction
+     * SMS was stored as a disaster report, putting an account number and balance
+     * into a table with a public_read RLS policy.
+     */
+    category: 'disaster' | 'missing_person' | 'animal_rescue' | 'not_a_report'
     confidence: number
     data: DisasterReportData | MissingPersonReportData | AnimalRescueReportData
+}
+
+/**
+ * Cheap deterministic pre-filter for machine-generated SMS, applied BEFORE the
+ * Gemini call so junk costs nothing and never reaches the model.
+ *
+ * Two signals, both high precision:
+ *  1. A non-dialable sender. Alpha sender IDs ("BOC", "Hutch", "Dialog") are
+ *     businesses and shortcodes; a member of the public reporting an emergency
+ *     always arrives from a real number.
+ *  2. Unmistakable transactional wording (account balances, reload receipts,
+ *     OTP codes, USSD prompts).
+ *
+ * A human never writes "AC Bal 20.07 Dial *344#", so the false-positive risk is
+ * negligible - and the cost of a false negative is someone's bank details in a
+ * publicly readable table.
+ */
+export function looksLikeMachineSms(sender: string, message: string): { machine: boolean; reason: string | null } {
+    // Anything that is not mostly digits (optionally +-prefixed) is a sender ID.
+    if (!/^\+?[\d\s-]{7,}$/.test(sender.trim())) {
+        return { machine: true, reason: `non-dialable sender ID "${sender}"` }
+    }
+
+    const text = message.toLowerCase()
+    const MACHINE_PATTERNS: Array<[RegExp, string]> = [
+        [/\ba\/c\s*no\b|\baccount\s*no\b/, 'account number'],
+        [/\bac\s*bal\b|\bbalance\s+available\b|\bavl\s*bal\b|\bbal\s*:?\s*rs\b/, 'balance statement'],
+        [/\bpos\/atm\b|\batm\s+transaction\b|\bpos\s+transaction\b/, 'card transaction'],
+        [/\breloaded\s+rs\b|\brecharge(?:d)?\s+(?:of\s+)?rs\b/, 'reload receipt'],
+        [/\bdial\s*\*\d|\*\d{3}#/, 'USSD prompt'],
+        [/\botp\b|\bone[\s-]?time\s+password\b|\bverification\s+code\b/, 'OTP'],
+        [/\binsufficient\s+balance\b/, 'carrier notice'],
+        [/\bunsubscribe\b|\bto\s+opt\s*out\b|\bpromo(?:tion)?\b|\bdata\s+bundle\b/, 'promotional'],
+    ]
+
+    for (const [pattern, reason] of MACHINE_PATTERNS) {
+        if (pattern.test(text)) return { machine: true, reason }
+    }
+
+    return { machine: false, reason: null }
 }
 
 /**
@@ -69,7 +117,7 @@ ${sourceLabelUpper}:
 CURRENT DATE/TIME: ${currentDate}
 
 TASK:
-1. Determine the report category: "disaster", "missing_person", or "animal_rescue"
+1. Determine the report category: "disaster", "missing_person", "animal_rescue", or "not_a_report"
 2. Extract ONLY the fields specified below (these match our database schema)
 3. Return a valid JSON object
 
@@ -77,6 +125,12 @@ CATEGORY DEFINITIONS:
 - disaster: Reports about floods, fires, earthquakes, landslides, cyclones, building collapse, etc.
 - missing_person: Reports about people who are lost, missing, or cannot be found
 - animal_rescue: Reports about animals that need rescue (stranded, injured, trapped)
+- not_a_report: Anything that is not a person reporting an emergency. This includes
+  bank and card transaction alerts, account balances, mobile reload and billing
+  notices, OTP or verification codes, marketing and promotional messages,
+  delivery notifications, automated system messages, wrong numbers, greetings,
+  tests, and any text with no emergency content. Use this category whenever the
+  ${opts.sourceLabel} is not someone asking for help.
 
 REQUIRED JSON STRUCTURE (only these exact fields):
 
@@ -126,10 +180,21 @@ For ANIMAL_RESCUE reports:
   }
 }
 
+For NOT_A_REPORT:
+{
+  "category": "not_a_report",
+  "confidence": 0.0-1.0,
+  "data": {}
+}
+
 RULES:
 1. Return ONLY valid JSON, no additional text
 2. Use ONLY the fields shown above - no extra fields
-3. If category is unclear, choose the most likely based on keywords
+3. If the ${opts.sourceLabel} IS an emergency report but the category is unclear,
+   choose the most likely based on keywords. Do NOT force a message that is not an
+   emergency report into one of the three report categories - use "not_a_report"
+   instead. It is far better to discard a promotional message than to file it as a
+   disaster.
 4. Set confidence based on how clear the ${opts.sourceLabel} is (0.5-1.0)
 5. Extract location as descriptive text in location_address field
 6. Do NOT invent facts that weren't stated - if information is missing, use null (or the literal default noted above for name/reporter_name). Never guess a specific number, name, or age that wasn't mentioned.
@@ -249,7 +314,13 @@ export async function insertAnimalRescueReport(
         location: { lat: geo?.lat ?? null, lng: geo?.lng ?? null, address: data.location_address || 'Unknown location' } as Location,
         reporter_name: data.reporter_name || defaultReporterNameFor(source),
         contact_number: contactNumberFor(source),
-        status: 'Pending',
+        // 'Active', not 'Pending'. animal_rescues_status_check allows only
+        // Active/Resolved - the same values disasters and missing_persons use.
+        // "Pending" is only the UI *label* for an Active rescue
+        // (AnimalRescueDetail.jsx renders isActive ? 'Pending' : 'Rescued'), and
+        // writing the label instead of the value made every SMS- and
+        // call-originated animal rescue fail its insert with a 23514.
+        status: 'Active',
         ...sourceColumns(source),
     }
 
@@ -286,6 +357,12 @@ export async function insertParsedReport(
             const result = await insertAnimalRescueReport(supabase, parsed.data as AnimalRescueReportData, source, geo)
             return result ? { id: result.id, table: 'animal_rescues' } : null
         }
+        case 'not_a_report':
+            // Nothing to insert, and this is a success rather than a failure.
+            // Callers distinguish it from an error via parsed.category, not via
+            // this null - see sms-report/index.ts.
+            console.log('Message classified as not_a_report; nothing inserted')
+            return null
         default:
             return null
     }

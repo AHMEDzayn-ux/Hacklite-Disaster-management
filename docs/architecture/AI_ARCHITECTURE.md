@@ -241,19 +241,109 @@ Then, on description text (Jaccard word-overlap similarity):
 **Solver:** `supabase/functions/_shared/transportationSolver.ts`
 **Writes:** `allocation_plans` (all `status = 'pending'`)
 
-This is **real Operations Research**, not a heuristic score. For **each of 7 resource categories** (food, water, medical, shelter, clothing, hygiene, other) it solves a classic **transportation problem**: move a resource from **surplus** camps to **shortage** camps at **minimum total distance**.
+This is **real Operations Research**, not a heuristic score. It solves a classic
+**transportation problem**: move stock from camps with spare supply to camps that
+**asked for it**, at **minimum distance**.
 
-### How supply and demand are measured
-- **Preferred (real data):** from the inventory ledger — `camp_inventory_levels` (quantity on hand) vs. `camps.inventory_thresholds` (target stock). `demand = max(0, threshold − onHand)`.
-- **Fallback (legacy):** camps that haven't adopted the inventory system yet use their free-text `needs` tags, mapped to categories (`_shared/resourceCategories.ts`), with demand approximated as **10% of camp capacity** (documented as interim, not permanent).
+### Demand comes only from camp requests
+
+The agent no longer *infers* what a camp needs. A **camp admin raises an explicit
+request** (`camp_resource_requests`, via the `camp-inventory` edge function from
+`/camp-admin/inventory`) naming the item, quantity, and urgency. Those requests are
+the **only** demand signal. If nobody asked, nothing is suggested.
+
+Outstanding demand per request subtracts what is already on its way:
+
+```
+outstanding = quantity_requested − quantity_fulfilled
+              − (quantity on linked plans still pending/approved/dispatched)
+```
+
+That subtraction is what makes the 2-hourly re-run **idempotent** — a request already
+covered by an unactioned plan does not generate a duplicate suggestion, and existing
+plans are never deleted out from under an admin who is mid-review.
+
+### Matching is per *item*, via a canonical catalog
+
+One solve per distinct requested item, not one per category. This matters because
+approval writes a real ledger transfer: a category-level plan would ship an item
+literally named `"food"` out of a camp that actually holds *Rice* and *Dhal*,
+corrupting stock at both ends. The plan also carries the source camp's `unit`, so the
+transfer reconciles against `camp_inventory_levels` (which groups by unit).
+
+Items are matched on **`item_id`**, a foreign key into the `resource_items` catalog —
+never on free-text spelling. Item names used to be typed by hand on both sides, so a
+camp stocking `"Water"` and a camp requesting `"Water"` only matched if the spelling
+*and* the hand-picked category happened to agree. In live data they didn't: two camps
+had `"Water"` filed under category `food`, so a request for water could never be
+sourced from it — the stock was invisible to the solver while sitting a few km away.
+
+Now every stock movement and every request resolves through the catalog server-side
+(`camp-inventory`'s `resolveCatalogItem`), which also *derives* `category` and the
+default `unit` from the catalog row. Two camps referring to the same item is a foreign
+key, not a coincidence of typing. `item_name` and `category` remain on the rows for
+display and history, but the catalog is the authority and they cannot disagree.
+
+### Supply is only what a camp can safely spare
+
+A camp's whole stock is never offered. Each candidate source keeps a **reserve**:
+
+```
+reserve_i  = max( camps.inventory_thresholds[item],          # what the camp configured
+                  current_occupancy × PER_OCCUPANT_MINIMUM[category] )  # what its people need
+spare_i    = max(0, onHand_i − reserve_i − alreadyCommittedOut_i)
+```
+
+- `PER_OCCUPANT_MINIMUM` (`_shared/resourceCategories.ts`) is an explicit, documented
+  planning assumption — not a measurement. It exists so a camp that never configured
+  thresholds still can't be stripped bare.
+- Only **`pending`** outbound plans count as committed; `approved` and later have
+  already written a `transferred_out` row, so the ledger reflects them and
+  subtracting again would double-count.
+- **A camp with an open request for an item is never a source for that item.**
 
 ### The solve
-- **Cost matrix** = pairwise **Haversine distance (km)** between camps. A camp's diagonal is set to `1e6` so it never "ships to itself."
-- **Algorithm: Vogel's Approximation Method (VAM).** For each row/column it computes a **penalty** = (2nd-cheapest − cheapest) route cost, then serves the row/column with the **largest penalty** first (delaying it is the riskiest), allocating to its cheapest cell. Repeats until supply/demand are exhausted.
-- **Imbalance handling:** if totals don't match, a **zero-cost dummy node** absorbs the difference. Genuinely unmet demand (supply < demand) is reported separately as `unmetDemand` rather than hidden.
-- **Honest scope note (from the code):** VAM finds a **strong feasible solution — frequently optimal, always a good approximation** — but it does *not* run a MODI/stepping-stone optimality pass, so it is not a certified-optimal simplex solve. This was a deliberate trade-off to run with **zero external packages** inside a Deno edge function.
 
-Each shipment becomes one `allocation_plans` row with `quantity`, `distance_km`, `lp_objective_value` (total plan cost), and `solver_metadata` (`method: 'vogel_approximation'`, imbalance flags, and the optional Gemini one-liner). **Everything is `pending`** — see [§11](#11-human-in-the-loop--safety).
+- **Cost matrix** (`supplyNodes × requests`, rectangular):
+  ```
+  cost[i][j] = FORBIDDEN (1e9)                        if same camp, or distance > 100 km
+             | haversineKm / URGENCY_WEIGHT[urgency]  otherwise
+  ```
+- **100 km hard cap.** Sri Lanka is ~450 km end to end, so 100 km still allows help
+  between neighbouring districts while excluding hauls no coordinator would run.
+  `FORBIDDEN` is a large **finite** sentinel, not `Infinity` — the solver does
+  arithmetic on costs and `Infinity` would poison it with `NaN` (same reasoning as
+  `FORBIDDEN_PAIRING_COST` in `hungarianAlgorithm.ts`).
+- **Urgency** divides the route cost (`low 1.0 → critical 2.0`), so a critical
+  request's routes look cheaper and VAM prefers to serve it when spare stock is
+  scarce. Distance still dominates; urgency only tilts.
+- **Algorithm: Vogel's Approximation Method (VAM).** For each row/column it computes a
+  **penalty** = (2nd-cheapest − cheapest) route cost, then serves the row/column with
+  the **largest penalty** first (delaying it is the riskiest), allocating to its
+  cheapest cell. Repeats until supply/demand are exhausted.
+- **Post-solve guard.** Any allocation landing on a `FORBIDDEN` cell is dropped and
+  counted as unmet. VAM is a heuristic and can be pushed onto one when a request is
+  unreachable but total spare stock exceeds total demand — this filter is what
+  actually *guarantees* no over-100 km suggestion reaches the dashboard, rather than
+  trusting the heuristic to avoid it.
+- **Request satisfaction is a soft constraint.** Partial fulfilment is a valid
+  outcome; the shortfall is reported (`unmet_quantity`), never hidden.
+- **Honest scope note (from the code):** VAM finds a **strong feasible solution —
+  frequently optimal, always a good approximation** — but it does *not* run a
+  MODI/stepping-stone optimality pass, so it is not a certified-optimal simplex solve.
+  This was a deliberate trade-off to run with **zero external packages** inside a Deno
+  edge function.
+
+Each shipment becomes one `allocation_plans` row linked to the `request_id` it serves,
+with `item_name`, `unit`, `quantity`, `distance_km` (the true haversine, not the
+weighted cost), `lp_objective_value`, and `solver_metadata` (`source_on_hand`,
+`source_reserve`, `source_spare`, `unmet_quantity`, `max_transfer_km`, and the
+optional Gemini one-liner). **Everything is `pending`** — see
+[§11](#11-human-in-the-loop--safety).
+
+**Closing the loop:** approving a plan moves the ledger, but **delivery** is what
+credits the request — `allocation-plan-review` adds the delivered quantity to
+`quantity_fulfilled` and flips the request to `fulfilled` once covered.
 
 ---
 
@@ -369,13 +459,15 @@ The "blackboard" tables (added by the `20260709*` migrations, see `AI_AGENTS_SET
 | `agent_runs` | every agent | One row per run: status, duration, items processed/failed, `gemini_calls`, `gemini_failures` |
 | `situation_reports` | Situation Awareness | Per-district damage index, risk score/trend, SITREP narrative |
 | `incident_priority_queue` | Incident Prioritization | Ranked active disasters + each score component |
-| `allocation_plans` | Resource Allocation | Proposed supply movements + solver metadata + lifecycle status |
+| `resource_items` | Reference data (seeded) | Canonical item catalog — stock and requests both reference it, so matching is by `item_id` not spelling |
+| `camp_resource_requests` | **Camp admins** (not an agent) | Explicit supply requests — the sole demand input to Resource Allocation |
+| `allocation_plans` | Resource Allocation | Proposed supply movements + solver metadata + lifecycle status, linked to `request_id` |
 | `route_plans` | Route Optimization | Road route geometry, distance, duration per plan / multi-stop |
 | `volunteer_assignments` | Volunteer Assignment | Proposed volunteer↔incident matches + cost |
 | `inventory_transactions` | Allocation **approval** | The ledger that actually moves stock |
 | `camp_inventory_levels` (view) | — | Current on-hand quantities per camp/item |
 
-Source data the agents read: `disasters`, `missing_persons`, `animal_rescues`, `camps`, `volunteers`.
+Source data the agents read: `disasters`, `missing_persons`, `animal_rescues`, `camps`, `volunteers`, `camp_resource_requests`.
 
 ---
 
@@ -405,7 +497,7 @@ supabase/functions/
 │   ├── geo.ts                 ← Haversine distance
 │   ├── textSimilarity.ts      ← Jaccard similarity (duplicate pre-filter)
 │   ├── taskSkills.ts          ← needs → required-skill inference
-│   ├── resourceCategories.ts  ← legacy needs-tags → 7 categories
+│   ├── resourceCategories.ts  ← the 7 categories + per-occupant reserve minimums
 │   ├── districts.ts           ← address → Sri Lanka district matching
 │   └── agentAuth.ts           ← admin-JWT / cron-secret auth
 │

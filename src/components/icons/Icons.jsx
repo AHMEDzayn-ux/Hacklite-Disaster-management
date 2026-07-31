@@ -67,10 +67,101 @@ export function IconArrowRight({ className }) {
     );
 }
 
+export function IconArrowLeft({ className }) {
+    return (
+        <svg {...iconProps} strokeWidth={2.25} className={className}>
+            <path d="M19 12H5M11 18l-6-6 6-6" />
+        </svg>
+    );
+}
+
 export function IconCheck({ className }) {
     return (
         <svg {...iconProps} strokeWidth={2.5} className={className}>
             <path d="M20 6 9 17l-5-5" />
+        </svg>
+    );
+}
+
+export function IconExternalLink({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M15 3h6v6" />
+            <path d="M10 14 21 3" />
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        </svg>
+    );
+}
+
+export function IconMaximize({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3" />
+        </svg>
+    );
+}
+
+export function IconThermometer({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0Z" />
+        </svg>
+    );
+}
+
+export function IconWind({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M12.8 19.6A2 2 0 1 0 14 16H2" />
+            <path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" />
+            <path d="M9.8 4.4A2 2 0 1 1 11 8H2" />
+        </svg>
+    );
+}
+
+export function IconUser({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+        </svg>
+    );
+}
+
+export function IconCalendar({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+    );
+}
+
+export function IconFileText({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+            <path d="M14 2v5h6M8 13h8M8 17h6" />
+        </svg>
+    );
+}
+
+export function IconClipboardList({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <rect x="8" y="2" width="8" height="4" rx="1" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <path d="M8.5 11h7M8.5 15h5" />
+        </svg>
+    );
+}
+
+export function IconPackage({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="m7.5 4.27 9 5.15" />
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+            <path d="m3.3 7 8.7 5 8.7-5M12 22V12" />
         </svg>
     );
 }
@@ -295,6 +386,59 @@ export function IconHeart({ className }) {
     return (
         <svg {...iconProps} className={className}>
             <path d="M20.8 8.6c0-2.5-2-4.5-4.5-4.5-1.7 0-3.2.9-4 2.3-.8-1.4-2.3-2.3-4-2.3-2.5 0-4.5 2-4.5 4.5 0 6.5 8.5 11.4 8.5 11.4s8.5-4.9 8.5-11.4Z" />
+        </svg>
+    );
+}
+
+export function IconMenu({ className }) {
+    return (
+        <svg {...iconProps} strokeWidth={2} className={className}>
+            <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    );
+}
+
+export function IconBell({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M6 8a6 6 0 1 1 12 0c0 4 1.5 5.5 2 6.5H4c.5-1 2-2.5 2-6.5Z" />
+            <path d="M10 18.5a2 2 0 0 0 4 0" />
+        </svg>
+    );
+}
+
+export function IconSun({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.3M12 19.2v2.3M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.4 19.6 6 18M18 6l1.6-1.6" />
+        </svg>
+    );
+}
+
+export function IconMoon({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+        </svg>
+    );
+}
+
+export function IconLogOut({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="M16 17l5-5-5-5" />
+            <path d="M21 12H9" />
+        </svg>
+    );
+}
+
+export function IconPanelLeft({ className }) {
+    return (
+        <svg {...iconProps} className={className}>
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <line x1="9" y1="4" x2="9" y2="20" />
         </svg>
     );
 }

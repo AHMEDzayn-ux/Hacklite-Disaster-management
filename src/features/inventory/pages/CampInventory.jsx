@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchCampInventoryLevels, recordInventoryTransaction, INVENTORY_CATEGORIES } from '@/features/inventory/services/inventoryService';
+import { fetchCampInventoryLevels, recordInventoryTransaction, fetchResourceItems, CATEGORY_LABELS } from '@/features/inventory/services/inventoryService';
 import { supabase } from '@/lib/supabase';
+import ItemSelect from '@/features/inventory/components/ItemSelect';
 import { IconGrid } from '@/components/icons/Icons';
 
 /**
@@ -10,11 +11,6 @@ import { IconGrid } from '@/components/icons/Icons';
  * login, just a short code shared by the camp coordinator. Large tap targets,
  * one-field quantity entry, low-stock items pinned to the top in red.
  */
-
-const CATEGORY_LABELS = {
-    food: '🍚 Food', water: '💧 Water', medical: '⚕️ Medical', shelter: '⛺ Shelter',
-    clothing: '👕 Clothing', hygiene: '🧼 Hygiene', other: '📦 Other'
-};
 
 function CampInventory() {
     const [campId, setCampId] = useState('');
@@ -26,21 +22,25 @@ function CampInventory() {
     const [error, setError] = useState('');
     const [actionItem, setActionItem] = useState(null); // { itemName, category, mode }
     const [quantity, setQuantity] = useState('');
-    const [newItemName, setNewItemName] = useState('');
-    const [newItemCategory, setNewItemCategory] = useState('food');
+    const [newItemId, setNewItemId] = useState('');
+    const [catalog, setCatalog] = useState([]);
     const [notes, setNotes] = useState('');
     const [recordedByName, setRecordedByName] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
     const loadLevels = useCallback(async (cid, code) => {
         setLoading(true);
-        const result = await fetchCampInventoryLevels(cid, code);
+        const [result, catalogResult] = await Promise.all([
+            fetchCampInventoryLevels(cid, code),
+            fetchResourceItems(),
+        ]);
         if (result.success) {
             setLevels(result.levels || []);
             setThresholds(result.thresholds || {});
         } else {
             setError(result.error || 'Failed to load inventory');
         }
+        if (catalogResult.success) setCatalog(catalogResult.items || []);
         setLoading(false);
     }, []);
 
@@ -58,17 +58,20 @@ function CampInventory() {
         setLoading(true);
         const { data: camp } = await supabase.from('camps').select('id, name').eq('id', campId.trim()).single();
         const result = await fetchCampInventoryLevels(campId.trim(), accessCode.trim().toUpperCase());
-        setLoading(false);
         if (!result.success) {
+            setLoading(false);
             setError('Invalid camp or access code.');
             return;
         }
+        // Deliberately leave the spinner up: unlocking triggers the levels
+        // effect below, and clearing it here would paint one frame of
+        // "No items tracked yet" against the still-empty levels array.
         setUnlocked({ campId: campId.trim(), accessCode: accessCode.trim().toUpperCase(), campName: camp?.name || 'Camp' });
     };
 
     const autofillNewItem = () => {
-        setNewItemName('Bottled Water');
-        setNewItemCategory('water');
+        const sample = catalog.find(i => i.name === 'Bottled Water') || catalog[0];
+        setNewItemId(sample?.id || '');
         setQuantity('100');
         setNotes('Delivered by relief truck');
     };
@@ -78,8 +81,8 @@ function CampInventory() {
         setNotes('Routine restock');
     };
 
-    const openAction = (itemName, category, mode) => {
-        setActionItem({ itemName, category, mode });
+    const openAction = (item, mode) => {
+        setActionItem({ itemId: item.item_id, itemName: item.item_name, unit: item.unit, mode });
         setQuantity('');
         setNotes('');
     };
@@ -89,8 +92,9 @@ function CampInventory() {
         if (!actionItem || !quantity || Number(quantity) <= 0) return;
         setSubmitting(true);
         const result = await recordInventoryTransaction(unlocked.campId, unlocked.accessCode, {
+            itemId: actionItem.itemId,
             itemName: actionItem.itemName,
-            category: actionItem.category,
+            unit: actionItem.unit,
             transactionType: actionItem.mode,
             quantity: Number(quantity),
             recordedByName: recordedByName || 'Volunteer',
@@ -107,11 +111,10 @@ function CampInventory() {
 
     const submitNewItem = async (e) => {
         e.preventDefault();
-        if (!newItemName.trim() || !quantity || Number(quantity) <= 0) return;
+        if (!newItemId || !quantity || Number(quantity) <= 0) return;
         setSubmitting(true);
         const result = await recordInventoryTransaction(unlocked.campId, unlocked.accessCode, {
-            itemName: newItemName.trim(),
-            category: newItemCategory,
+            itemId: newItemId,
             transactionType: 'received',
             quantity: Number(quantity),
             recordedByName: recordedByName || 'Volunteer',
@@ -119,7 +122,7 @@ function CampInventory() {
         });
         setSubmitting(false);
         if (result.success) {
-            setNewItemName('');
+            setNewItemId('');
             setQuantity('');
             setNotes('');
             loadLevels(unlocked.campId, unlocked.accessCode);
@@ -142,7 +145,7 @@ function CampInventory() {
 
     if (!unlocked) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans flex items-center justify-center px-4">
+            <div className="page-shell flex items-center justify-center px-4">
                 <div
                     className="absolute inset-0 pointer-events-none opacity-10"
                     style={{
@@ -154,7 +157,7 @@ function CampInventory() {
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300">
                         <IconGrid className="h-6 w-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-1 text-center">Camp Inventory</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 text-center">Camp Inventory</h1>
                     <p className="text-sm text-slate-400 text-center mb-6">Enter the camp ID and access code given by your coordinator.</p>
                     <form onSubmit={handleUnlock} className="space-y-4">
                         <input
@@ -187,7 +190,7 @@ function CampInventory() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans pb-24">
+        <div className="page-shell pb-24">
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -204,42 +207,42 @@ function CampInventory() {
                 <button onClick={() => setUnlocked(null)} className="text-xs text-primary-300 hover:text-primary-200 underline">Switch camp</button>
             </header>
 
-            <div className="relative z-10 mx-auto max-w-2xl p-4">
+            <div className="relative z-10 mx-auto max-w-4xl p-4 sm:p-6">
                 <input
                     type="text"
                     placeholder="Your name (optional)"
                     value={recordedByName}
                     onChange={(e) => setRecordedByName(e.target.value)}
-                    className="input-field mb-4 text-sm"
+                    className="input-field mb-4 text-sm max-w-md"
                 />
 
                 {error && <div className="mb-4 p-3 bg-danger-500/10 border border-danger-400/20 rounded-lg text-danger-300 text-sm">{error}</div>}
                 {loading && <p className="text-center text-slate-400">Loading...</p>}
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {sortedLevels.map((item) => {
                         const low = isLowStock(item.item_name, item.quantity_on_hand);
                         return (
-                            <div key={`${item.item_name}-${item.category}`} className={`card p-4 border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
+                            <div key={`${item.item_name}-${item.category}`} className={`card border-l-4 ${low ? 'border-l-danger-500' : 'border-l-success-500'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
-                                        <div className="font-bold text-white">{item.item_name}</div>
+                                        <div className="font-bold text-slate-900 dark:text-white">{item.item_name}</div>
                                         <div className="text-xs text-slate-400">{CATEGORY_LABELS[item.category] || item.category}</div>
                                     </div>
-                                    <div className={`text-2xl font-extrabold ${low ? 'text-danger-400' : 'text-white'}`}>
+                                    <div className={`text-2xl font-extrabold ${low ? 'text-danger-400' : 'text-slate-900 dark:text-white'}`}>
                                         {item.quantity_on_hand} <span className="text-sm font-normal text-slate-400">{item.unit}</span>
                                     </div>
                                 </div>
                                 {low && <div className="text-xs text-danger-400 font-semibold mb-2">⚠ Below threshold ({thresholds[item.item_name]})</div>}
                                 <div className="flex gap-2">
                                     <button
-                                        onClick={() => openAction(item.item_name, item.category, 'received')}
+                                        onClick={() => openAction(item, 'received')}
                                         className="flex-1 bg-success-500/15 hover:bg-success-500/25 text-success-300 font-bold py-3 rounded-lg text-lg"
                                     >
                                         + Add Stock
                                     </button>
                                     <button
-                                        onClick={() => openAction(item.item_name, item.category, 'distributed')}
+                                        onClick={() => openAction(item, 'distributed')}
                                         className="flex-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold py-3 rounded-lg text-lg"
                                     >
                                         − Distribute
@@ -249,14 +252,14 @@ function CampInventory() {
                         );
                     })}
                     {!loading && sortedLevels.length === 0 && (
-                        <p className="text-center text-slate-400 py-8">No items tracked yet. Add one below.</p>
+                        <p className="text-center text-slate-400 py-8 sm:col-span-2">No items tracked yet. Add one below.</p>
                     )}
                 </div>
 
                 {/* Add a new item type */}
-                <div className="mt-6 card p-4">
+                <div className="mt-6 card max-w-md">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-bold text-white">➕ Add New Item</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white">➕ Add New Item</h3>
                         <button
                             type="button"
                             onClick={autofillNewItem}
@@ -266,20 +269,12 @@ function CampInventory() {
                         </button>
                     </div>
                     <form onSubmit={submitNewItem} className="space-y-3">
-                        <input
-                            type="text"
-                            placeholder="Item name (e.g. Rice, Bottled Water)"
-                            value={newItemName}
-                            onChange={(e) => setNewItemName(e.target.value)}
+                        <ItemSelect
+                            catalog={catalog}
+                            value={newItemId}
+                            onChange={setNewItemId}
                             className="input-field text-lg py-3"
                         />
-                        <select
-                            value={newItemCategory}
-                            onChange={(e) => setNewItemCategory(e.target.value)}
-                            className="input-field text-lg py-3"
-                        >
-                            {INVENTORY_CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>)}
-                        </select>
                         <input
                             type="number"
                             placeholder="Quantity received"
@@ -304,7 +299,7 @@ function CampInventory() {
                 <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-20 p-4">
                     <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                            <h3 className="text-xl font-bold text-white">
+                            <h3 className="text-xl font-bold text-white mb-1">
                                 {actionItem.mode === 'received' ? 'Add Stock' : 'Distribute'}: {actionItem.itemName}
                             </h3>
                             <button
@@ -333,7 +328,7 @@ function CampInventory() {
                                 className="input-field text-sm"
                             />
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-white hover:bg-white/10 py-3 rounded-xl font-bold">Cancel</button>
+                                <button type="button" onClick={() => setActionItem(null)} className="flex-1 border border-white/20 bg-white/5 text-white hover:bg-white/10 py-3 rounded-xl font-bold transition-colors">Cancel</button>
                                 <button type="submit" disabled={submitting} className="flex-1 btn-primary rounded-xl disabled:opacity-50">
                                     {submitting ? 'Saving...' : 'Confirm'}
                                 </button>

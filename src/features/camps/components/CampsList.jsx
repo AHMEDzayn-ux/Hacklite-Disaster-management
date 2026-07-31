@@ -69,22 +69,17 @@ function CampsList() {
     const [needsFilter, setNeedsFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('map'); // Default to map view as it's most important
-    const [isInitializing, setIsInitializing] = useState(true); // Always start with loading state
 
-    // Subscribe to real-time updates on mount
+    // Subscribe to real-time updates on mount. The store's isInitialized is the
+    // only trustworthy "data has arrived" signal: subscribeToCamps() resolves
+    // immediately when another page already opened the shared channel, so a local
+    // "done awaiting" flag would drop us onto the empty state mid-fetch.
     useEffect(() => {
-        const initialize = async () => {
-            if (!isInitialized) {
-                // Only invalidate cache if not initialized yet
-                invalidateCache('camps');
-                await subscribeToCamps();
-            }
-            // Add small delay to ensure data is loaded
-            setTimeout(() => {
-                setIsInitializing(false);
-            }, 100);
-        };
-        initialize();
+        if (!isInitialized) {
+            // Only invalidate cache if not initialized yet
+            invalidateCache('camps');
+            subscribeToCamps();
+        }
         // Don't unsubscribe on unmount to maintain cache
     }, [isInitialized, subscribeToCamps]);
 
@@ -147,9 +142,9 @@ function CampsList() {
     };
 
     // Show loading state while initializing
-    if (isInitializing) {
+    if (!isInitialized) {
         return (
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+            <div className="page-shell">
                 <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
                     <div className="text-center">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mb-4"></div>
@@ -161,7 +156,9 @@ function CampsList() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 font-sans">
+        <div className={viewMode === 'map'
+            ? 'relative h-[calc(100vh-4rem)] overflow-y-auto lg:overflow-hidden bg-slate-50 font-sans dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col'
+            : 'page-shell'}>
             <div
                 className="absolute inset-0 pointer-events-none opacity-10"
                 style={{
@@ -170,28 +167,95 @@ function CampsList() {
                 }}
             ></div>
 
-            <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8">
-                {/* Header with Stats and Controls */}
-                <div className="card mb-3 p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        {/* Title & Stats */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-                                <IconTent className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-white">Relief Camps</h1>
-                                <div className="hidden sm:flex items-center gap-3 text-sm mt-1">
-                                    <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium">
-                                        {activeCount} Active
-                                    </span>
-                                    <span className="flex items-center gap-1 text-slate-400">
-                                        <IconUsers className="h-3.5 w-3.5" />
-                                        {totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()} sheltered
-                                    </span>
-                                </div>
-                            </div>
+            <div className={`relative z-10 mx-auto max-w-[1600px] px-4 py-4 sm:px-8 w-full ${viewMode === 'map' ? 'flex-1 min-h-0 flex flex-col' : ''}`}>
+                {/* Header + Filters — one compact row so map view keeps most of the viewport */}
+                <div className="card mb-3 p-3 flex-shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                        {/* Stats */}
+                        <span className="px-2 py-1 bg-success-500/15 text-success-300 rounded-full font-medium text-sm">
+                            {activeCount} Active
+                        </span>
+                        <span className="flex items-center gap-1 text-slate-400 text-sm">
+                            <IconUsers className="h-3.5 w-3.5" />
+                            {totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()} sheltered
+                        </span>
+
+                        <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block" />
+
+                        <select
+                            value={districtFilter}
+                            onChange={(e) => setDistrictFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Districts</option>
+                            {allDistricts.map(district => (
+                                <option key={district} value={district} className="text-slate-900">{district}</option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={needsFilter}
+                            onChange={(e) => setNeedsFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Needs</option>
+                            {allNeeds.map((need, idx) => (
+                                <option key={need + '-' + idx} value={need} className="text-slate-900">{need}</option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Status</option>
+                            <option value="active" className="text-slate-900">Active Only</option>
+                            <option value="closed" className="text-slate-900">Closed</option>
+                        </select>
+
+                        <select
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                            className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                        >
+                            <option value="all" className="text-slate-900">All Types</option>
+                            <option value="temporary-shelter" className="text-slate-900">Temporary Shelter</option>
+                            <option value="emergency-evacuation" className="text-slate-900">Emergency Evacuation</option>
+                            <option value="long-term-relief" className="text-slate-900">Long-term Relief</option>
+                            <option value="medical-facility" className="text-slate-900">Medical Facility</option>
+                        </select>
+
+                        <div className="relative">
+                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
+                            <input
+                                type="text"
+                                placeholder="Search camps..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="text-sm bg-white/5 border border-white/15 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
+                            />
                         </div>
+
+                        {(districtFilter !== 'all' || needsFilter !== 'all' || statusFilter !== 'all' || typeFilter !== 'all' || searchTerm) && (
+                            <button
+                                onClick={() => {
+                                    setSearchTerm('');
+                                    setStatusFilter('all');
+                                    setTypeFilter('all');
+                                    setDistrictFilter('all');
+                                    setNeedsFilter('all');
+                                }}
+                                className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 px-2 py-1.5"
+                            >
+                                <IconX className="h-3.5 w-3.5" />
+                                Clear
+                            </button>
+                        )}
+
+                        <span className="ml-auto text-xs text-slate-500">
+                            {filteredCamps.length} of {camps.length} camps
+                        </span>
 
                         {/* View Toggle */}
                         {camps.length > 0 && (
@@ -219,84 +283,6 @@ function CampsList() {
                             </div>
                         )}
                     </div>
-
-                    {/* Inline Filters */}
-                    <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-white/10">
-                        <select
-                            value={districtFilter}
-                            onChange={(e) => setDistrictFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
-                        >
-                            <option value="all">All Districts</option>
-                            {allDistricts.map(district => (
-                                <option key={district} value={district}>{district}</option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={needsFilter}
-                            onChange={(e) => setNeedsFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
-                        >
-                            <option value="all">All Needs</option>
-                            {allNeeds.map((need, idx) => (
-                                <option key={need + '-' + idx} value={need}>{need}</option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
-                        >
-                            <option value="all">All Status</option>
-                            <option value="active">Active Only</option>
-                            <option value="closed">Closed</option>
-                        </select>
-
-                        <select
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value)}
-                            className="text-sm bg-white/5 border border-white/15 text-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50"
-                        >
-                            <option value="all">All Types</option>
-                            <option value="temporary-shelter">Temporary Shelter</option>
-                            <option value="emergency-evacuation">Emergency Evacuation</option>
-                            <option value="long-term-relief">Long-term Relief</option>
-                            <option value="medical-facility">Medical Facility</option>
-                        </select>
-
-                        <div className="relative">
-                            <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
-                            <input
-                                type="text"
-                                placeholder="Search camps..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="text-sm bg-white/5 border border-white/15 text-white placeholder:text-slate-500 rounded-lg pl-8 pr-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary-500/50 w-40"
-                            />
-                        </div>
-
-                        {(districtFilter !== 'all' || needsFilter !== 'all' || statusFilter !== 'all' || typeFilter !== 'all' || searchTerm) && (
-                            <button
-                                onClick={() => {
-                                    setSearchTerm('');
-                                    setStatusFilter('all');
-                                    setTypeFilter('all');
-                                    setDistrictFilter('all');
-                                    setNeedsFilter('all');
-                                }}
-                                className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 px-2 py-1.5"
-                            >
-                                <IconX className="h-3.5 w-3.5" />
-                                Clear
-                            </button>
-                        )}
-
-                        <span className="ml-auto text-xs text-slate-500">
-                            {filteredCamps.length} of {camps.length} camps
-                        </span>
-                    </div>
                 </div>
 
                 {camps.length === 0 ? (
@@ -304,7 +290,7 @@ function CampsList() {
                         <div className="mb-3 flex justify-center text-amber-300">
                             <IconTent className="h-12 w-12" />
                         </div>
-                        <h2 className="text-xl font-bold text-white mb-1">No Relief Camps Available</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">No Relief Camps Available</h2>
                         <p className="text-slate-400 text-sm">There are currently no registered relief camps.</p>
                     </div>
                 ) : (
@@ -316,7 +302,7 @@ function CampsList() {
                                         <div className="mb-2 flex justify-center text-slate-500">
                                             <IconSearch className="h-8 w-8" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-white mb-1">No Camps Match Filters</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Camps Match Filters</h3>
                                         <p className="text-slate-400 text-sm">Try adjusting your filter criteria</p>
                                     </div>
                                 ) : (
@@ -331,7 +317,7 @@ function CampsList() {
                                                 {/* Header */}
                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                     <div className="min-w-0 flex-1">
-                                                        <h3 className="text-sm font-bold text-white truncate flex items-center gap-1">
+                                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate flex items-center gap-1">
                                                             <span className="text-base">{getCampTypeIcon(camp.type || 'unknown')}</span>
                                                             {camp.name || 'Unnamed Camp'}
                                                         </h3>
@@ -392,7 +378,7 @@ function CampsList() {
                                                 )}
 
                                                 {/* View Button */}
-                                                <button className="w-full bg-primary-500 hover:bg-primary-600 text-white text-xs font-medium py-1.5 rounded-lg">
+                                                <button className="w-full border-2 border-slate-900 dark:border-white bg-white dark:bg-transparent hover:bg-slate-900 dark:hover:bg-white text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 text-xs font-medium py-1.5 rounded-lg transition-colors">
                                                     View Details →
                                                 </button>
                                             </div>
@@ -402,26 +388,26 @@ function CampsList() {
                             </div>
                         ) : (
                             // Map View
-                            <div className="card p-0 overflow-hidden">
-                                {/* Compact Warning */}
-                                <div className="bg-amber-500/10 border-b border-amber-400/20 px-3 py-2 flex items-center gap-2 text-xs text-amber-200">
-                                    <span>⚠️</span>
-                                    <span>Only camps with coordinates shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
-                                </div>
-
+                            <div className="card p-0 overflow-hidden flex-1 min-h-0 flex flex-col">
                                 {filteredCamps.length === 0 ? (
                                     <div className="text-center py-8">
                                         <div className="mb-2 flex justify-center text-slate-500">
                                             <IconSearch className="h-8 w-8" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-white mb-1">No Camps Match Filters</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Camps Match Filters</h3>
                                         <p className="text-slate-400 text-sm">Try adjusting your filter criteria</p>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="flex flex-col lg:flex-row gap-4 items-start p-3">
-                                        <div className="rounded-xl overflow-hidden border border-white/10 w-full lg:w-auto">
-                                            <MapFrame height="calc(100vh - 320px)" style={{ minHeight: 400 }}>
+                                        <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 items-start p-3">
+                                        <div className="w-full h-[50vh] lg:h-full flex-1 min-w-0">
+                                            <MapFrame
+                                                height="100%"
+                                                className="rounded-xl border border-white/10"
+                                                resizable
+                                                fillWidth
+                                                minHeight={320}
+                                            >
                                             <MapContainer
                                                 center={[7.8731, 80.7718]}
                                                 zoom={7}
@@ -500,10 +486,18 @@ function CampsList() {
                                             </MapFrame>
                                         </div>
 
-                                        {/* Compact Legend */}
-                                        <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 w-full lg:w-56 lg:flex-shrink-0 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
-                                            <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Active ({activeCount})</span>
-                                            <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-500 rounded-full inline-block"></span> Closed ({closedCount})</span>
+                                        {/* Sidebar: warning note + legend */}
+                                        <div className="w-full lg:w-56 lg:flex-shrink-0 flex flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:pr-1 scroll-panel">
+                                            <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                                                <span>⚠️</span>
+                                                <span>Only camps with coordinates shown. <button onClick={() => setViewMode('cards')} className="font-semibold underline">Switch to Cards</button> for all.</span>
+                                            </div>
+
+                                            {/* Marker color key — counts already shown in the filter bar above */}
+                                            <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 flex flex-row lg:flex-col gap-3 text-xs text-slate-300">
+                                                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-success-500 rounded-full inline-block"></span> Active</span>
+                                                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-slate-500 rounded-full inline-block"></span> Closed</span>
+                                            </div>
                                         </div>
                                         </div>
                                     </>

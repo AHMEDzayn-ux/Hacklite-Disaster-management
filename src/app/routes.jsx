@@ -1,7 +1,8 @@
 import { lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import RoleLayout from '@/components/layout/RoleLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import ProtectedRoute from '@/features/auth/ProtectedRoute';
 
 // Eager load only critical pages
@@ -32,18 +33,18 @@ const Donations = lazy(() => import('@/features/donations/pages/Donations'));
 
 // Inventory (camp-scoped field tools + admin rollup)
 const CampInventory = lazy(() => import('@/features/inventory/pages/CampInventory'));
-const CampAdminLogin = lazy(() => import('@/features/inventory/pages/CampAdminLogin'));
 const CampAdminInventory = lazy(() => import('@/features/inventory/pages/CampAdminInventory'));
 const AdminInventoryOverview = lazy(() => import('@/features/inventory/pages/AdminInventoryOverview'));
+const AdminCampInventory = lazy(() => import('@/features/inventory/pages/AdminCampInventory'));
 
 // Admin pages (lazy loaded)
 const AdminLogin = lazy(() => import('@/features/admin/pages/AdminLogin'));
 const AdminDashboard = lazy(() => import('@/features/admin/pages/AdminDashboard'));
 const AdminRecords = lazy(() => import('@/features/admin/pages/AdminRecords'));
-const AdminCallReports = lazy(() => import('@/features/admin/pages/AdminCallReports'));
 const AdminCommandDashboard = lazy(() => import('@/features/admin/pages/AdminCommandDashboard'));
 const BulkTestData = lazy(() => import('@/features/admin/pages/BulkTestData'));
 
+const AdminCampsLayout = lazy(() => import('@/features/camps/pages/AdminCampsLayout'));
 const AdminReviewRequests = lazy(() => import('@/features/camps/pages/AdminReviewRequests'));
 const AdminRegisterCamp = lazy(() => import('@/features/camps/pages/AdminRegisterCamp'));
 const AdminManageCamps = lazy(() => import('@/features/camps/pages/AdminManageCamps'));
@@ -89,22 +90,34 @@ export default function AppRoutes() {
       <Route path="/camp-inventory" element={<CampInventory />} />
 
       {/* Camp Admin - logged-in user scoped to one camp (add/distribute stock).
-          The login is public; the inventory page requires auth and self-guards
-          to camp_admin, and the edge function enforces the camp scope. */}
-      <Route path="/camp-admin/login" element={<CampAdminLogin />} />
+          There is a single sign-in at /admin/login that routes by account role;
+          the inventory page requires auth and self-guards to camp_admin, and the
+          edge function enforces the camp scope. */}
+      <Route path="/camp-admin/login" element={<Navigate to="/admin/login" replace />} />
       <Route path="/camp-admin/inventory" element={<ProtectedRoute><CampAdminInventory /></ProtectedRoute>} />
 
-      {/* Admin Routes - Authentication required ONLY for these */}
+      {/* Admin Routes - Authentication required ONLY for these.
+          AdminLayout supplies the shared admin nav bar and the auth gate, so
+          every screen below is reachable from every other one. */}
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/review-requests" element={<ProtectedRoute><AdminReviewRequests /></ProtectedRoute>} />
-      <Route path="/admin/register-camp" element={<ProtectedRoute><AdminRegisterCamp /></ProtectedRoute>} />
-      <Route path="/admin/manage-camps" element={<ProtectedRoute><AdminManageCamps /></ProtectedRoute>} />
-      <Route path="/admin/edit-camp/:id" element={<ProtectedRoute><AdminEditCamp /></ProtectedRoute>} />
-      <Route path="/admin/records" element={<ProtectedRoute><AdminRecords /></ProtectedRoute>} />
-      <Route path="/admin/call-reports" element={<ProtectedRoute><AdminCallReports /></ProtectedRoute>} />
-      <Route path="/admin/command" element={<ProtectedRoute><AdminCommandDashboard /></ProtectedRoute>} />
-      <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventoryOverview /></ProtectedRoute>} />
+      <Route element={<AdminLayout />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        {/* The camp lifecycle - review a public request, register the camp,
+            maintain it - is one section with its own tabs, so these three sit
+            together instead of as separate top-level nav entries. */}
+        <Route element={<AdminCampsLayout />}>
+          <Route path="/admin/manage-camps" element={<AdminManageCamps />} />
+          <Route path="/admin/review-requests" element={<AdminReviewRequests />} />
+          <Route path="/admin/register-camp" element={<AdminRegisterCamp />} />
+          <Route path="/admin/edit-camp/:id" element={<AdminEditCamp />} />
+        </Route>
+        <Route path="/admin/records" element={<AdminRecords />} />
+        <Route path="/admin/command" element={<AdminCommandDashboard />} />
+        <Route path="/admin/inventory" element={<AdminInventoryOverview />} />
+        {/* Drill-down into one camp's sheet, read-only - stock entry and requests
+            stay with that camp's own admin. */}
+        <Route path="/admin/inventory/:campId" element={<AdminCampInventory />} />
+      </Route>
 
       {/* Bulk Test Data Generator */}
       <Route path="/bulk-test-data" element={<BulkTestData />} />

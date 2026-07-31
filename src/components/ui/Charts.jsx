@@ -13,9 +13,13 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 // Categorical palette — hex so it works inside SVG (Tailwind `fill-*`/`bg-*`
 // utilities are unreliable on arbitrary elements and some tokens like
 // `warning`/`info` aren't even defined in this project's tailwind config).
+// Muted, theme-aligned: blue/red/green stay as the app's three meaningful
+// accents (primary / critical / resolved); everything past that is grayscale
+// rather than another saturated hue, so extra chart series read as neutral
+// categories instead of decoration.
 export const CHART_COLORS = [
-    '#2563eb', '#dc2626', '#16a34a', '#f59e0b', '#7c3aed',
-    '#0891b2', '#db2777', '#ea580c', '#0d9488', '#64748b',
+    '#2563eb', '#dc2626', '#16a34a', '#64748b', '#94a3b8',
+    '#475569', '#334155', '#1e293b', '#cbd5e1', '#0f172a',
 ];
 
 function niceCeil(v) {
@@ -83,7 +87,7 @@ export function Donut({ data, size = 132, thickness = 22, centerLabel, centerSub
                     <div key={i} className="flex items-center gap-2 text-xs">
                         <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: d.color }} />
                         <span className="text-slate-300 truncate">{d.label}</span>
-                        <span className="ml-auto font-semibold text-white">{d.value}</span>
+                        <span className="ml-auto font-semibold text-slate-900 dark:text-white">{d.value}</span>
                     </div>
                 ))}
             </div>
@@ -197,7 +201,7 @@ export function TrendLine({ series, labels, height = 168, area = true }) {
             </svg>
             {hover != null && (
                 <div
-                    className="absolute pointer-events-none bg-gray-900 border border-white/10 text-white text-[10px] rounded px-2 py-1 shadow-lg z-10 whitespace-nowrap"
+                    className="absolute pointer-events-none bg-gray-900 border border-white/10 text-slate-900 dark:text-white text-[10px] rounded px-2 py-1 shadow-lg z-10 whitespace-nowrap"
                     style={{ left: Math.min(Math.max(x(hover), 40), W - 90), top: 4, transform: 'translateX(-50%)' }}
                 >
                     <div className="font-semibold text-gray-300">{labels[hover]}</div>

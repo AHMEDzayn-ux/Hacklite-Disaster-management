@@ -1,69 +1,36 @@
 /**
  * Volunteer Service
  * =================
- * Public self-registration (no account) plus availability/assignment
- * self-service via the volunteer-self-service edge function, identity
- * proven by (volunteerId, phone) - the id is returned at registration and
- * expected to be kept in the browser (localStorage) by the caller.
+ * Volunteering needs no account and no registration. Someone describes what
+ * they can contribute and gets AI-ranked, safety-checked open cases they
+ * could help with, with the reporter's contact details to reach out directly.
+ *
+ * Nothing is stored - the request carries the whole profile and the response
+ * is purely informational. There is no assignment, no claim, no commitment.
  */
 
 import { supabase } from '@/lib/supabase';
 
-export const VOLUNTEER_SKILLS = ['rescue', 'medical', 'logistics', 'driving', 'first_aid', 'construction', 'counseling'];
+export const VOLUNTEER_SKILLS = [
+    'rescue', 'medical', 'logistics', 'driving', 'first_aid', 'construction', 'counseling',
+    'missing_person_search', 'house_clearing', 'boat_service',
+];
 
-export const registerVolunteer = async ({ name, phone, email, skills, district, location }) => {
+/**
+ * Hazardous cases (flood/fire rescue, dangerous animals, hazardous-terrain
+ * searches) are filtered out server-side unless the person said they can do
+ * rescue, medical, or boat/water work - they are never merely deprioritized.
+ */
+export const fetchVolunteerSuggestions = async ({ skills, customSkill, groupSize, district, location }) => {
     try {
-        const { data, error } = await supabase.from('volunteers').insert({
-            name, phone, email: email || null,
-            skills: skills || [], district: district || null,
-            location: location || null,
-            availability_status: 'available',
-        }).select().single();
-
-        if (error) throw error;
-        return { success: true, volunteer: data };
-    } catch (error) {
-        console.error('Volunteer registration error:', error);
-        return { success: false, error: error.message || 'Failed to register' };
-    }
-};
-
-const invokeSelfService = async (body) => {
-    try {
-        const { data, error } = await supabase.functions.invoke('volunteer-self-service', { body });
+        const { data, error } = await supabase.functions.invoke('volunteer-suggestions', {
+            body: { skills, customSkill, groupSize, district, location },
+        });
         if (error) throw new Error(error.message || 'Request failed');
         if (data?.error) throw new Error(data.error);
-        return { success: true, ...data };
+        return { success: true, suggestions: data?.suggestions || [] };
     } catch (error) {
-        console.error('volunteer-self-service error:', error);
+        console.error('volunteer-suggestions error:', error);
         return { success: false, error: error.message };
-    }
-};
-
-export const updateVolunteerAvailability = (volunteerId, phone, availabilityStatus) =>
-    invokeSelfService({ action: 'update-availability', volunteerId, phone, availabilityStatus });
-
-export const respondToAssignment = (volunteerId, phone, assignmentId, response) =>
-    invokeSelfService({ action: 'respond-assignment', volunteerId, phone, assignmentId, response });
-
-export const fetchVolunteerAssignments = async (volunteerId) => {
-    try {
-        const { data, error } = await supabase
-            .from('volunteer_assignments').select('*').eq('volunteer_id', volunteerId)
-            .order('proposed_at', { ascending: false });
-        if (error) throw error;
-        return { success: true, data: data || [] };
-    } catch (error) {
-        return { success: false, error: error.message, data: [] };
-    }
-};
-
-export const fetchAllVolunteers = async () => {
-    try {
-        const { data, error } = await supabase.from('volunteers').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-        return { success: true, data: data || [] };
-    } catch (error) {
-        return { success: false, error: error.message, data: [] };
     }
 };

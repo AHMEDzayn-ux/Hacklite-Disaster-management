@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Sri Lanka Disaster Management Platform - Report emergencies, find missing persons, coordinate rescue efforts" />
-    <meta name="theme-color" content="#2563eb" />
+    <meta name="theme-color" content="#f8fafc" />
     
     <!-- Preconnect to Supabase for faster API/storage connections -->
     <link rel="preconnect" href="https://imwsvbyqivsfyomrkppa.supabase.co" crossorigin />
@@ -25,6 +25,13 @@
 
     <!-- Critical CSS will be inlined by Vite -->
     <title>Disaster Management - Sri Lanka</title>
+    <script>
+      // Applied before paint so the correct theme renders immediately (no flash).
+      try {
+        var t = localStorage.getItem('resqlink_theme');
+        if (t === 'dark') document.documentElement.classList.add('dark');
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

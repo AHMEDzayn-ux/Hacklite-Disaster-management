@@ -127,26 +127,24 @@ export const useMissingPersonStore = create((set, get) => ({
         }
     },
 
-    // Mark as found by responder
-    markFoundByResponder: async (id, foundByContact, foundNotes) => {
-        try {
-            const updates = {
-                status: 'Resolved',
-                found_at: new Date().toISOString(),
-                found_by_contact: foundByContact,
-                found_notes: foundNotes,
-                updated_at: new Date().toISOString()
-            };
-            await updateDocument(TABLES.MISSING_PERSONS, id, updates);
-            set((state) => ({
-                missingPersons: state.missingPersons.map(person =>
-                    person.id === id ? { ...person, ...updates } : person
-                )
-            }));
-        } catch (error) {
-            set({ error: error.message });
-            throw error;
-        }
+    /**
+     * Patch a case locally after the resolve-missing-person edge function has
+     * closed it server-side.
+     *
+     * There is deliberately no store action that closes a case by writing to
+     * the table: closing one notifies the reporter by SMS, and that has to go
+     * through the function so the closure text is screened for payment demands
+     * and the reporter's phone number stays server-side. See
+     * features/missing-persons/services/missingPersonResolutionService.js.
+     */
+    applyCaseResolution: (id, resolution) => {
+        set((state) => ({
+            missingPersons: state.missingPersons.map(person =>
+                person.id === id
+                    ? { ...person, status: 'Resolved', ...resolution }
+                    : person
+            )
+        }));
     },
 }));
 

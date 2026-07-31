@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { IconMap, IconMapPin, IconInfo } from '@/components/icons/Icons';
 
 /**
@@ -8,9 +8,19 @@ import { IconMap, IconMapPin, IconInfo } from '@/components/icons/Icons';
  */
 function LocationPicker({ value, onChange, label = "Location", required = false, error }) {
     const [showMap, setShowMap] = useState(false);
-    const [position, setPosition] = useState(null);
+    const [position, setPosition] = useState(value?.lat && value?.lng ? { lat: value.lat, lng: value.lng } : null);
     const [mapInstance, setMapInstance] = useState(null);
     const [address, setAddress] = useState(value?.address || '');
+    const [geocoding, setGeocoding] = useState(false);
+    const geocodeTimer = useRef(null);
+
+    // Debounced geocode of typed addresses via Nominatim (free, no API key,
+    // matches the OSM tiles used everywhere else). Without this, the manual
+    // text field - the default entry mode - saved lat/lng as null, so those
+    // reports never appeared as pins on any map view.
+    useEffect(() => {
+        return () => { if (geocodeTimer.current) clearTimeout(geocodeTimer.current); };
+    }, []);
 
     // Get user's current location
     const getCurrentLocation = () => {
@@ -110,15 +120,40 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
         }
     };
 
-    // Manual text input handler
+    // Manual text input handler - resolves the typed address to coordinates
+    // in the background so the report still gets a map pin.
     const handleManualInput = (e) => {
         const text = e.target.value;
         setAddress(text);
-        onChange({
-            address: text,
-            lat: null,
-            lng: null
-        });
+        onChange({ address: text, lat: null, lng: null });
+
+        if (geocodeTimer.current) clearTimeout(geocodeTimer.current);
+        if (!text.trim()) return;
+
+        geocodeTimer.current = setTimeout(async () => {
+            setGeocoding(true);
+            try {
+                const params = new URLSearchParams({
+                    format: 'json',
+                    q: text,
+                    countrycodes: 'lk',
+                    limit: '1',
+                });
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`);
+                const results = await res.json();
+                const hit = results?.[0];
+                if (hit) {
+                    const lat = parseFloat(hit.lat);
+                    const lng = parseFloat(hit.lon);
+                    setPosition({ lat, lng });
+                    onChange({ address: text, lat, lng });
+                }
+            } catch (err) {
+                console.error('Geocoding failed:', err);
+            } finally {
+                setGeocoding(false);
+            }
+        }, 700);
     };
 
     return (
@@ -171,7 +206,12 @@ function LocationPicker({ value, onChange, label = "Location", required = false,
             )}
 
             {/* Display Coordinates */}
-            {position?.lat && position?.lng && (
+            {geocoding ? (
+                <div className="flex items-center gap-1.5 mt-2 p-2 bg-white/5 border border-white/10 text-slate-400 rounded text-sm">
+                    <IconMapPin className="h-4 w-4 flex-shrink-0 animate-pulse" />
+                    Locating address...
+                </div>
+            ) : position?.lat && position?.lng && (
                 <div className="flex items-center gap-1.5 mt-2 p-2 bg-success-500/10 border border-success-400/30 text-success-300 rounded text-sm">
                     <IconMapPin className="h-4 w-4 flex-shrink-0" />
                     Coordinates: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}

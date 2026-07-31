@@ -562,7 +562,9 @@ export const generateAnimalRescues = async (count = 40) => {
       location: location,
       reporter_name: `${FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)]} ${LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]}`,
       contact_number: generatePhone(),
-      status: Math.random() > 0.7 ? "Rescued" : "Pending",
+      // Stored values are Active/Resolved (animal_rescues_status_check).
+      // "Pending"/"Rescued" are only the UI labels for those two states.
+      status: Math.random() > 0.7 ? "Resolved" : "Active",
       photo: getRandomPhoto(ANIMAL_PHOTOS[animalType]),
     };
 
